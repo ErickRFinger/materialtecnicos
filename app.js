@@ -453,18 +453,18 @@ document.addEventListener("DOMContentLoaded", () => {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21.2 15c.7-1.2 1-2.5.7-3.9-.6-2-2.4-3.5-4.4-3.5h-1.2c-.7-3-3.2-5.2-6.2-5.6-3-.3-5.9 1.3-7.3 4-1.2 2.5-1 5.4.5 7.6M22 10V6h-4"></path>
               </svg>
-              Vídeo na Nuvem
+              Vídeo em Nuvem
             </span>
-            <button class="watch-btn">Abrir no Drive</button>
+            <button class="watch-btn">Assistir</button>
           </div>
         </div>
       `;
 
-      // Evento para abrir o link do Drive
+      // Evento para abrir o player de vídeo
       const actionBtn = card.querySelector(".watch-btn");
       const playBtn = card.querySelector(".play-overlay-btn");
       
-      const triggerWatch = () => window.open("https://drive.google.com/drive/folders/1xOX1e0IQKu_C5EEWF-2UzShTGpoxvVuc?usp=sharing", "_blank");
+      const triggerWatch = () => openVideoPlayer(video);
       actionBtn.addEventListener("click", triggerWatch);
       playBtn.addEventListener("click", triggerWatch);
 
@@ -703,7 +703,11 @@ document.addEventListener("DOMContentLoaded", () => {
       accordion.querySelectorAll(".related-video-chip").forEach(chip => {
         chip.addEventListener("click", (e) => {
           e.stopPropagation(); // Evita abrir/fechar accordion
-          window.open("https://drive.google.com/drive/folders/1xOX1e0IQKu_C5EEWF-2UzShTGpoxvVuc?usp=sharing", "_blank");
+          const vId = chip.getAttribute("data-video-id");
+          const videoObj = VIGI_DATA.videos.find(v => v.id === vId);
+          if (videoObj) {
+            openVideoPlayer(videoObj);
+          }
         });
       });
 
@@ -983,80 +987,64 @@ document.addEventListener("DOMContentLoaded", () => {
     const container = document.createElement("div");
     container.className = "video-player-container";
     
-    // Criar elemento de vídeo nativo HTML5
-    const video = document.createElement("video");
-    video.src = videoData.caminho;
-    video.autoplay = true;
-    video.controls = true;
-    
-    // Controles customizados extras
+    // Verifica se possui o link do drive
+    if (videoData.driveUrl && videoData.driveUrl.trim() !== "") {
+      
+      const spinner = document.createElement("div");
+      spinner.className = "iframe-spinner";
+      container.appendChild(spinner);
+      
+      const iframe = document.createElement("iframe");
+
+      
+      // Converte o link de "view" do Google Drive para "preview" para forçar o player embutido
+      let embedUrl = videoData.driveUrl;
+      if (embedUrl.includes("/view")) {
+        embedUrl = embedUrl.replace("/view", "/preview");
+      }
+      
+      iframe.src = embedUrl;
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.style.border = "none";
+      iframe.allow = "autoplay";
+      iframe.onload = () => {
+        if(container.contains(spinner)) container.removeChild(spinner);
+      };
+      
+      container.appendChild(iframe);
+    } else {
+      // Mensagem de fallback caso não tenha a URL cadastrada no data.js
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: white; padding: 20px; text-align: center;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; color: var(--color-danger);">
+            <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <h3 style="margin-bottom: 8px;">Vídeo não configurado</h3>
+          <p style="color: var(--text-muted); font-size: 14px; max-width: 400px; line-height: 1.5;">
+            Este vídeo ainda não possui um link individual do Google Drive configurado no arquivo <code>data.js</code>. <br><br>
+            Edite a propriedade <code>driveUrl</code> do vídeo <b>${videoData.id}</b> para habilitar o reprodutor.
+          </p>
+        </div>
+      `;
+    }
+
     const customControls = document.createElement("div");
     customControls.className = "video-custom-controls";
-    
     customControls.innerHTML = `
       <div class="video-controls-left">
         <span>Categoria: <strong>${videoData.categoria}</strong></span>
         <span>Marca: <strong>${videoData.marca}</strong></span>
       </div>
       <div class="video-controls-right" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-        <button id="btnVoltar10" class="filter-btn" style="padding: 6px 12px; font-size: 13px; border-radius: 12px;">⏪ -10s</button>
-        <button id="btnAvancar10" class="filter-btn" style="padding: 6px 12px; font-size: 13px; border-radius: 12px;">+10s ⏩</button>
-        <button id="btnPiP" class="filter-btn" style="padding: 6px 12px; font-size: 13px; border-radius: 12px;">📺 PiP</button>
-        
-        <div style="display: flex; align-items: center; margin-left: 4px;">
-          <label for="videoSpeed" style="font-size:12px; color:var(--text-muted); margin-right:8px;">Velocidade:</label>
-          <select id="videoSpeed" class="speed-select" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px; font-family: var(--font-family); font-size: 13px;">
-            <option value="0.5">0.5x</option>
-            <option value="1.0" selected>Normal</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.5x</option>
-            <option value="2.0">2.0x</option>
-          </select>
-        </div>
+         <span style="font-size: 12px; color: var(--text-muted);">Reprodutor Integrado do Google Drive</span>
       </div>
     `;
 
-    container.appendChild(video);
     modalBody.appendChild(container);
     modalBody.appendChild(customControls);
-    
-    // Evento de alteração de velocidade
-    const speedSelect = customControls.querySelector("#videoSpeed");
-    speedSelect.addEventListener("change", (e) => {
-      video.playbackRate = parseFloat(e.target.value);
-    });
-
-    const btnVoltar10 = customControls.querySelector("#btnVoltar10");
-    const btnAvancar10 = customControls.querySelector("#btnAvancar10");
-    const btnPiP = customControls.querySelector("#btnPiP");
-
-    if (btnVoltar10) {
-      btnVoltar10.addEventListener("click", () => {
-        video.currentTime = Math.max(0, video.currentTime - 10);
-      });
-    }
-    if (btnAvancar10) {
-      btnAvancar10.addEventListener("click", () => {
-        video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
-      });
-    }
-    if (btnPiP) {
-      if (document.pictureInPictureEnabled && !video.disablePictureInPicture) {
-        btnPiP.addEventListener("click", async () => {
-          try {
-            if (document.pictureInPictureElement) {
-              await document.exitPictureInPicture();
-            } else {
-              await video.requestPictureInPicture();
-            }
-          } catch (err) {
-            console.error("Picture-in-Picture error:", err);
-          }
-        });
-      } else {
-        btnPiP.style.display = "none";
-      }
-    }
 
     openModal();
   }
@@ -1781,4 +1769,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // DISPARO
   init();
+
+  // --- LÓGICA DA BUSCA GLOBAL ---
+  const globalSearch = document.getElementById("globalSearch");
+  if (globalSearch) {
+    globalSearch.addEventListener("input", (e) => {
+      const termo = e.target.value.toLowerCase().trim();
+      
+      const videoCards = document.querySelectorAll(".video-card");
+      videoCards.forEach(card => {
+        const title = card.querySelector(".video-title").textContent.toLowerCase();
+        const desc = card.querySelector(".video-desc").textContent.toLowerCase();
+        if (title.includes(termo) || desc.includes(termo)) card.style.display = "flex";
+        else card.style.display = "none";
+      });
+
+      const arteCards = document.querySelectorAll(".art-card");
+      arteCards.forEach(card => {
+        const title = card.querySelector(".art-title").textContent.toLowerCase();
+        if (title.includes(termo)) card.style.display = "flex";
+        else card.style.display = "none";
+      });
+
+      const guideCards = document.querySelectorAll(".guide-card");
+      guideCards.forEach(card => {
+        const title = card.querySelector(".guide-title").textContent.toLowerCase();
+        const desc = card.querySelector(".guide-desc") ? card.querySelector(".guide-desc").textContent.toLowerCase() : "";
+        if (title.includes(termo) || desc.includes(termo)) card.style.display = "flex";
+        else card.style.display = "none";
+      });
+    });
+  }
+
 });
