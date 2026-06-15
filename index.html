@@ -169,136 +169,86 @@
 
       <!-- ABA: INÍCIO (DASHBOARD) -->
       <section id="dashboard" class="content-section active">
-        <div class="section-header">
-          <h1 class="section-title">Painel de Suporte</h1>
-          <p class="section-subtitle">Tudo o que você precisa para realizar seu trabalho com excelência e sem improvisos.</p>
+
+        <!-- Saudação + logo -->
+        <div class="dash-greeting">
+          <div class="dash-greeting-text">
+            <span class="dash-hello">Olá, técnico! 👋</span>
+            <h1 class="dash-title">O que você precisa hoje?</h1>
+          </div>
+          <img src="VIGI.png" alt="VIGI" class="dash-logo-mini">
         </div>
 
-        <div class="welcome-banner">
-          <h2>Bem-vindo ao Portal de Conhecimento VIGI</h2>
-          <p>Esta plataforma centraliza todos os vídeos tutoriais, manuais simplificados e materiais informativos. Use a busca acima para encontrar soluções rápidas de campo ou navegue pelas abas ao lado.</p>
-        </div>
+        <!-- Acesso rápido: blocos grandes, fáceis de tocar -->
+        <div class="dash-quick-grid">
 
-        <!-- Estatísticas -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon alarme">🚨</div>
-            <div>
-              <div class="stat-number" id="count-alarme">0</div>
-              <div class="stat-label">Alarmes</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon hik">🔴</div>
-            <div>
-              <div class="stat-number" id="count-hik">0</div>
-              <div class="stat-label">Hikvision</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon unv">🟢</div>
-            <div>
-              <div class="stat-number" id="count-unv">0</div>
-              <div class="stat-label">Uniview</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon tec">🛠️</div>
-            <div>
-              <div class="stat-number" id="count-tec">0</div>
-              <div class="stat-label">Guias & Leis</div>
-            </div>
-          </div>
-        </div>
+          <button class="dash-quick-btn dash-btn-videos" data-target-tab="videos">
+            <span class="dash-quick-icon">🎬</span>
+            <span class="dash-quick-label">Vídeos</span>
+            <span class="dash-quick-sub">Tutoriais de suporte</span>
+          </button>
 
-        <!-- Painéis de Detalhes -->
-        <div class="dashboard-details-grid">
-          
-          <div class="quick-links-panel">
-            <h3 class="panel-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-              Acesso Rápido a Tarefas Frequentes
-            </h3>
-            <div class="shortcuts-grid">
-              <button class="shortcut-btn" data-target-guide="man-1">
-                <span class="shortcut-title">Configurar DVR do Zero</span>
-                <span class="shortcut-desc">Passo a passo com boas práticas de rede e nuvem.</span>
-              </button>
-              <button class="shortcut-btn" data-target-guide="man-2">
-                <span class="shortcut-title">Atualização Segura de DVR</span>
-                <span class="shortcut-desc">Como evitar queimar a placa do aparelho.</span>
-              </button>
-              <button class="shortcut-btn" data-target-guide="man-3">
-                <span class="shortcut-title">Ativação de Central Intelbras</span>
-                <span class="shortcut-desc">Passos cruciais de teste de sinal e cadastro.</span>
-              </button>
-              <button class="shortcut-btn" data-target-tab="artes">
-                <span class="shortcut-title">Tabela de Preços e Adicionais</span>
-                <span class="shortcut-desc">Acesse valores de sensores e câmeras ColorVu.</span>
-              </button>
-            </div>
-          </div>
+          <button class="dash-quick-btn dash-btn-artes" data-target-tab="artes">
+            <span class="dash-quick-icon">🖼️</span>
+            <span class="dash-quick-label">Artes & Tabelas</span>
+            <span class="dash-quick-sub">Preços e informativos</span>
+          </button>
 
-          <div class="daily-tip-panel">
-            <div class="tip-header">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg>
-              Dica contra o "Jeitinho"
-            </div>
-            <p class="tip-content">
-              Nunca saia do cliente sem conferir se o fuso horário do gravador está configurado para <strong>GMT -03:00 Brasília</strong>. Caso a hora fique incorreta, o cliente não conseguirá buscar gravações antigas e o suporte precisará retornar ao local!
-            </p>
-          </div>
+          <button class="dash-quick-btn dash-btn-manuais" data-target-tab="manuais">
+            <span class="dash-quick-icon">📋</span>
+            <span class="dash-quick-label">Guias & Checklists</span>
+            <span class="dash-quick-sub">Passo a passo</span>
+          </button>
+
+          <button class="dash-quick-btn dash-btn-solicitar" data-target-tab="solicitacoes">
+            <span class="dash-quick-icon">💬</span>
+            <span class="dash-quick-label">Solicitar Material</span>
+            <span class="dash-quick-sub">Pedir novo conteúdo</span>
+          </button>
+
+          <button class="dash-quick-btn dash-btn-cert" data-target-tab="treinamento">
+            <span class="dash-quick-icon">🎓</span>
+            <span class="dash-quick-label">Certificação</span>
+            <span class="dash-quick-sub">Treinamento técnico</span>
+          </button>
 
         </div>
 
-        <!-- Painéis Secundários (Favoritos & Histórico de Atualizações) -->
-        <div class="dashboard-secondary-grid" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; margin-top: 32px;">
-          
-          <!-- Meus Favoritos -->
-          <div class="quick-links-panel" id="favoritesPanel">
-            <h3 class="panel-title" style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-              <span style="color: #f59e0b; font-size: 18px;">⭐</span>
-              Meus Favoritos (Acesso Rápido)
-            </h3>
-            <div id="favoritesList" class="favorites-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
-              <!-- Injetado dinamicamente via JS -->
-            </div>
+        <!-- Estatísticas compactas -->
+        <div class="dash-stats-strip">
+          <div class="dash-stat-item">
+            <span class="dash-stat-num" id="count-alarme">0</span>
+            <span class="dash-stat-lbl">🚨 Alarme</span>
           </div>
-          
-          <!-- Feed de Atualizações -->
-          <div class="daily-tip-panel" style="border-left-color: var(--color-primary);">
-            <div class="tip-header" style="color: var(--color-primary); display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 18px;">🔔</span>
-              Feed de Atualizações do Portal
-            </div>
-            <div class="update-timeline" style="display: flex; flex-direction: column; gap: 14px; margin-top: 18px; max-height: 220px; overflow-y: auto;">
-              <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                <span style="color: var(--color-primary); font-size: 12px; font-weight: 700; white-space: nowrap;">Hoje</span>
-                <span style="font-size: 13px; color: var(--text-main);">Disponibilizado o manual de <strong>Aplicativos PC</strong> reformulado.</span>
-              </div>
-              <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                <span style="color: var(--text-muted); font-size: 12px; font-weight: 700; white-space: nowrap;">Ontem</span>
-                <span style="font-size: 13px; color: var(--text-main);">Adicionado o manual com checklist da <strong>Central de Alarme Intelbras</strong>.</span>
-              </div>
-              <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                <span style="color: var(--text-muted); font-size: 12px; font-weight: 700; white-space: nowrap;">05 Jun</span>
-                <span style="font-size: 13px; color: var(--text-main);">Novo vídeo tutorial: <strong>Reset Físico e Configuração de Fábrica DVR Hikvision</strong>.</span>
-              </div>
-              <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                <span style="color: var(--text-muted); font-size: 12px; font-weight: 700; white-space: nowrap;">01 Jun</span>
-                <span style="font-size: 13px; color: var(--text-main);">Arte atualizada: <strong>Tabelas de Sensores de Alarme Sem Fio</strong>.</span>
-              </div>
-            </div>
+          <div class="dash-stat-sep"></div>
+          <div class="dash-stat-item">
+            <span class="dash-stat-num" id="count-hik">0</span>
+            <span class="dash-stat-lbl">🔴 Hikvision</span>
           </div>
-          
+          <div class="dash-stat-sep"></div>
+          <div class="dash-stat-item">
+            <span class="dash-stat-num" id="count-unv">0</span>
+            <span class="dash-stat-lbl">🟢 Uniview</span>
+          </div>
+          <div class="dash-stat-sep"></div>
+          <div class="dash-stat-item">
+            <span class="dash-stat-num" id="count-tec">0</span>
+            <span class="dash-stat-lbl">🛠️ Guias</span>
+          </div>
         </div>
+
+        <!-- Dica rápida -->
+        <div class="dash-tip">
+          <span class="dash-tip-icon">💡</span>
+          <p><strong>Dica:</strong> Nunca saia do cliente sem conferir se o fuso horário do gravador está em <strong>GMT -03:00 Brasília</strong>. Hora errada = cliente sem conseguir buscar gravação!</p>
+        </div>
+
+        <!-- Favoritos (mantido) -->
+        <div id="favoritesPanel" class="dash-favorites-panel" style="display:none;">
+          <h3 class="dash-fav-title">⭐ Favoritos</h3>
+          <div id="favoritesList" class="favorites-grid"></div>
+        </div>
+
       </section>
 
       <!-- ABA: VÍDEOS DE SUPORTE -->
@@ -405,100 +355,109 @@
       <section id="solicitacoes" class="content-section">
         <div class="section-header">
           <h1 class="section-title">Solicitação de Novo Material</h1>
-          <p class="section-subtitle">Sentiu falta de algum vídeo, imagem ou manual explicativo? Peça aqui e a comunidade de técnicos apoiará a gravação!</p>
+          <p class="section-subtitle">Sentiu falta de algum vídeo, imagem ou manual? Abra uma solicitação e acompanhe o progresso em tempo real no quadro abaixo.</p>
         </div>
 
-        <!-- Dashboard de Métricas de Solicitação -->
-        <div class="requests-stats-dashboard">
-          <div class="req-stat-card">
-            <div class="req-stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--color-primary);">📁</div>
-            <div>
-              <div class="req-stat-number" id="req-count-total">0</div>
-              <div class="req-stat-label">Total Solicitado</div>
-            </div>
+        <!-- Formulário compacto (toggle) -->
+        <div class="kanban-form-bar">
+          <button class="kanban-new-btn" id="toggleKanbanForm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova Solicitação
+          </button>
+          <div class="kanban-stats">
+            <span class="k-stat" id="req-count-total">0 total</span>
+            <span class="k-stat-sep">·</span>
+            <span class="k-stat k-stat-warn" id="req-count-progress">0 em produção</span>
+            <span class="k-stat-sep">·</span>
+            <span class="k-stat k-stat-ok" id="req-count-ready">0 concluídos</span>
           </div>
-          <div class="req-stat-card">
-            <div class="req-stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--color-warning);">🎬</div>
-            <div>
-              <div class="req-stat-number" id="req-count-progress">0</div>
-              <div class="req-stat-label">Em Produção</div>
-            </div>
-          </div>
-          <div class="req-stat-card">
-            <div class="req-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success);">✅</div>
-            <div>
-              <div class="req-stat-number" id="req-count-ready">0</div>
-              <div class="req-stat-label">Disponíveis</div>
-            </div>
-          </div>
-          <div class="req-stat-card">
-            <div class="req-stat-icon" style="background: rgba(139, 92, 246, 0.1); color: var(--color-alarme);">👍</div>
-            <div>
-              <div class="req-stat-number" id="req-count-upvoted">-</div>
-              <div class="req-stat-label">Mais Apoiado</div>
-            </div>
-          </div>
+          <button class="kanban-clear-btn" id="btnClearAll" title="Limpar todas as solicitações">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
+            Limpar Tudo
+          </button>
         </div>
 
-        <div class="request-section-grid">
-          
-          <div class="request-form-panel">
-            <h3 class="panel-title">Formulário de Solicitação</h3>
-            <form id="requestForm">
+        <!-- Painel do formulário (colapsável) -->
+        <div class="kanban-form-panel" id="kanbanFormPanel" style="display:none;">
+          <div class="kanban-form-inner">
+            <h3 class="kanban-form-title">Nova Solicitação de Material</h3>
+            <form id="requestForm" class="kanban-form-grid">
               <div class="form-group">
                 <label class="form-label" for="reqName">Seu Nome *</label>
-                <input type="text" id="reqName" class="form-control" placeholder="Digite seu nome completo" required>
+                <input type="text" id="reqName" class="form-control" placeholder="Nome completo" required>
               </div>
-
               <div class="form-group">
-                <label class="form-label" for="reqTitle">Título do Material Solicitado *</label>
-                <input type="text" id="reqTitle" class="form-control" placeholder="Ex: Como configurar controle remoto na central antiga" required>
+                <label class="form-label" for="reqTitle">Título do Material *</label>
+                <input type="text" id="reqTitle" class="form-control" placeholder="Ex: Como configurar fuso horário no DVR Uniview" required>
               </div>
-
               <div class="form-group">
                 <label class="form-label" for="reqType">Tipo de Conteúdo *</label>
                 <select id="reqType" class="form-control" required>
-                  <option value="" disabled selected>Selecione uma opção...</option>
+                  <option value="" disabled selected>Selecione...</option>
                   <option value="Vídeo Tutorial">Vídeo Tutorial</option>
                   <option value="Manual / Guia Escrito">Manual / Guia Escrito</option>
                   <option value="Tabela / Imagem Informativa">Tabela / Imagem Informativa</option>
                 </select>
               </div>
-
               <div class="form-group">
-                <label class="form-label" for="reqUrgency">Nível de Urgência *</label>
+                <label class="form-label" for="reqUrgency">Urgência *</label>
                 <select id="reqUrgency" class="form-control" required>
-                  <option value="Baixa">Baixa (Dúvida comum, uso esporádico)</option>
-                  <option value="Média" selected>Média (Uso recorrente)</option>
-                  <option value="Alta">Alta (Processo travado ou erro frequente)</option>
+                  <option value="Baixa">🟢 Baixa</option>
+                  <option value="Média" selected>🟡 Média</option>
+                  <option value="Alta">🔴 Alta</option>
                 </select>
               </div>
-
-              <div class="form-group">
-                <label class="form-label" for="reqDesc">Detalhes da Dúvida ou Processo *</label>
-                <textarea id="reqDesc" class="form-control form-control-textarea" placeholder="Descreva qual processo técnico você precisa aprender ou qual dúvida este material deve sanar..." required></textarea>
+              <div class="form-group form-group-full">
+                <label class="form-label" for="reqDesc">Descrição / Detalhes *</label>
+                <textarea id="reqDesc" class="form-control form-control-textarea" placeholder="Descreva o processo técnico ou dúvida que este material deve sanar..." required></textarea>
               </div>
-
-              <button type="submit" class="submit-btn">Enviar Solicitação</button>
+              <div class="form-group form-group-full kanban-form-actions">
+                <button type="button" class="kanban-cancel-btn" id="cancelKanbanForm">Cancelar</button>
+                <button type="submit" class="submit-btn">Enviar Solicitação</button>
+              </div>
             </form>
           </div>
+        </div>
 
-          <div class="requests-list-panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-              <h3 class="panel-title" style="margin: 0;">Solicitações da Comunidade</h3>
-              <span style="font-size: 12px; color: var(--text-muted);">Clique em apoiar nos itens mais importantes.</span>
+        <!-- QUADRO KANBAN -->
+        <div class="kanban-board" id="kanbanBoard">
+
+          <!-- COLUNA: PENDENTE -->
+          <div class="kanban-col" data-status="Pendente">
+            <div class="kanban-col-header kanban-col-pending">
+              <span class="kanban-col-dot"></span>
+              <span class="kanban-col-title">Pendente</span>
+              <span class="kanban-col-count" id="count-Pendente">0</span>
             </div>
-            
-            <div class="requests-cards-grid" id="requestsCardsContainer">
-              <!-- Injetado dinamicamente via JS -->
+            <div class="kanban-cards" id="col-Pendente" data-status="Pendente"></div>
+          </div>
+
+          <!-- COLUNA: EM PRODUÇÃO -->
+          <div class="kanban-col" data-status="Em Gravação">
+            <div class="kanban-col-header kanban-col-production">
+              <span class="kanban-col-dot"></span>
+              <span class="kanban-col-title">Em Produção</span>
+              <span class="kanban-col-count" id="count-Em Gravação">0</span>
             </div>
-            
-            <div class="empty-state" id="tableEmptyState" style="margin-top: 20px;">
-              Nenhuma solicitação enviada ainda.
+            <div class="kanban-cards" id="col-Em Gravação" data-status="Em Gravação"></div>
+          </div>
+
+          <!-- COLUNA: CONCLUÍDO -->
+          <div class="kanban-col" data-status="Pronto">
+            <div class="kanban-col-header kanban-col-done">
+              <span class="kanban-col-dot"></span>
+              <span class="kanban-col-title">Concluído</span>
+              <span class="kanban-col-count" id="count-Pronto">0</span>
             </div>
+            <div class="kanban-cards" id="col-Pronto" data-status="Pronto"></div>
           </div>
 
         </div>
+
+        <div class="empty-state" id="tableEmptyState" style="display:none; margin-top: 20px;">
+          Nenhuma solicitação registrada ainda. Clique em "Nova Solicitação" para começar!
+        </div>
+
       </section>
 
     </main>

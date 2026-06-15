@@ -88,9 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Filtros de vídeo
   const videoFilterBar = document.getElementById("video-filters");
   
-  // Formulário de Solicitação
-  const requestForm = document.getElementById("requestForm");
-  const requestsTableBody = document.getElementById("requestsTableBody");
+  // Formulário de Solicitação (gerenciado dentro de setupEventListeners)
   const tableEmptyState = document.getElementById("tableEmptyState");
   
   // Modal de Mídia
@@ -247,9 +245,43 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Formulário de Solicitação
+    // Formulário de Solicitação (Kanban)
+    const requestForm = document.getElementById("requestForm");
     if (requestForm) {
       requestForm.addEventListener("submit", handleRequestSubmit);
+    }
+
+    // Toggle do formulário de solicitação
+    const toggleBtn  = document.getElementById("toggleKanbanForm");
+    const cancelBtn  = document.getElementById("cancelKanbanForm");
+    const formPanel  = document.getElementById("kanbanFormPanel");
+
+    if (toggleBtn && formPanel) {
+      toggleBtn.addEventListener("click", () => {
+        const isOpen = formPanel.style.display !== "none";
+        formPanel.style.display = isOpen ? "none" : "block";
+        toggleBtn.textContent = isOpen ? "+ Nova Solicitação" : "✕ Fechar";
+        if (!isOpen) {
+          // Re-inject SVG icon when opening
+          toggleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova Solicitação`;
+        }
+      });
+    }
+    if (cancelBtn && formPanel) {
+      cancelBtn.addEventListener("click", () => {
+        formPanel.style.display = "none";
+        if (requestForm) requestForm.reset();
+      });
+    }
+
+    // Limpar todas as solicitações
+    const clearAllBtn = document.getElementById("btnClearAll");
+    if (clearAllBtn) {
+      clearAllBtn.addEventListener("click", () => {
+        if (!confirm("Deseja remover TODAS as solicitações? Esta ação não pode ser desfeita.")) return;
+        localStorage.removeItem("vigi_requests");
+        loadRequests();
+      });
     }
 
     // Fechamento de Modal
@@ -822,221 +854,213 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================================
   // SOLICITAÇÃO DE MATERIAIS (PERSISTÊNCIA LOCAL)
   // ==========================================================================
+  // ==========================================================================
+  // KANBAN - SISTEMA DE SOLICITAÇÕES
+  // ==========================================================================
+
+  const KANBAN_KEY = "vigi_requests";
+  const STATUSES   = ["Pendente", "Em Gravação", "Pronto"];
+
+  // Mock inicial para primeira visita
+  function seedMocks() {
+    return [
+      { id:"req-mock-1", nome:"Guilherme Silva", titulo:"Reset físico central Intelbras ANM 24 NET", tipo:"Vídeo Tutorial", urgencia:"Alta", status:"Em Gravação", data:"05/06/2026", upvotes:24, descricao:"Procedimento passo a passo para fazer o reset físico da central Intelbras modelo ANM 24 NET em campo.", adminReply:"Material em produção na bancada técnica. Previsão de publicação: Quarta-feira (10/06)." },
+      { id:"req-mock-2", nome:"Diego Souza", titulo:"Esquema de ligação de sensores sem fio", tipo:"Tabela / Imagem Informativa", urgencia:"Média", status:"Pronto", data:"01/06/2026", upvotes:12, descricao:"Tabela com especificações técnicas de distância de cada sensor de presença sem fio.", adminReply:"Disponível na aba Artes & Tabelas." },
+      { id:"req-mock-3", nome:"Carlos Oliveira", titulo:"Configurar fuso horário e NTP no DVR Uniview", tipo:"Vídeo Tutorial", urgencia:"Alta", status:"Pronto", data:"07/06/2026", upvotes:18, descricao:"Muitos clientes reclamam de fuso horário incorreto em Uniview, causando falhas na busca remota.", adminReply:"Disponível no Guia de Reset e Configuração Básica de DVR (Passo 3)." },
+      { id:"req-mock-4", nome:"Felipe Rodrigues", titulo:"Como utilizar o aplicativo Hik-Connect", tipo:"Vídeo Tutorial", urgencia:"Alta", status:"Pendente", data:"04/06/2026", upvotes:31, descricao:"Download, criação da conta e adição de dispositivo por QR Code no Hik-Connect." }
+    ];
+  }
+
+  function getRequests() {
+    const raw = localStorage.getItem(KANBAN_KEY);
+    if (!raw) {
+      const mocks = seedMocks();
+      localStorage.setItem(KANBAN_KEY, JSON.stringify(mocks));
+      return mocks;
+    }
+    return JSON.parse(raw);
+  }
+
+  function saveRequests(list) {
+    localStorage.setItem(KANBAN_KEY, JSON.stringify(list));
+  }
+
   function handleRequestSubmit(e) {
     e.preventDefault();
-    
-    const name = document.getElementById("reqName").value.trim();
-    const title = document.getElementById("reqTitle").value.trim();
-    const type = document.getElementById("reqType").value;
+    const name    = document.getElementById("reqName").value.trim();
+    const title   = document.getElementById("reqTitle").value.trim();
+    const type    = document.getElementById("reqType").value;
     const urgency = document.getElementById("reqUrgency").value;
-    const desc = document.getElementById("reqDesc").value.trim();
+    const desc    = document.getElementById("reqDesc").value.trim();
+    if (!name || !title || !type || !urgency || !desc) { alert("Preencha todos os campos."); return; }
 
-    if (!name || !title || !type || !urgency || !desc) {
-      alert("Por favor, preencha todos os campos obrigatórios.");
-      return;
-    }
+    const newReq = { id:"req-"+Date.now(), nome:name, titulo:title, tipo:type, urgencia:urgency, descricao:desc, status:"Pendente", data:new Date().toLocaleDateString("pt-BR"), upvotes:0 };
+    const list = getRequests();
+    list.unshift(newReq);
+    saveRequests(list);
 
-    const newRequest = {
-      id: "req-" + Date.now(),
-      nome: name,
-      titulo: title,
-      tipo: type,
-      urgencia: urgency,
-      descricao: desc,
-      status: "Pendente", // Pendente -> Em Gravação -> Pronto
-      data: new Date().toLocaleDateString("pt-BR")
-    };
-
-    // Salvar no localstorage
-    const currentRequests = JSON.parse(localStorage.getItem("vigi_requests") || "[]");
-    currentRequests.unshift(newRequest); // Inserir no topo
-    localStorage.setItem("vigi_requests", JSON.stringify(currentRequests));
-
-    // Feedback visual
     const submitBtn = requestForm.querySelector(".submit-btn");
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = "Solicitado com Sucesso! ✓";
-    submitBtn.style.backgroundColor = "var(--color-success)";
+    const orig = submitBtn.textContent;
+    submitBtn.textContent = "Enviado! ✓";
+    submitBtn.style.background = "var(--color-success)";
     submitBtn.disabled = true;
+    setTimeout(() => { submitBtn.textContent = orig; submitBtn.style.background = ""; submitBtn.disabled = false; }, 2000);
 
-    setTimeout(() => {
-      submitBtn.textContent = originalText;
-      submitBtn.style.backgroundColor = "var(--color-primary)";
-      submitBtn.disabled = false;
-    }, 2000);
-
-    // Reset do form e recarregar lista
     requestForm.reset();
+    // Fechar formulário
+    const panel = document.getElementById("kanbanFormPanel");
+    if (panel) panel.style.display = "none";
     loadRequests();
   }
 
   function loadRequests() {
-    const requestsCardsContainer = document.getElementById("requestsCardsContainer");
-    if (!requestsCardsContainer) return;
-    requestsCardsContainer.innerHTML = "";
+    const list = getRequests();
 
-    const requests = JSON.parse(localStorage.getItem("vigi_requests") || "[]");
+    // Atualizar stats na barra
+    const totalEl    = document.getElementById("req-count-total");
+    const progressEl = document.getElementById("req-count-progress");
+    const readyEl    = document.getElementById("req-count-ready");
+    if (totalEl)    totalEl.textContent    = list.length + " total";
+    if (progressEl) progressEl.textContent = list.filter(r=>r.status==="Em Gravação").length + " em produção";
+    if (readyEl)    readyEl.textContent    = list.filter(r=>r.status==="Pronto").length + " concluídos";
 
-    // Adiciona alguns mocks de requisições iniciais caso esteja vazio, para simular realismo no portal
-    if (requests.length === 0) {
-      const defaultMocks = [
-        {
-          id: "req-mock-1",
-          nome: "Guilherme Silva",
-          titulo: "Reset físico central Intelbras ANM 24 NET",
-          tipo: "Vídeo Tutorial",
-          urgencia: "Alta",
-          status: "Em Gravação",
-          data: "05/06/2026",
-          upvotes: 24,
-          descricao: "Procedimento passo a passo para fazer o reset físico da central Intelbras modelo ANM 24 NET em campo.",
-          adminReply: "Material em produção na bancada técnica. Previsão de publicação: Quarta-feira (10/06)."
-        },
-        {
-          id: "req-mock-2",
-          nome: "Diego Souza",
-          titulo: "Esquema de ligação de sensores de alarme sem fio",
-          tipo: "Tabela / Imagem Informativa",
-          urgencia: "Média",
-          status: "Pronto",
-          data: "01/06/2026",
-          upvotes: 12,
-          descricao: "Tabela contendo os valores e especificações técnicas de distância de cada sensor de presença sem fio.",
-          adminReply: "Tabela oficial disponível na aba Artes & Tabelas com o nome de Valores de Sensores de Alarme Sem Fio.",
-          linkMaterial: { type: "arte", id: "art-9" }
-        },
-        {
-          id: "req-mock-3",
-          nome: "Carlos Oliveira",
-          titulo: "Como configurar fuso horário e NTP no DVR Uniview",
-          tipo: "Vídeo Tutorial",
-          urgencia: "Alta",
-          status: "Pronto",
-          data: "07/06/2026",
-          upvotes: 18,
-          descricao: "Muitos clientes reclamam de fuso horário incorreto em Uniview, causando falhas na busca de gravações remota.",
-          adminReply: "Passo a passo disponível no Guia de Reset e Configuração Básica de DVR (Passo 3: Ajuste de Data/Hora/NTP).",
-          linkMaterial: { type: "manual", id: "man-1" }
-        },
-        {
-          id: "req-mock-4",
-          nome: "Felipe Rodrigues",
-          titulo: "Como utilizar o aplicativo Hik-Connect",
-          tipo: "Vídeo Tutorial",
-          urgencia: "Alta",
-          status: "Pronto",
-          data: "04/06/2026",
-          upvotes: 31,
-          descricao: "Passo a passo completo mostrando o download, criação da conta e adição de dispositivo por QR Code no aplicativo Hik-Connect.",
-          adminReply: "Vídeo tutorial publicado com sucesso! Acesse a aba de vídeos para assistir.",
-          linkMaterial: { type: "video", id: "v-hik-7" }
-        }
-      ];
-      localStorage.setItem("vigi_requests", JSON.stringify(defaultMocks));
-      loadRequests();
+    // Limpar colunas
+    STATUSES.forEach(s => {
+      const col = document.getElementById("col-"+s);
+      if (col) col.innerHTML = "";
+      const cnt = document.getElementById("count-"+s);
+      if (cnt) cnt.textContent = list.filter(r=>r.status===s).length;
+    });
+
+    if (list.length === 0) {
+      const empty = document.getElementById("tableEmptyState");
+      if (empty) empty.style.display = "block";
       return;
     }
+    const empty = document.getElementById("tableEmptyState");
+    if (empty) empty.style.display = "none";
 
-    // Ordenar por upvotes decrescente
-    requests.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
+    // Renderizar cada card na coluna correta
+    list.forEach(req => {
+      const col = document.getElementById("col-"+req.status);
+      if (!col) return;
 
-    // Atualizar Dashboard de Métricas
-    const totalCount = requests.length;
-    const progressCount = requests.filter(r => r.status === "Em Gravação").length;
-    const readyCount = requests.filter(r => r.status === "Pronto").length;
-    
-    let mostUpvotedTitle = "-";
-    if (requests.length > 0) {
-      mostUpvotedTitle = requests[0].titulo;
-      if (mostUpvotedTitle.length > 25) {
-        mostUpvotedTitle = mostUpvotedTitle.substring(0, 25) + "...";
-      }
-    }
+      const urgClass = { Alta:"urg-alta", Média:"urg-media", Media:"urg-media", Baixa:"urg-baixa" }[req.urgencia] || "urg-media";
+      const isVoted  = localStorage.getItem("vigi_voted_"+req.id) === "true";
 
-    const reqTotalEl = document.getElementById("req-count-total");
-    const reqProgressEl = document.getElementById("req-count-progress");
-    const reqReadyEl = document.getElementById("req-count-ready");
-    const reqUpvotedEl = document.getElementById("req-count-upvoted");
+      // Botões de mover
+      const statusIdx = STATUSES.indexOf(req.status);
+      const movePrev  = statusIdx > 0 ? `<button class="kanban-move-btn" data-move="${req.id}" data-dir="-1">← Voltar</button>` : "";
+      const moveNext  = statusIdx < STATUSES.length-1 ? `<button class="kanban-move-btn" data-move="${req.id}" data-dir="1">Avançar →</button>` : "";
 
-    if (reqTotalEl) reqTotalEl.textContent = totalCount;
-    if (reqProgressEl) reqProgressEl.textContent = progressCount;
-    if (reqReadyEl) reqReadyEl.textContent = readyCount;
-    if (reqUpvotedEl) {
-      reqUpvotedEl.textContent = mostUpvotedTitle;
-      reqUpvotedEl.title = requests[0] ? requests[0].titulo : "";
-      reqUpvotedEl.style.fontSize = "14px";
-      reqUpvotedEl.style.whiteSpace = "nowrap";
-      reqUpvotedEl.style.overflow = "hidden";
-      reqUpvotedEl.style.textOverflow = "ellipsis";
-    }
-
-    tableEmptyState.style.display = requests.length > 0 ? "none" : "block";
-
-    requests.forEach(req => {
       const card = document.createElement("div");
-      card.className = "request-card";
-      
-      const isVoted = localStorage.getItem(`vigi_voted_${req.id}`) === "true";
-      const urgencyClass = req.urgencia.toLowerCase().replace("é", "e");
-
-      // Timeline HTML
-      let timelineHtml = "";
-      if (req.status === "Pendente") {
-        timelineHtml = `
-          <div class="status-timeline">
-            <div class="timeline-step active"><span class="timeline-dot"></span>Recebido</div>
-            <div class="timeline-step"><span class="timeline-dot"></span>Produção</div>
-            <div class="timeline-step"><span class="timeline-dot"></span>Publicado</div>
-          </div>
-        `;
-      } else if (req.status === "Em Gravação") {
-        timelineHtml = `
-          <div class="status-timeline">
-            <div class="timeline-step completed"><span class="timeline-dot"></span>Recebido</div>
-            <div class="timeline-step active"><span class="timeline-dot"></span>Produção</div>
-            <div class="timeline-step"><span class="timeline-dot"></span>Publicado</div>
-          </div>
-        `;
-      } else if (req.status === "Pronto") {
-        timelineHtml = `
-          <div class="status-timeline">
-            <div class="timeline-step completed"><span class="timeline-dot"></span>Recebido</div>
-            <div class="timeline-step completed"><span class="timeline-dot"></span>Produção</div>
-            <div class="timeline-step completed"><span class="timeline-dot"></span>Publicado</div>
-          </div>
-        `;
-      }
+      card.className = "kanban-card";
+      card.setAttribute("draggable", "true");
+      card.setAttribute("data-id", req.id);
+      card.setAttribute("data-status", req.status);
 
       card.innerHTML = `
-        <div class="request-card-header">
-          <span class="request-card-type-tag">${req.tipo}</span>
-          <span class="urgency-badge urgency-${urgencyClass}">${req.urgencia}</span>
+        <div class="kanban-card-header">
+          <span class="kanban-card-type">${req.tipo}</span>
+          <span class="kanban-urgency ${urgClass}">${req.urgencia}</span>
+          <button class="kanban-delete-btn" data-delete="${req.id}" title="Excluir">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
-        <h4 class="request-card-title">${req.titulo}</h4>
-        <p class="request-card-desc">${req.descricao}</p>
-        ${req.adminReply ? `
-          <div class="admin-reply-bubble">
-            <strong>Suporte VIGI:</strong> ${req.adminReply}
-          </div>
-        ` : ""}
-        <div class="request-card-footer">
-          <div style="display: flex; gap: 10px;">
-            <button class="upvote-btn ${isVoted ? 'active' : ''}" data-id="${req.id}">
-              👍 <span>${req.upvotes || 0}</span> Apoiar
-            </button>
-            ${req.status === "Pronto" && req.linkMaterial ? `
-              <button class="access-material-btn" data-id="${req.id}">
-                Acessar Material
-              </button>
-            ` : ""}
-          </div>
-          ${timelineHtml}
+        <h4 class="kanban-card-title">${req.titulo}</h4>
+        <p class="kanban-card-desc">${req.descricao}</p>
+        ${req.adminReply ? `<div class="kanban-admin-reply"><strong>VIGI:</strong> ${req.adminReply}</div>` : ""}
+        <div class="kanban-card-footer">
+          <div class="kanban-move-btns">${movePrev}${moveNext}</div>
+          <button class="kanban-upvote-btn ${isVoted?'active':''}" data-upvote="${req.id}">
+            👍 <span>${req.upvotes||0}</span>
+          </button>
         </div>
-        <div class="request-card-user">Solicitado por ${req.nome} em ${req.data}</div>
+        <div class="kanban-card-user">Por ${req.nome} · ${req.data}</div>
       `;
 
-      requestsCardsContainer.appendChild(card);
+      // Drag & Drop
+      card.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", req.id);
+        setTimeout(()=>card.classList.add("dragging"), 0);
+      });
+      card.addEventListener("dragend", () => card.classList.remove("dragging"));
+
+      col.appendChild(card);
     });
+
+    // Drag & Drop nas colunas
+    document.querySelectorAll(".kanban-cards").forEach(zone => {
+      zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("drag-over"); });
+      zone.addEventListener("dragleave", () => zone.classList.remove("drag-over"));
+      zone.addEventListener("drop", e => {
+        e.preventDefault();
+        zone.classList.remove("drag-over");
+        const id = e.dataTransfer.getData("text/plain");
+        const newStatus = zone.getAttribute("data-status");
+        moveCard(id, newStatus);
+      });
+    });
+
+    // Botões: mover, upvote, deletar
+    document.querySelectorAll("[data-move]").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        const id  = btn.getAttribute("data-move");
+        const dir = parseInt(btn.getAttribute("data-dir"));
+        const list2 = getRequests();
+        const req2  = list2.find(r=>r.id===id);
+        if (!req2) return;
+        const idx = STATUSES.indexOf(req2.status);
+        const newIdx = idx + dir;
+        if (newIdx >= 0 && newIdx < STATUSES.length) {
+          req2.status = STATUSES[newIdx];
+          saveRequests(list2);
+          loadRequests();
+        }
+      });
+    });
+
+    document.querySelectorAll("[data-upvote]").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-upvote");
+        const alreadyVoted = localStorage.getItem("vigi_voted_"+id) === "true";
+        const list2 = getRequests();
+        const req2  = list2.find(r=>r.id===id);
+        if (!req2) return;
+        if (!alreadyVoted) {
+          req2.upvotes = (req2.upvotes||0) + 1;
+          localStorage.setItem("vigi_voted_"+id, "true");
+        } else {
+          req2.upvotes = Math.max(0, (req2.upvotes||1) - 1);
+          localStorage.removeItem("vigi_voted_"+id);
+        }
+        saveRequests(list2);
+        loadRequests();
+      });
+    });
+
+    document.querySelectorAll("[data-delete]").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-delete");
+        if (!confirm("Remover esta solicitação?")) return;
+        const list2 = getRequests().filter(r=>r.id!==id);
+        saveRequests(list2);
+        loadRequests();
+      });
+    });
+  }
+
+  function moveCard(id, newStatus) {
+    const list = getRequests();
+    const req = list.find(r=>r.id===id);
+    if (req && STATUSES.includes(newStatus)) {
+      req.status = newStatus;
+      saveRequests(list);
+      loadRequests();
+    }
   }
 
   // Abrir o Player de Vídeo no Modal
@@ -1773,19 +1797,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderFavorites() {
     const favoritesList = document.getElementById("favoritesList");
+    const favoritesPanel = document.getElementById("favoritesPanel");
     if (!favoritesList) return;
     favoritesList.innerHTML = "";
 
     const favorites = JSON.parse(localStorage.getItem("vigi_favorites") || "[]");
 
-    if (favorites.length === 0) {
-      favoritesList.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">
-          Nenhum material favoritado ainda. Toque na estrela de qualquer vídeo, tabela ou manual para fixar atalhos aqui!
-        </div>
-      `;
-      return;
+    // Mostrar/ocultar painel no dashboard mobile
+    if (favoritesPanel) {
+      favoritesPanel.style.display = favorites.length > 0 ? "block" : "none";
     }
+
+    if (favorites.length === 0) return;
 
     favorites.forEach(fav => {
       let icon = "⚙️";
