@@ -229,75 +229,35 @@ const VIGI_DATA = {
   artes: [
     {
       id: "art-1",
-      titulo: "Acréscimos de Valor por Modelo de Câmeras",
-      caminho: "VIGI.png",
+      titulo: "Valores Extras",
+      caminho: "https://drive.google.com/thumbnail?id=1G9w-bZMtF-v0_fAbi7sFofO6PeMkRlIP&sz=w800",
       categoria: "Tabelas e Valores",
-      descricao: "Tabela informativa detalhando os valores adicionais cobrados de acordo com o modelo de câmera escolhido pelo cliente.",
-      driveUrl: ""
+      descricao: "Tabela com os valores de itens e serviços extras disponíveis para clientes VIGI.",
+      driveUrl: "https://drive.google.com/file/d/1G9w-bZMtF-v0_fAbi7sFofO6PeMkRlIP/view?usp=drive_link"
     },
     {
       id: "art-2",
-      titulo: "Câmeras ColorVu - Vantagens e Modelos",
-      caminho: "VIGI.png",
+      titulo: "Valores Câmeras ColorVu",
+      caminho: "https://drive.google.com/thumbnail?id=1SYeNWQbjc2du-SJCaKDLjsO4NNrarHxv&sz=w800",
       categoria: "Informativos e Vendas",
-      descricao: "Material demonstrativo sobre a tecnologia ColorVu (colorido 24 horas) para apoiar o técnico no argumento de venda ou explicação.",
-      driveUrl: ""
+      descricao: "Tabela de preços e modelos das câmeras ColorVu com imagem colorida 24 horas.",
+      driveUrl: "https://drive.google.com/file/d/1SYeNWQbjc2du-SJCaKDLjsO4NNrarHxv/view?usp=drive_link"
     },
     {
       id: "art-3",
-      titulo: "Câmeras com Acréscimo (Modelos Especiais)",
-      caminho: "VIGI.png",
-      categoria: "Tabelas e Valores",
-      descricao: "Lista rápida de câmeras especiais que possuem variação de custo para instalação ou upgrade.",
-      driveUrl: ""
+      titulo: "Planos de Alarme",
+      caminho: "https://drive.google.com/thumbnail?id=1nQ_aC2eYmSRxklmfuU5zm9OAg1RNS6pL&sz=w800",
+      categoria: "Informativos e Vendas",
+      descricao: "Grade dos planos mensais de monitoramento de alarme 24h disponíveis para clientes.",
+      driveUrl: "https://drive.google.com/file/d/1nQ_aC2eYmSRxklmfuU5zm9OAg1RNS6pL/view?usp=drive_link"
     },
     {
       id: "art-4",
-      titulo: "Catálogo de Câmeras e Alarmes",
-      caminho: "VIGI.png",
-      categoria: "Informativos e Vendas",
-      descricao: "Arte institucional que ilustra os equipamentos de câmeras e sensores de alarme disponíveis.",
-      driveUrl: ""
-    },
-    {
-      id: "art-5",
-      titulo: "Câmeras Infravermelho Convencionais",
-      caminho: "VIGI.png",
-      categoria: "Informativos e Vendas",
-      descricao: "Especificações e ilustrações de câmeras com infravermelho comum para monitoramento noturno padrão.",
-      driveUrl: ""
-    },
-    {
-      id: "art-6",
-      titulo: "Itens de Venda VIGI - Parte 1",
-      caminho: "VIGI.png",
+      titulo: "Planos VIGI Completo",
+      caminho: "https://drive.google.com/thumbnail?id=12LBbHX5euX9ZizkthlSHyt2Y4aR3wsm6&sz=w800",
       categoria: "Tabelas e Valores",
-      descricao: "Tabela de itens adicionais, acessórios, cabos, caixas de proteção e conectores disponíveis para venda rápida.",
-      driveUrl: ""
-    },
-    {
-      id: "art-7",
-      titulo: "Itens de Venda VIGI - Parte 2",
-      caminho: "VIGI.png",
-      categoria: "Tabelas e Valores",
-      descricao: "Complemento da tabela de produtos, licenças de software, suportes e serviços extras prestados no campo.",
-      driveUrl: ""
-    },
-    {
-      id: "art-8",
-      titulo: "Planos de Monitoramento de Alarme",
-      caminho: "VIGI.png",
-      categoria: "Informativos e Vendas",
-      descricao: "Grade de planos mensais de monitoramento de alarme 24h, essencial para o técnico apresentar na residência/empresa.",
-      driveUrl: ""
-    },
-    {
-      id: "art-9",
-      titulo: "Valores de Sensores de Alarme Sem Fio",
-      caminho: "VIGI.png",
-      categoria: "Tabelas e Valores",
-      descricao: "Tabela de custos de sensores sem fio (magnéticos, presença, barreira) para adição rápida a projetos.",
-      driveUrl: ""
+      descricao: "Tabela completa de todos os planos e serviços oferecidos pela VIGI Câmeras.",
+      driveUrl: "https://drive.google.com/file/d/12LBbHX5euX9ZizkthlSHyt2Y4aR3wsm6/view?usp=drive_link"
     }
   ],
 

@@ -1049,7 +1049,42 @@ document.addEventListener("DOMContentLoaded", () => {
   function openLightbox(artData) {
     modalTitle.textContent = artData.titulo;
     modalBody.innerHTML = "";
-    
+
+    // Se tiver driveUrl, abre como iframe do Google Drive (igual ao player de vídeo)
+    if (artData.driveUrl && artData.driveUrl.trim() !== "") {
+      const container = document.createElement("div");
+      container.className = "video-player-container";
+
+      const spinner = document.createElement("div");
+      spinner.className = "iframe-spinner";
+      container.appendChild(spinner);
+
+      const iframe = document.createElement("iframe");
+      let embedUrl = artData.driveUrl;
+      if (embedUrl.includes("/view")) {
+        embedUrl = embedUrl.replace("/view", "/preview");
+      }
+      iframe.src = embedUrl;
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.style.border = "none";
+      iframe.allow = "autoplay";
+      iframe.onload = () => {
+        if (container.contains(spinner)) container.removeChild(spinner);
+      };
+      container.appendChild(iframe);
+
+      const caption = document.createElement("div");
+      caption.className = "lightbox-caption";
+      caption.innerHTML = `<p>${artData.descricao}</p><small style="color:var(--text-muted); display:block; margin-top:4px;">* Use os botões de zoom do próprio visualizador para ampliar a imagem.</small>`;
+
+      modalBody.appendChild(container);
+      modalBody.appendChild(caption);
+      openModal();
+      return;
+    }
+
+    // Fallback: lightbox local com zoom & pan
     // Resetar variáveis de zoom & pan
     zoomFactor = 1.0;
     panX = 0;
@@ -1098,6 +1133,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateImageTransform() {
       img.style.transform = `scale(${zoomFactor}) translate(${panX}px, ${panY}px)`;
       zoomLabel.textContent = `${Math.round(zoomFactor * 100)}%`;
+
     }
 
     // Ações de Clique de Zoom
