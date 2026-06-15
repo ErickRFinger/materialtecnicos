@@ -121,7 +121,7 @@ const VIGI_DATA = {
       marca: "Uniview",
       caminho: "VIDEOS E ARTES/UNIVIEW/ALTERAR SENHA DE LOGIN UNV LINK.mp4",
       descricao: "Como redefinir ou alterar a credencial de acesso no aplicativo UNV Link para clientes e técnicos.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1bXVGtuOC3eBUSMMQxnXD8xS8xz2gloGA/view?usp=sharing"
     },
     {
       id: "v-unv-2",
@@ -130,7 +130,7 @@ const VIGI_DATA = {
       marca: "Uniview",
       caminho: "VIDEOS E ARTES/UNIVIEW/LOGAR UNV LINK.mp4",
       descricao: "Processo de cadastro e login inicial na plataforma de monitoramento em nuvem da Uniview.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1RQMcCI8qwu6JuKMNZBZxpqTgQ-8k2O_9/view?usp=sharing"
     },
     {
       id: "v-unv-3",
@@ -139,7 +139,7 @@ const VIGI_DATA = {
       marca: "Uniview",
       caminho: "VIDEOS E ARTES/UNIVIEW/Reiniciar DVR  UNV.mp4",
       descricao: "Como reiniciar com segurança o gravador da Uniview (UNV) usando o sistema operacional integrado.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1RRJXnYF_I3O68X7ZKPbW-I-hzNZvkG-p/view?usp=sharing"
     },
     {
       id: "v-unv-4",
@@ -148,7 +148,7 @@ const VIGI_DATA = {
       marca: "Uniview",
       caminho: "VIDEOS E ARTES/UNIVIEW/VIDEO EXPLICATIVO UTILIZAÇÃO UNV LINK.mp4",
       descricao: "Tour pelas funcionalidades principais do UNV Link, como visualização em tempo real e reprodução remota.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1LhjjCDwBVi7JlWOQ-HmYJuIBWqk6PSaA/view?usp=sharing"
     },
     {
       id: "v-unv-5",
@@ -157,7 +157,7 @@ const VIGI_DATA = {
       marca: "Uniview",
       caminho: "VIDEOS E ARTES/UNIVIEW/VÍDEO 1 - Tutorial para Troca de Senha UNV - Vigi Câmeras.mp4",
       descricao: "Como alterar a senha administrativa do DVR Uniview localmente de forma segura.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1xrGWJ8e_e_X7TE2hF7Gw-UWsNXMiZvp-/view?usp=sharing"
     },
     {
       id: "v-unv-6",
@@ -166,7 +166,7 @@ const VIGI_DATA = {
       marca: "Uniview",
       caminho: "VIDEOS E ARTES/UNIVIEW/VÍDEO EXPLICATIVO_Utilização EZ Station.mp4",
       descricao: "Tutorial avançado sobre operação do software cliente EZStation para gerenciamento de câmeras e DVRs UNV em PCs.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1gS_Lk7e5u8Ut5VXle2C8rOt_5FgH12H0/view?usp=sharing"
     },
 
     // MATERIAL - TÉCNICOS
@@ -177,7 +177,7 @@ const VIGI_DATA = {
       marca: "Hikvision",
       caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/Atualizar DVR HIK.mp4",
       descricao: "Instruções técnicas para carregamento de firmware e atualização de DVRs Hikvision com segurança.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1lWQ2ToVeOqlgnuedD22OoV79DNZTE24p/view?usp=sharing"
     },
     {
       id: "v-tec-2",
@@ -186,7 +186,7 @@ const VIGI_DATA = {
       marca: "Uniview",
       caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/Atualizar DVR UNV.mp4",
       descricao: "Procedimento completo de atualização de firmware em gravadores Uniview usando pendrive ou rede.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1OHVbavKOUElRfxy9jQpBVZAjs0JQqSyz/view?usp=sharing"
     },
     {
       id: "v-tec-3",
@@ -195,7 +195,7 @@ const VIGI_DATA = {
       marca: "Hikvision",
       caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/Resetar e configurar DVR HIK.mp4",
       descricao: "Como resetar o DVR Hikvision e refazer a parametrização inicial recomendada pela Vigi Câmeras.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1SyTikSnxALHtISM7hqkmfb3b86m92Qdy/view?usp=sharing"
     },
     {
       id: "v-tec-4",
@@ -204,7 +204,7 @@ const VIGI_DATA = {
       marca: "Uniview",
       caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/Resetar e configurar DVR UNV.mp4",
       descricao: "Passo a passo para redefinir as configurações do DVR Uniview e estruturar as definições do zero.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1LIHO9l0y-iYzeqZC3K6iJgSStWzOjv2o/view?usp=sharing"
     },
     {
       id: "v-tec-5",
@@ -213,7 +213,7 @@ const VIGI_DATA = {
       marca: "Uniview",
       caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/VÍDEO_Como Baixar e Instalar o EZStation.mp4",
       descricao: "Link e demonstração de download do instalador oficial do EZStation e processo de instalação no Windows.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1KF12LVypIxTR8LCjNIJnk2Nt9c1hN2Ua/view?usp=sharing"
     },
     {
       id: "v-tec-6",
@@ -222,7 +222,7 @@ const VIGI_DATA = {
       marca: "Hikvision",
       caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/VÍDEO_Como Baixar e Instalar o IVMS.mp4",
       descricao: "Onde encontrar o iVMS-4200 oficial e os cuidados básicos durante a instalação do software.",
-      driveUrl: ""
+      driveUrl: "https://drive.google.com/file/d/1GiFCbYd0CRqF7f9D7eNBGdei0jHJEWSn/view?usp=sharing"
     }
   ],
 
