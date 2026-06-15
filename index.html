@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Suporte Técnico - VIGI Câmeras</title>
+  <!-- Favicon ou estilo básico -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Hamburguer Mobile -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- SIDEBAR DE NAVEGAÇÃO -->
+    <aside class="sidebar" id="sidebar">
+      <div class="logo-container">
+        <div class="logo-icon">V</div>
+        <div>
+          <span class="logo-text">VIGI</span>
+          <span class="logo-sub">Técnicos</span>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <li class="nav-item active" data-tab="dashboard">
+          <button>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Início
+          </button>
+        </li>
+        <li class="nav-item" data-tab="videos">
+          <button>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+              <line x1="7" y1="2" x2="7" y2="22"></line>
+              <line x1="17" y1="2" x2="17" y2="22"></line>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <line x1="2" y1="7" x2="7" y2="7"></line>
+              <line x1="2" y1="17" x2="7" y2="17"></line>
+              <line x1="17" y1="17" x2="22" y2="17"></line>
+              <line x1="17" y1="7" x2="22" y2="7"></line>
+            </svg>
+            Vídeos de Suporte
+          </button>
+        </li>
+        <li class="nav-item" data-tab="artes">
+          <button>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            Artes & Tabelas
+          </button>
+        </li>
+        <li class="nav-item" data-tab="manuais">
+          <button>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Guias & Manuais
+          </button>
+        </li>
+        <li class="nav-item" data-tab="treinamento">
+          <button>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+              <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path>
+            </svg>
+            Certificação
+          </button>
+        </li>
+        <li class="nav-item" data-tab="solicitacoes">
+          <button>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Solicitar Material
+          </button>
+        </li>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <p>Portal Técnico da VIGI</p>
+        <p>&copy; 2026 Vigi Câmeras</p>
+      </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+      
+      <!-- HEADER -->
+      <header class="main-header">
+        <div class="search-container">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="search-input" id="globalSearch" placeholder="O que você está procurando hoje?">
+        </div>
+        
+        <div class="user-profile">
+          <div class="user-status-dot"></div>
+          <span class="user-info-text">Técnico VIGI</span>
+        </div>
+      </header>
+
+      <!-- ABA: INÍCIO (DASHBOARD) -->
+      <section id="dashboard" class="content-section active">
+        <div class="section-header">
+          <h1 class="section-title">Painel de Suporte</h1>
+          <p class="section-subtitle">Tudo o que você precisa para realizar seu trabalho com excelência e sem improvisos.</p>
+        </div>
+
+        <div class="welcome-banner">
+          <h2>Bem-vindo ao Portal de Conhecimento VIGI</h2>
+          <p>Esta plataforma centraliza todos os vídeos tutoriais, manuais simplificados e materiais informativos. Use a busca acima para encontrar soluções rápidas de campo ou navegue pelas abas ao lado.</p>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon alarme">🚨</div>
+            <div>
+              <div class="stat-number" id="count-alarme">0</div>
+              <div class="stat-label">Alarmes</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon hik">🔴</div>
+            <div>
+              <div class="stat-number" id="count-hik">0</div>
+              <div class="stat-label">Hikvision</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon unv">🟢</div>
+            <div>
+              <div class="stat-number" id="count-unv">0</div>
+              <div class="stat-label">Uniview</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon tec">🛠️</div>
+            <div>
+              <div class="stat-number" id="count-tec">0</div>
+              <div class="stat-label">Guias & Leis</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Painéis de Detalhes -->
+        <div class="dashboard-details-grid">
+          
+          <div class="quick-links-panel">
+            <h3 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              Acesso Rápido a Tarefas Frequentes
+            </h3>
+            <div class="shortcuts-grid">
+              <button class="shortcut-btn" data-target-guide="man-1">
+                <span class="shortcut-title">Configurar DVR do Zero</span>
+                <span class="shortcut-desc">Passo a passo com boas práticas de rede e nuvem.</span>
+              </button>
+              <button class="shortcut-btn" data-target-guide="man-2">
+                <span class="shortcut-title">Atualização Segura de DVR</span>
+                <span class="shortcut-desc">Como evitar queimar a placa do aparelho.</span>
+              </button>
+              <button class="shortcut-btn" data-target-guide="man-3">
+                <span class="shortcut-title">Ativação de Central Intelbras</span>
+                <span class="shortcut-desc">Passos cruciais de teste de sinal e cadastro.</span>
+              </button>
+              <button class="shortcut-btn" data-target-tab="artes">
+                <span class="shortcut-title">Tabela de Preços e Adicionais</span>
+                <span class="shortcut-desc">Acesse valores de sensores e câmeras ColorVu.</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="daily-tip-panel">
+            <div class="tip-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              Dica contra o "Jeitinho"
+            </div>
+            <p class="tip-content">
+              Nunca saia do cliente sem conferir se o fuso horário do gravador está configurado para <strong>GMT -03:00 Brasília</strong>. Caso a hora fique incorreta, o cliente não conseguirá buscar gravações antigas e o suporte precisará retornar ao local!
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Painéis Secundários (Favoritos & Histórico de Atualizações) -->
+        <div class="dashboard-secondary-grid" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; margin-top: 32px;">
+          
+          <!-- Meus Favoritos -->
+          <div class="quick-links-panel" id="favoritesPanel">
+            <h3 class="panel-title" style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+              <span style="color: #f59e0b; font-size: 18px;">⭐</span>
+              Meus Favoritos (Acesso Rápido)
+            </h3>
+            <div id="favoritesList" class="favorites-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
+              <!-- Injetado dinamicamente via JS -->
+            </div>
+          </div>
+          
+          <!-- Feed de Atualizações -->
+          <div class="daily-tip-panel" style="border-left-color: var(--color-primary);">
+            <div class="tip-header" style="color: var(--color-primary); display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">🔔</span>
+              Feed de Atualizações do Portal
+            </div>
+            <div class="update-timeline" style="display: flex; flex-direction: column; gap: 14px; margin-top: 18px; max-height: 220px; overflow-y: auto;">
+              <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                <span style="color: var(--color-primary); font-size: 12px; font-weight: 700; white-space: nowrap;">Hoje</span>
+                <span style="font-size: 13px; color: var(--text-main);">Disponibilizado o manual de <strong>Aplicativos PC</strong> reformulado.</span>
+              </div>
+              <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                <span style="color: var(--text-muted); font-size: 12px; font-weight: 700; white-space: nowrap;">Ontem</span>
+                <span style="font-size: 13px; color: var(--text-main);">Adicionado o manual com checklist da <strong>Central de Alarme Intelbras</strong>.</span>
+              </div>
+              <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                <span style="color: var(--text-muted); font-size: 12px; font-weight: 700; white-space: nowrap;">05 Jun</span>
+                <span style="font-size: 13px; color: var(--text-main);">Novo vídeo tutorial: <strong>Reset Físico e Configuração de Fábrica DVR Hikvision</strong>.</span>
+              </div>
+              <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                <span style="color: var(--text-muted); font-size: 12px; font-weight: 700; white-space: nowrap;">01 Jun</span>
+                <span style="font-size: 13px; color: var(--text-main);">Arte atualizada: <strong>Tabelas de Sensores de Alarme Sem Fio</strong>.</span>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- ABA: VÍDEOS DE SUPORTE -->
+      <section id="videos" class="content-section">
+        <div class="section-header">
+          <h1 class="section-title">Central de Vídeos</h1>
+          <p class="section-subtitle">Pesquise e assista a tutoriais práticos de configuração e reset.</p>
+        </div>
+
+        <div class="filter-bar" id="video-filters">
+          <button class="filter-btn active" data-filter="todos">Todos</button>
+          <button class="filter-btn" data-filter="alarme">Alarmes</button>
+          <button class="filter-btn" data-filter="hikvision">Hikvision</button>
+          <button class="filter-btn" data-filter="uniview">Uniview</button>
+          <button class="filter-btn" data-filter="material técnico">Material Técnico</button>
+        </div>
+
+        <div class="content-grid" id="videos-grid">
+          <!-- Injetado dinamicamente via JS -->
+        </div>
+      </section>
+
+      <!-- ABA: ARTES E TABELAS -->
+      <section id="artes" class="content-section">
+        <div class="section-header">
+          <h1 class="section-title">Artes & Tabelas Informativas</h1>
+          <p class="section-subtitle">Esquemas visuais de instalação, especificações e tabelas de valores para apoiar as vendas em campo.</p>
+        </div>
+
+        <div class="content-grid" id="artes-grid">
+          <!-- Injetado dinamicamente via JS -->
+        </div>
+      </section>
+
+      <!-- ABA: GUIAS E MANUAIS -->
+      <section id="manuais" class="content-section">
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h1 class="section-title">Guias de Processo Simplificados</h1>
+            <p class="section-subtitle">Siga os checklists para garantir que cada instalação siga o padrão VIGI e evite retrabalhos.</p>
+          </div>
+          <button class="filter-btn" id="btnResetAllChecklists" style="display: flex; align-items: center; gap: 8px; border-color: var(--color-danger); color: var(--color-danger); background: rgba(239, 68, 68, 0.05); font-weight: 600; padding: 10px 16px; transition: var(--transition-smooth); cursor: pointer;">
+            🗑️ Limpar Checklists
+          </button>
+        </div>
+
+        <div class="filter-bar" id="manual-filters" style="margin-bottom: 24px; display: flex; gap: 10px;">
+          <button class="filter-btn active" data-filter="todos">Todos</button>
+          <button class="filter-btn" data-filter="Gravadores (DVR/NVR)">Gravadores</button>
+          <button class="filter-btn" data-filter="Manutenção Preventiva">Manutenção</button>
+          <button class="filter-btn" data-filter="Sistemas de Alarme">Alarmes</button>
+        </div>
+
+        <div class="guides-container" id="manuais-container">
+          <!-- Injetado dinamicamente via JS -->
+        </div>
+      </section>
+
+      <!-- ABA: SLIDES DE TREINAMENTO (CERTIFICAÇÃO) -->
+      <section id="treinamento" class="content-section">
+        <div class="section-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
+          <div>
+            <h1 class="section-title">Certificação Técnica</h1>
+            <p class="section-subtitle">Slides oficiais do treinamento de capacitação da VIGI Câmeras.</p>
+          </div>
+          <button class="filter-btn" id="btnFullscreenSlides" style="display:flex; align-items:center; gap:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+            Tela Cheia
+          </button>
+        </div>
+
+        <div class="slideshow-wrapper" id="slideshowWrapper">
+          <button class="slide-close-fullscreen-btn" id="btnCloseFullscreen" title="Sair da Tela Cheia" aria-label="Sair da Tela Cheia">&times;</button>
+          <div class="slide-deck" id="slideDeck">
+            <!-- Injetado dinamicamente via JS -->
+          </div>
+
+          <div class="slide-controls-bar">
+            <button class="slide-nav-btn" id="prevSlideBtn" disabled>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              Anterior
+            </button>
+            
+            <div class="slide-indicator-container">
+              <div class="slide-progress-dots" id="slideProgressDots"></div>
+              <span class="slide-counter-label" id="slideCounterLabel">Slide 1 de 10</span>
+            </div>
+
+            <button class="slide-nav-btn" id="nextSlideBtn">
+              Próximo
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA: SOLICITAR MATERIAL -->
+      <section id="solicitacoes" class="content-section">
+        <div class="section-header">
+          <h1 class="section-title">Solicitação de Novo Material</h1>
+          <p class="section-subtitle">Sentiu falta de algum vídeo, imagem ou manual explicativo? Peça aqui e a comunidade de técnicos apoiará a gravação!</p>
+        </div>
+
+        <!-- Dashboard de Métricas de Solicitação -->
+        <div class="requests-stats-dashboard">
+          <div class="req-stat-card">
+            <div class="req-stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--color-primary);">📁</div>
+            <div>
+              <div class="req-stat-number" id="req-count-total">0</div>
+              <div class="req-stat-label">Total Solicitado</div>
+            </div>
+          </div>
+          <div class="req-stat-card">
+            <div class="req-stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--color-warning);">🎬</div>
+            <div>
+              <div class="req-stat-number" id="req-count-progress">0</div>
+              <div class="req-stat-label">Em Produção</div>
+            </div>
+          </div>
+          <div class="req-stat-card">
+            <div class="req-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success);">✅</div>
+            <div>
+              <div class="req-stat-number" id="req-count-ready">0</div>
+              <div class="req-stat-label">Disponíveis</div>
+            </div>
+          </div>
+          <div class="req-stat-card">
+            <div class="req-stat-icon" style="background: rgba(139, 92, 246, 0.1); color: var(--color-alarme);">👍</div>
+            <div>
+              <div class="req-stat-number" id="req-count-upvoted">-</div>
+              <div class="req-stat-label">Mais Apoiado</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="request-section-grid">
+          
+          <div class="request-form-panel">
+            <h3 class="panel-title">Formulário de Solicitação</h3>
+            <form id="requestForm">
+              <div class="form-group">
+                <label class="form-label" for="reqName">Seu Nome *</label>
+                <input type="text" id="reqName" class="form-control" placeholder="Digite seu nome completo" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="reqTitle">Título do Material Solicitado *</label>
+                <input type="text" id="reqTitle" class="form-control" placeholder="Ex: Como configurar controle remoto na central antiga" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="reqType">Tipo de Conteúdo *</label>
+                <select id="reqType" class="form-control" required>
+                  <option value="" disabled selected>Selecione uma opção...</option>
+                  <option value="Vídeo Tutorial">Vídeo Tutorial</option>
+                  <option value="Manual / Guia Escrito">Manual / Guia Escrito</option>
+                  <option value="Tabela / Imagem Informativa">Tabela / Imagem Informativa</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="reqUrgency">Nível de Urgência *</label>
+                <select id="reqUrgency" class="form-control" required>
+                  <option value="Baixa">Baixa (Dúvida comum, uso esporádico)</option>
+                  <option value="Média" selected>Média (Uso recorrente)</option>
+                  <option value="Alta">Alta (Processo travado ou erro frequente)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="reqDesc">Detalhes da Dúvida ou Processo *</label>
+                <textarea id="reqDesc" class="form-control form-control-textarea" placeholder="Descreva qual processo técnico você precisa aprender ou qual dúvida este material deve sanar..." required></textarea>
+              </div>
+
+              <button type="submit" class="submit-btn">Enviar Solicitação</button>
+            </form>
+          </div>
+
+          <div class="requests-list-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h3 class="panel-title" style="margin: 0;">Solicitações da Comunidade</h3>
+              <span style="font-size: 12px; color: var(--text-muted);">Clique em apoiar nos itens mais importantes.</span>
+            </div>
+            
+            <div class="requests-cards-grid" id="requestsCardsContainer">
+              <!-- Injetado dinamicamente via JS -->
+            </div>
+            
+            <div class="empty-state" id="tableEmptyState" style="margin-top: 20px;">
+              Nenhuma solicitação enviada ainda.
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL DE MÍDIA UNIVERSAL (VÍDEO PLAYER / LIGHTBOX DE IMAGEM) -->
+  <div class="modal-backdrop" id="mediaModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Título da Mídia</h3>
+        <button class="modal-close-btn" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        
+        <!-- O JS injetará o container adequado aqui (Player de Vídeo ou Imagem de Zoom) -->
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Importações dos Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
