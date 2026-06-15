@@ -139,16 +139,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Busca Global
-    globalSearch.addEventListener("input", (e) => {
-      currentSearchQuery = e.target.value.toLowerCase().trim();
-      
-      // Se o usuário começar a digitar na Dashboard, muda para a aba de Vídeos automaticamente
-      if (currentActiveTab === "dashboard" && currentSearchQuery.length > 0) {
-        switchTab("videos");
-      } else {
-        applyFiltersAndSearch();
-      }
-    });
+    if (globalSearch) {
+      globalSearch.addEventListener("input", (e) => {
+        currentSearchQuery = e.target.value.toLowerCase().trim();
+        
+        // Se o usuário começar a digitar na Dashboard, muda para a aba de Vídeos automaticamente
+        if (currentActiveTab === "dashboard" && currentSearchQuery.length > 0) {
+          switchTab("videos");
+        } else {
+          applyFiltersAndSearch();
+        }
+      });
+    }
 
     // Filtros de Categoria de Vídeo
     if (videoFilterBar) {
@@ -506,13 +508,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       card.innerHTML = `
         <div class="art-thumbnail">
-          <div class="art-placeholder" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); color: var(--color-primary);">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
-          </div>
+          <img src="${art.caminho}" alt="${art.titulo}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src=''; this.style.backgroundColor='#1a1c23';">
           <div class="art-zoom-overlay">
             <span class="zoom-icon-btn" style="font-size: 24px; color: white;">↗️</span>
           </div>
@@ -529,7 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <p class="art-card-desc">${art.descricao}</p>
           <div class="art-actions">
-            <button class="art-btn-main view-art-btn">Abrir no Drive</button>
+            <button class="art-btn-main view-art-btn">Ampliar Tabela</button>
           </div>
         </div>
       `;
@@ -537,7 +533,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const viewBtn = card.querySelector(".view-art-btn");
       const zoomOverlay = card.querySelector(".art-zoom-overlay");
       
-      const triggerZoom = () => window.open("https://drive.google.com/drive/folders/1xOX1e0IQKu_C5EEWF-2UzShTGpoxvVuc?usp=sharing", "_blank");
+      const triggerZoom = () => openLightbox(art);
       viewBtn.addEventListener("click", triggerZoom);
       zoomOverlay.addEventListener("click", triggerZoom);
 
@@ -1769,36 +1765,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // DISPARO
   init();
-
-  // --- LÓGICA DA BUSCA GLOBAL ---
-  const globalSearch = document.getElementById("globalSearch");
-  if (globalSearch) {
-    globalSearch.addEventListener("input", (e) => {
-      const termo = e.target.value.toLowerCase().trim();
-      
-      const videoCards = document.querySelectorAll(".video-card");
-      videoCards.forEach(card => {
-        const title = card.querySelector(".video-title").textContent.toLowerCase();
-        const desc = card.querySelector(".video-desc").textContent.toLowerCase();
-        if (title.includes(termo) || desc.includes(termo)) card.style.display = "flex";
-        else card.style.display = "none";
-      });
-
-      const arteCards = document.querySelectorAll(".art-card");
-      arteCards.forEach(card => {
-        const title = card.querySelector(".art-title").textContent.toLowerCase();
-        if (title.includes(termo)) card.style.display = "flex";
-        else card.style.display = "none";
-      });
-
-      const guideCards = document.querySelectorAll(".guide-card");
-      guideCards.forEach(card => {
-        const title = card.querySelector(".guide-title").textContent.toLowerCase();
-        const desc = card.querySelector(".guide-desc") ? card.querySelector(".guide-desc").textContent.toLowerCase() : "";
-        if (title.includes(termo) || desc.includes(termo)) card.style.display = "flex";
-        else card.style.display = "none";
-      });
-    });
-  }
 
 });
