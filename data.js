@@ -7,7 +7,7 @@ const VIGI_DATA = {
       titulo: "Configurar Aplicativo de Alarme",
       categoria: "Alarme",
       marca: "Intelbras",
-      caminho: "VIDEOS E ARTES/ALARME/Configurar aplicativo Alarme.mp4",
+      caminho: "VIGI.png",
       descricao: "Tutorial detalhado para configuração inicial e pareamento do aplicativo de alarme no smartphone do cliente.",
       driveUrl: "https://drive.google.com/file/d/1QX_i-FzLbkKmK8kgMIdcIuQUc-EVTNYB/view"
     },
@@ -16,7 +16,7 @@ const VIGI_DATA = {
       titulo: "Reiniciar Central de Alarme Intelbras (Modelo Antigo)",
       categoria: "Alarme",
       marca: "Intelbras",
-      caminho: "VIDEOS E ARTES/ALARME/REINICIAR CENTRAL DE ALARME INTELBRAS antigo.mp4",
+      caminho: "VIGI.png",
       descricao: "Procedimento passo a passo para reinicialização física e lógica das centrais de alarme Intelbras de modelos legados.",
       driveUrl: "https://drive.google.com/file/d/1Q5gyHFQhOczRlRySMgw4TCGHN1OSvI3k/view"
     },
@@ -25,7 +25,7 @@ const VIGI_DATA = {
       titulo: "Reiniciar Central de Alarme",
       categoria: "Alarme",
       marca: "Intelbras",
-      caminho: "VIDEOS E ARTES/ALARME/Reiniciar Central de Alarme.mp4",
+      caminho: "VIGI.png",
       descricao: "Como reiniciar com segurança a central de alarme padrão para restabelecimento de sinal ou limpeza de falhas.",
       driveUrl: "https://drive.google.com/file/d/1DqFJR9ylcVSpXHqSLpg1kgJ73SVvYzBA/view"
     },
@@ -36,7 +36,7 @@ const VIGI_DATA = {
       titulo: "Alterar Senha de Login Hik-Connect",
       categoria: "Hikvision",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/HIKVISION/ALTERAR SENHA DE LOGIN HIKCONNECT.mp4",
+      caminho: "VIGI.png",
       descricao: "Como proceder com a redefinição ou alteração de senha de uma conta no aplicativo Hik-Connect.",
       driveUrl: "https://drive.google.com/file/d/1UOfHK5oa3EjYuAr9lWheM8Wl6RkxsSzC/view?usp=sharing"
     },
@@ -45,7 +45,7 @@ const VIGI_DATA = {
       titulo: "Como Aceitar Compartilhamento no Aplicativo Hik-Connect",
       categoria: "Hikvision",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/HIKVISION/COMO ACEITAR NO APLICATIVO HIK (1).mp4",
+      caminho: "VIGI.png",
       descricao: "Demonstração prática de como o cliente final aceita o compartilhamento de câmeras enviado pelo técnico.",
       driveUrl: "https://drive.google.com/file/d/1RDRzzsYLUZWWPOD2tb0tblbvvo1b-jWB/view?usp=sharing"
     },
@@ -54,7 +54,7 @@ const VIGI_DATA = {
       titulo: "Desabilitar Modo Tablet no Aplicativo Hik-Connect",
       categoria: "Hikvision",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/HIKVISION/COMO DESABILTAR MODO TABLET NO APLICATIVO.mp4",
+      caminho: "VIGI.png",
       descricao: "Como desativar a visualização em modo tablet para normalizar a interface em smartphones.",
       driveUrl: "https://drive.google.com/file/d/1UjtKlzG_sgtD2RYit0LjLLroI8Jr6reH/view?usp=sharing"
     },
@@ -63,7 +63,7 @@ const VIGI_DATA = {
       titulo: "Como Logar no Hik-Connect",
       categoria: "Hikvision",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/HIKVISION/LOGAR HIKCONNECT.mp4",
+      caminho: "VIGI.png",
       descricao: "Guia básico de login, criação de conta e primeiro acesso no aplicativo Hik-Connect.",
       driveUrl: "https://drive.google.com/file/d/1B_1OWKM7-gsyQDg--MRt2Y_pczgWDqM0/view?usp=sharing"
     },
@@ -72,7 +72,7 @@ const VIGI_DATA = {
       titulo: "Reiniciar DVR Hikvision",
       categoria: "Hikvision",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/HIKVISION/Reiniciar DVR HIK.mp4",
+      caminho: "VIGI.png",
       descricao: "Procedimento correto de reinicialização do DVR Hikvision através do menu local ou web interface.",
       driveUrl: "https://drive.google.com/file/d/1xl0x7hNpHxPMeZGVnIKJwhX4RHMNaZ8P/view?usp=sharing"
     },
@@ -81,7 +81,7 @@ const VIGI_DATA = {
       titulo: "Como Baixar Gravação de Vídeo no Hik-Connect",
       categoria: "Hikvision",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/HIKVISION/VIDEO COMO BAIXAR UMA GRAVAÇÃO  NO HIKCONNECT - VIGI.mp4",
+      caminho: "VIGI.png",
       descricao: "Como buscar, selecionar e baixar trechos de gravações diretamente para a memória do celular.",
       driveUrl: "https://drive.google.com/file/d/1KiTbnEBJ6GPoILaAj9S9tPVVThVTk6W9/view?usp=sharing"
     },
@@ -90,7 +90,7 @@ const VIGI_DATA = {
       titulo: "Como Utilizar o Aplicativo Hik-Connect",
       categoria: "Hikvision",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/HIKVISION/VIDEO COMO USAR O APLICATIVO HIKCONNECT - VIGI.mp4",
+      caminho: "VIGI.png",
       descricao: "Manual completo em vídeo de navegação, visualização ao vivo e reprodução no app Hik-Connect.",
       driveUrl: "https://drive.google.com/file/d/12qHaLDsgZq8tXvVEIE8VT1YXzhRbnTrA/view?usp=sharing"
     },
@@ -99,7 +99,7 @@ const VIGI_DATA = {
       titulo: "Troca de Senha Hikvision (Vigi Câmeras)",
       categoria: "Hikvision",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/HIKVISION/VÍDEO 2 - Tutorial para Troca de Senha HIK - Vigi Câmeras.mp4",
+      caminho: "VIGI.png",
       descricao: "Vídeo explicativo sobre a política e processo de alteração de senha de dispositivos físicos Hikvision.",
       driveUrl: "https://drive.google.com/file/d/11dUpxFR9JGWXB5F1_xzahcssunQWTn58/view?usp=sharing"
     },
@@ -108,7 +108,7 @@ const VIGI_DATA = {
       titulo: "Guia Completo de Utilização do Software iVMS-4200",
       categoria: "Hikvision",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/HIKVISION/VÍDEO EXPLICATIVO_Utilização IVMS.mp4",
+      caminho: "VIGI.png",
       descricao: "Treinamento detalhado para operação, visualização e extração de imagens através do software de monitoramento iVMS-4200.",
       driveUrl: "https://drive.google.com/file/d/1sWJikfGy9S7X5cq35_Wm81PpEQORDT7z/view?usp=sharing"
     },
@@ -119,7 +119,7 @@ const VIGI_DATA = {
       titulo: "Alterar Senha de Login UNV Link",
       categoria: "Uniview",
       marca: "Uniview",
-      caminho: "VIDEOS E ARTES/UNIVIEW/ALTERAR SENHA DE LOGIN UNV LINK.mp4",
+      caminho: "VIGI.png",
       descricao: "Como redefinir ou alterar a credencial de acesso no aplicativo UNV Link para clientes e técnicos.",
       driveUrl: "https://drive.google.com/file/d/1bXVGtuOC3eBUSMMQxnXD8xS8xz2gloGA/view?usp=sharing"
     },
@@ -128,7 +128,7 @@ const VIGI_DATA = {
       titulo: "Como Logar no Aplicativo UNV Link",
       categoria: "Uniview",
       marca: "Uniview",
-      caminho: "VIDEOS E ARTES/UNIVIEW/LOGAR UNV LINK.mp4",
+      caminho: "VIGI.png",
       descricao: "Processo de cadastro e login inicial na plataforma de monitoramento em nuvem da Uniview.",
       driveUrl: "https://drive.google.com/file/d/1RQMcCI8qwu6JuKMNZBZxpqTgQ-8k2O_9/view?usp=sharing"
     },
@@ -137,7 +137,7 @@ const VIGI_DATA = {
       titulo: "Reiniciar DVR / NVR Uniview",
       categoria: "Uniview",
       marca: "Uniview",
-      caminho: "VIDEOS E ARTES/UNIVIEW/Reiniciar DVR  UNV.mp4",
+      caminho: "VIGI.png",
       descricao: "Como reiniciar com segurança o gravador da Uniview (UNV) usando o sistema operacional integrado.",
       driveUrl: "https://drive.google.com/file/d/1RRJXnYF_I3O68X7ZKPbW-I-hzNZvkG-p/view?usp=sharing"
     },
@@ -146,7 +146,7 @@ const VIGI_DATA = {
       titulo: "Guia de Utilização do Aplicativo UNV Link",
       categoria: "Uniview",
       marca: "Uniview",
-      caminho: "VIDEOS E ARTES/UNIVIEW/VIDEO EXPLICATIVO UTILIZAÇÃO UNV LINK.mp4",
+      caminho: "VIGI.png",
       descricao: "Tour pelas funcionalidades principais do UNV Link, como visualização em tempo real e reprodução remota.",
       driveUrl: "https://drive.google.com/file/d/1LhjjCDwBVi7JlWOQ-HmYJuIBWqk6PSaA/view?usp=sharing"
     },
@@ -155,7 +155,7 @@ const VIGI_DATA = {
       titulo: "Troca de Senha Uniview (Vigi Câmeras)",
       categoria: "Uniview",
       marca: "Uniview",
-      caminho: "VIDEOS E ARTES/UNIVIEW/VÍDEO 1 - Tutorial para Troca de Senha UNV - Vigi Câmeras.mp4",
+      caminho: "VIGI.png",
       descricao: "Como alterar a senha administrativa do DVR Uniview localmente de forma segura.",
       driveUrl: "https://drive.google.com/file/d/1xrGWJ8e_e_X7TE2hF7Gw-UWsNXMiZvp-/view?usp=sharing"
     },
@@ -164,7 +164,7 @@ const VIGI_DATA = {
       titulo: "Guia Completo de Utilização do EZStation",
       categoria: "Uniview",
       marca: "Uniview",
-      caminho: "VIDEOS E ARTES/UNIVIEW/VÍDEO EXPLICATIVO_Utilização EZ Station.mp4",
+      caminho: "VIGI.png",
       descricao: "Tutorial avançado sobre operação do software cliente EZStation para gerenciamento de câmeras e DVRs UNV em PCs.",
       driveUrl: "https://drive.google.com/file/d/1gS_Lk7e5u8Ut5VXle2C8rOt_5FgH12H0/view?usp=sharing"
     },
@@ -175,7 +175,7 @@ const VIGI_DATA = {
       titulo: "Atualização de Firmware - DVR Hikvision",
       categoria: "Material Técnico",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/Atualizar DVR HIK.mp4",
+      caminho: "VIGI.png",
       descricao: "Instruções técnicas para carregamento de firmware e atualização de DVRs Hikvision com segurança.",
       driveUrl: "https://drive.google.com/file/d/1lWQ2ToVeOqlgnuedD22OoV79DNZTE24p/view?usp=sharing"
     },
@@ -184,7 +184,7 @@ const VIGI_DATA = {
       titulo: "Atualização de Firmware - DVR Uniview",
       categoria: "Material Técnico",
       marca: "Uniview",
-      caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/Atualizar DVR UNV.mp4",
+      caminho: "VIGI.png",
       descricao: "Procedimento completo de atualização de firmware em gravadores Uniview usando pendrive ou rede.",
       driveUrl: "https://drive.google.com/file/d/1OHVbavKOUElRfxy9jQpBVZAjs0JQqSyz/view?usp=sharing"
     },
@@ -193,7 +193,7 @@ const VIGI_DATA = {
       titulo: "Reset Físico e Configuração de Fábrica - DVR Hikvision",
       categoria: "Material Técnico",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/Resetar e configurar DVR HIK.mp4",
+      caminho: "VIGI.png",
       descricao: "Como resetar o DVR Hikvision e refazer a parametrização inicial recomendada pela Vigi Câmeras.",
       driveUrl: "https://drive.google.com/file/d/1SyTikSnxALHtISM7hqkmfb3b86m92Qdy/view?usp=sharing"
     },
@@ -202,7 +202,7 @@ const VIGI_DATA = {
       titulo: "Reset Físico e Configuração de Fábrica - DVR Uniview",
       categoria: "Material Técnico",
       marca: "Uniview",
-      caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/Resetar e configurar DVR UNV.mp4",
+      caminho: "VIGI.png",
       descricao: "Passo a passo para redefinir as configurações do DVR Uniview e estruturar as definições do zero.",
       driveUrl: "https://drive.google.com/file/d/1LIHO9l0y-iYzeqZC3K6iJgSStWzOjv2o/view?usp=sharing"
     },
@@ -211,7 +211,7 @@ const VIGI_DATA = {
       titulo: "Como Baixar e Instalar o EZStation",
       categoria: "Material Técnico",
       marca: "Uniview",
-      caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/VÍDEO_Como Baixar e Instalar o EZStation.mp4",
+      caminho: "VIGI.png",
       descricao: "Link e demonstração de download do instalador oficial do EZStation e processo de instalação no Windows.",
       driveUrl: "https://drive.google.com/file/d/1KF12LVypIxTR8LCjNIJnk2Nt9c1hN2Ua/view?usp=sharing"
     },
@@ -220,7 +220,7 @@ const VIGI_DATA = {
       titulo: "Como Baixar e Instalar o iVMS-4200",
       categoria: "Material Técnico",
       marca: "Hikvision",
-      caminho: "VIDEOS E ARTES/MATERIAL - TÉCNICOS/VÍDEO_Como Baixar e Instalar o IVMS.mp4",
+      caminho: "VIGI.png",
       descricao: "Onde encontrar o iVMS-4200 oficial e os cuidados básicos durante a instalação do software.",
       driveUrl: "https://drive.google.com/file/d/1GiFCbYd0CRqF7f9D7eNBGdei0jHJEWSn/view?usp=sharing"
     }
@@ -230,7 +230,7 @@ const VIGI_DATA = {
     {
       id: "art-1",
       titulo: "Acréscimos de Valor por Modelo de Câmeras",
-      caminho: "VIDEOS E ARTES/ARTES CÂMERAS/ACRÉSCIMOS DE VALOR POR MODELO DE CÂMERAS.png",
+      caminho: "VIGI.png",
       categoria: "Tabelas e Valores",
       descricao: "Tabela informativa detalhando os valores adicionais cobrados de acordo com o modelo de câmera escolhido pelo cliente.",
       driveUrl: ""
@@ -238,7 +238,7 @@ const VIGI_DATA = {
     {
       id: "art-2",
       titulo: "Câmeras ColorVu - Vantagens e Modelos",
-      caminho: "VIDEOS E ARTES/ARTES CÂMERAS/CAMERAS COLOR VU.png",
+      caminho: "VIGI.png",
       categoria: "Informativos e Vendas",
       descricao: "Material demonstrativo sobre a tecnologia ColorVu (colorido 24 horas) para apoiar o técnico no argumento de venda ou explicação.",
       driveUrl: ""
@@ -246,7 +246,7 @@ const VIGI_DATA = {
     {
       id: "art-3",
       titulo: "Câmeras com Acréscimo (Modelos Especiais)",
-      caminho: "VIDEOS E ARTES/ARTES CÂMERAS/CAMERAS COM ACRESCIMO.png",
+      caminho: "VIGI.png",
       categoria: "Tabelas e Valores",
       descricao: "Lista rápida de câmeras especiais que possuem variação de custo para instalação ou upgrade.",
       driveUrl: ""
@@ -254,7 +254,7 @@ const VIGI_DATA = {
     {
       id: "art-4",
       titulo: "Catálogo de Câmeras e Alarmes",
-      caminho: "VIDEOS E ARTES/ARTES CÂMERAS/CAMERAS E ALARMES.png",
+      caminho: "VIGI.png",
       categoria: "Informativos e Vendas",
       descricao: "Arte institucional que ilustra os equipamentos de câmeras e sensores de alarme disponíveis.",
       driveUrl: ""
@@ -262,7 +262,7 @@ const VIGI_DATA = {
     {
       id: "art-5",
       titulo: "Câmeras Infravermelho Convencionais",
-      caminho: "VIDEOS E ARTES/ARTES CÂMERAS/CAMERAS INFRA VERMELHO.png",
+      caminho: "VIGI.png",
       categoria: "Informativos e Vendas",
       descricao: "Especificações e ilustrações de câmeras com infravermelho comum para monitoramento noturno padrão.",
       driveUrl: ""
@@ -270,7 +270,7 @@ const VIGI_DATA = {
     {
       id: "art-6",
       titulo: "Itens de Venda VIGI - Parte 1",
-      caminho: "VIDEOS E ARTES/ARTES CÂMERAS/ITENS VENDA VIGI 1.png",
+      caminho: "VIGI.png",
       categoria: "Tabelas e Valores",
       descricao: "Tabela de itens adicionais, acessórios, cabos, caixas de proteção e conectores disponíveis para venda rápida.",
       driveUrl: ""
@@ -278,7 +278,7 @@ const VIGI_DATA = {
     {
       id: "art-7",
       titulo: "Itens de Venda VIGI - Parte 2",
-      caminho: "VIDEOS E ARTES/ARTES CÂMERAS/ITENS VENDA VIGI 2.png",
+      caminho: "VIGI.png",
       categoria: "Tabelas e Valores",
       descricao: "Complemento da tabela de produtos, licenças de software, suportes e serviços extras prestados no campo.",
       driveUrl: ""
@@ -286,7 +286,7 @@ const VIGI_DATA = {
     {
       id: "art-8",
       titulo: "Planos de Monitoramento de Alarme",
-      caminho: "VIDEOS E ARTES/ARTES CÂMERAS/PLANOS ALARME.jpeg",
+      caminho: "VIGI.png",
       categoria: "Informativos e Vendas",
       descricao: "Grade de planos mensais de monitoramento de alarme 24h, essencial para o técnico apresentar na residência/empresa.",
       driveUrl: ""
@@ -294,7 +294,7 @@ const VIGI_DATA = {
     {
       id: "art-9",
       titulo: "Valores de Sensores de Alarme Sem Fio",
-      caminho: "VIDEOS E ARTES/ARTES CÂMERAS/VALORES SENSORES DE ALARME SEM FIO.png",
+      caminho: "VIGI.png",
       categoria: "Tabelas e Valores",
       descricao: "Tabela de custos de sensores sem fio (magnéticos, presença, barreira) para adição rápida a projetos.",
       driveUrl: ""
