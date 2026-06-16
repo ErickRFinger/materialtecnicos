@@ -8,22 +8,16 @@
   "description": "Portal offline e central de vídeos, artes e manuais VIGI Câmeras",
   "icons": [
     {
-      "src": "VIGI.png?v=2",
-      "sizes": "any",
+      "src": "./VIGI.png",
+      "sizes": "144x144 192x192 256x256 512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "VIGI.png?v=2",
-      "sizes": "192x192",
+      "src": "./VIGI.png",
+      "sizes": "144x144 192x192 256x256 512x512",
       "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "VIGI.png?v=2",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ]
 }
