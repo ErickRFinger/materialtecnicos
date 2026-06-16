@@ -3,68 +3,8 @@
    ========================================================================== */
 
 /* ------------------------------------------------------------------
-   CONTROLE DE LOGIN
+   LOGIN: Gerenciado por auth.js (Supabase)
    ------------------------------------------------------------------ */
-(function () {
-  const LOGIN_USER = "admin";
-  const LOGIN_PASS = "clic3369";
-  const SESSION_KEY = "vigi_auth";
-
-  const overlay = document.getElementById("loginOverlay");
-  const form    = document.getElementById("loginForm");
-  const userInp = document.getElementById("loginUser");
-  const passInp = document.getElementById("loginPass");
-  const errEl   = document.getElementById("loginError");
-  const togglePassBtn = document.getElementById("togglePass");
-  const loginBtn = document.getElementById("loginBtn");
-
-  // Se já autenticado nesta sessão, esconde o overlay imediatamente
-  if (sessionStorage.getItem(SESSION_KEY) === "ok") {
-    overlay.style.display = "none";
-    return; // Nada mais a fazer
-  }
-
-  // Mostrar/esconder senha
-  if (togglePassBtn) {
-    togglePassBtn.addEventListener("click", () => {
-      const isPass = passInp.type === "password";
-      passInp.type = isPass ? "text" : "password";
-    });
-  }
-
-  // Submissão do formulário
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const user = userInp.value.trim();
-    const pass = passInp.value;
-
-    if (user === LOGIN_USER && pass === LOGIN_PASS) {
-      // Credenciais corretas
-      errEl.classList.remove("visible");
-      loginBtn.disabled = true;
-      loginBtn.textContent = "Entrando…";
-
-      // Salvar sessão e animar saída
-      sessionStorage.setItem(SESSION_KEY, "ok");
-      overlay.classList.add("hidden");
-
-      // Remover do DOM após animação
-      overlay.addEventListener("animationend", () => {
-        overlay.style.display = "none";
-      }, { once: true });
-
-    } else {
-      // Credenciais erradas — shake + mensagem
-      errEl.classList.remove("visible");
-      // Força re-flow para reiniciar animação
-      void errEl.offsetWidth;
-      errEl.classList.add("visible");
-      passInp.value = "";
-      passInp.focus();
-    }
-  });
-})();
 
 document.addEventListener("DOMContentLoaded", () => {
   // ELEMENTOS DO DOM
@@ -2015,5 +1955,6 @@ document.addEventListener("DOMContentLoaded", () => {
   init();
 
 });
+
 
 
