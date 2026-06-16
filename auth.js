@@ -232,8 +232,11 @@
 
     if (!check.allowed) {
       await supabase.auth.signOut();
-      showError(loginError, "🔒 Este login já está sendo usado em outro dispositivo. Peça ao técnico para sair primeiro.");
       showLoginScreen();
+      // Mostra o erro DEPOIS de preparar a tela de login, para o tabLogin.click() não apagá-lo
+      setTimeout(() => {
+        showError(loginError, "🔒 Este login já está sendo usado em outro dispositivo. Você precisa sair no outro aparelho primeiro.");
+      }, 50);
       return;
     }
 
@@ -424,6 +427,7 @@
   });
 
 })();
+
 
 
 
