@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    PORTAL TÉCNICO VIGI - APLICATIVO LOGIC
    ========================================================================== */
 
@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadRequests();
     renderSlide(currentSlideIndex);
     setupSlideDots();
+    initTipsCarousel();
     setupEventListeners();
   }
 
@@ -147,32 +148,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================================
   function switchTab(tabId) {
     currentActiveTab = tabId;
-    
-    // Atualizar classe ativa na Sidebar
     navItems.forEach(item => {
-      if (item.getAttribute("data-tab") === tabId) {
-        item.classList.add("active");
-      } else {
-        item.classList.remove("active");
-      }
+      if (item.getAttribute("data-tab") === tabId) { item.classList.add("active"); }
+      else { item.classList.remove("active"); }
     });
-
-    // Exibir seção correspondente
     sections.forEach(section => {
-      if (section.getAttribute("id") === tabId) {
-        section.classList.add("active");
-      } else {
-        section.classList.remove("active");
-      }
+      if (section.getAttribute("id") === tabId) { section.classList.add("active"); }
+      else { section.classList.remove("active"); }
     });
-
-    // Fechar menu mobile se estiver aberto
+    // Sincronizar barra de navegação inferior (mobile)
+    document.querySelectorAll(".mobile-nav-btn").forEach(btn => {
+      if (btn.getAttribute("data-tab") === tabId) { btn.classList.add("active"); }
+      else { btn.classList.remove("active"); }
+    });
     sidebar.classList.remove("open");
-    
-    // Rolar para o topo ao trocar de aba
     window.scrollTo({ top: 0, behavior: "smooth" });
-
-    // Filtrar conteúdo de acordo com a aba e busca
     applyFiltersAndSearch();
   }
 
@@ -189,6 +179,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Hamburguer Mobile
     mobileMenuToggle.addEventListener("click", () => {
       sidebar.classList.toggle("open");
+    });
+
+    // Barra de navegação inferior (mobile)
+    document.querySelectorAll(".mobile-nav-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tabId = btn.getAttribute("data-tab");
+        switchTab(tabId);
+      });
     });
 
     // Fechar sidebar ao clicar fora em telas pequenas
@@ -1938,7 +1936,84 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // ==========================================================================
+  // CARROSSEL DE DICAS ROTATIVAS
+  // ==========================================================================
+  const TIPS = [
+    { icon: "💡", text: "<strong>Fuso Horário:</strong> Nunca saia do cliente sem conferir se o gravador está em <strong>GMT -03:00 Brasília</strong>. Hora errada = cliente sem conseguir buscar gravação!" },
+    { icon: "🔒", text: "<strong>Senha Forte:</strong> Use sempre letras maiúsculas, minúsculas, números e caractere especial (@, #, $). Anote na ficha técnica do cliente sem exceção." },
+    { icon: "📡", text: "<strong>IP Fixo:</strong> Sempre configure um IP estático para o DVR fora da faixa DHCP do roteador (ex: final .200). IP dinâmico = câmera sumindo na nuvem." },
+    { icon: "💾", text: "<strong>Formatar HD:</strong> Todo HD novo ou após reset deve ser inicializado no menu do DVR antes de fechar o rack. Sem formatação, o gravador não grava." },
+    { icon: "⚡", text: "<strong>No-break:</strong> Nunca atualize firmware sem garantir alimentação estável. Queda de energia durante update queima a placa permanentemente." },
+    { icon: "📶", text: "<strong>Sub-stream:</strong> Configure o sub-stream do DVR para CIF ou 2CIF a 10-12 FPS. Fluidez no celular 3G/4G do cliente depende disso." },
+    { icon: "🌐", text: "<strong>DNS:</strong> Sempre configure DNS primário <strong>8.8.8.8</strong> e secundário <strong>1.1.1.1</strong> no DVR. DNS incorreto impede a sincronização de nuvem." },
+    { icon: "🔌", text: "<strong>Separação de Cabos:</strong> Nunca passe cabo de vídeo na mesma tubulação de cabos de energia 110V/220V. Isso causa chuviscos e faixas na imagem." },
+    { icon: "📱", text: "<strong>Compartilhamento Hik-Connect:</strong> O admin deve compartilhar pelo app para os demais usuários. Nunca adicione o DVR direto no celular de um segundo usuário." },
+    { icon: "🛠️", text: "<strong>Balun / BNC:</strong> Refaça sempre as pontas dos conectores. Mau contato é a principal causa de perda de vídeo intermitente em campo." }
+  ];
+
+  let currentTipIndex = 0;
+  let tipAutoInterval = null;
+
+  function initTipsCarousel() {
+    const track = document.getElementById("dashTipsTrack");
+    const dotsContainer = document.getElementById("dashTipsDots");
+    const prevBtn = document.getElementById("tipPrevBtn");
+    const nextBtn = document.getElementById("tipNextBtn");
+    if (!track || !dotsContainer) return;
+
+    // Renderizar todas as dicas
+    track.innerHTML = TIPS.map((tip, i) => `
+      <div class="dash-tip-slide ${i === 0 ? 'active' : ''}" data-tip-idx="${i}">
+        <span class="dash-tip-icon">${tip.icon}</span>
+        <p>${tip.text}</p>
+      </div>
+    `).join("");
+
+    // Criar dots
+    dotsContainer.innerHTML = TIPS.map((_, i) =>
+      `<button class="dash-tip-dot ${i === 0 ? 'active' : ''}" data-dot="${i}" aria-label="Dica ${i+1}"></button>`
+    ).join("");
+
+    function goToTip(idx) {
+      const slides = track.querySelectorAll(".dash-tip-slide");
+      const dots = dotsContainer.querySelectorAll(".dash-tip-dot");
+      slides.forEach(s => s.classList.remove("active", "exit"));
+      dots.forEach(d => d.classList.remove("active"));
+      currentTipIndex = (idx + TIPS.length) % TIPS.length;
+      slides[currentTipIndex].classList.add("active");
+      dots[currentTipIndex].classList.add("active");
+    }
+
+    // Auto-avanço a cada 6 segundos
+    function startAuto() {
+      tipAutoInterval = setInterval(() => goToTip(currentTipIndex + 1), 6000);
+    }
+    function resetAuto() {
+      clearInterval(tipAutoInterval);
+      startAuto();
+    }
+
+    if (prevBtn) prevBtn.addEventListener("click", () => { goToTip(currentTipIndex - 1); resetAuto(); });
+    if (nextBtn) nextBtn.addEventListener("click", () => { goToTip(currentTipIndex + 1); resetAuto(); });
+    dotsContainer.addEventListener("click", (e) => {
+      const dot = e.target.closest(".dash-tip-dot");
+      if (dot) { goToTip(parseInt(dot.getAttribute("data-dot"))); resetAuto(); }
+    });
+
+    // Pausa ao passar o mouse
+    const carousel = document.getElementById("dashTipsCarousel");
+    if (carousel) {
+      carousel.addEventListener("mouseenter", () => clearInterval(tipAutoInterval));
+      carousel.addEventListener("mouseleave", () => startAuto());
+    }
+
+    startAuto();
+  }
+
   // DISPARO
   init();
 
 });
+
+

@@ -3033,24 +3033,105 @@ body {
   flex-shrink: 0;
 }
 
-/* Tip card */
-.dash-tip {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(245, 158, 11, 0.06);
+/* ===== CARROSSEL DE DICAS ROTATIVAS ===== */
+.dash-tips-carousel {
+  background: rgba(245, 158, 11, 0.05);
   border: 1px solid rgba(245, 158, 11, 0.2);
   border-left: 3px solid var(--color-tec);
-  border-radius: 10px;
-  padding: 14px 16px;
+  border-radius: 12px;
+  overflow: hidden;
   margin-bottom: 20px;
+  position: relative;
 }
-.dash-tip-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-.dash-tip p {
+
+.dash-tips-track {
+  position: relative;
+  min-height: 64px;
+  padding: 14px 16px 10px;
+}
+
+.dash-tip-slide {
+  display: none;
+  align-items: flex-start;
+  gap: 12px;
+  animation: tipFadeIn 0.4s ease-out forwards;
+}
+
+.dash-tip-slide.active {
+  display: flex;
+}
+
+@keyframes tipFadeIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.dash-tip-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.dash-tip-slide p {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0;
+}
+
+.dash-tips-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 6px 16px 10px;
+  border-top: 1px solid rgba(245, 158, 11, 0.1);
+}
+
+.dash-tip-nav {
+  background: none;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--color-tec);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  line-height: 1;
+  flex-shrink: 0;
+}
+.dash-tip-nav:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: var(--color-tec);
+}
+
+.dash-tips-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dash-tip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.25);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+}
+.dash-tip-dot.active {
+  background: var(--color-tec);
+  width: 20px;
+  border-radius: 4px;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
 }
 
 /* Favoritos */
@@ -3077,3 +3158,169 @@ body {
   .dash-quick-grid { grid-template-columns: repeat(5, 1fr); }
 }
 
+
+/* ==========================================================================
+   MELHORIAS MOBILE — USO EM CAMPO
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .main-header {
+    height: 60px;
+    padding: 0 14px;
+    gap: 10px;
+  }
+  .search-container { width: auto; flex: 1; }
+  .search-input {
+    font-size: 16px;
+    padding: 10px 16px 10px 40px;
+    border-radius: 10px;
+  }
+  .search-icon { left: 12px; }
+
+  .content-section { padding: 16px 14px 80px; }
+  .section-title { font-size: 22px; }
+  .section-subtitle { font-size: 14px; }
+  .section-header { margin-bottom: 20px; }
+
+  .filter-bar {
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filter-btn {
+    padding: 10px 18px;
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-height: 40px;
+  }
+
+  .content-grid { grid-template-columns: 1fr; gap: 14px; }
+
+  .video-card { flex-direction: row; min-height: 90px; }
+  .video-thumbnail {
+    width: 110px; min-width: 110px;
+    aspect-ratio: unset; height: auto;
+    border-bottom: none;
+    border-right: 1px solid var(--border-color);
+    border-radius: 0;
+  }
+  .video-card-body { padding: 10px 12px; }
+  .video-card-title { font-size: 13px; margin-bottom: 4px; }
+  .video-card-desc { display: none; }
+  .video-card-footer { padding-top: 8px; margin-top: 6px; }
+  .watch-btn { padding: 8px 14px; font-size: 13px; min-height: 36px; }
+
+  .art-card { flex-direction: row; }
+  .art-thumbnail {
+    width: 100px; min-width: 100px;
+    aspect-ratio: unset; height: auto; min-height: 84px;
+    border-bottom: none;
+    border-right: 1px solid var(--border-color);
+  }
+  .art-card-body { padding: 10px 12px; }
+  .art-card-title { font-size: 13px; }
+  .art-card-desc { font-size: 12px; }
+  .art-btn-main { font-size: 12px; padding: 7px 10px; min-height: 34px; }
+
+  .guide-header { padding: 16px; min-height: 58px; }
+  .guide-accordion-title { font-size: 14px !important; }
+
+  .step-checkbox { width: 22px !important; height: 22px !important; min-width: 22px !important; }
+  .step-item { padding: 12px 14px; gap: 12px; }
+  .step-title { font-size: 14px !important; }
+  .step-details { font-size: 12px !important; }
+
+  .dash-tip-dot { width: 6px; height: 6px; }
+  .dash-tip-dot.active { width: 16px; }
+  .dash-tips-track { min-height: 80px; }
+
+  .kanban-board { grid-template-columns: 1fr !important; }
+
+  .form-control { font-size: 16px; min-height: 46px; }
+  .form-control-textarea { min-height: 100px; font-size: 16px; }
+  .submit-btn { min-height: 48px; font-size: 15px; }
+  .kanban-new-btn { min-height: 42px; font-size: 14px; }
+
+  .slide-deck { height: auto; min-height: 320px; padding: 20px 14px; }
+  .slide-layout-capa h2 { font-size: 24px; }
+  .slide-layout-capa p { font-size: 14px; }
+  .slide-summary-grid { grid-template-columns: 1fr; }
+  .slide-module-cols { grid-template-columns: 1fr; gap: 16px; }
+  .slide-nav-btn { min-height: 44px; font-size: 13px; }
+
+  .modal-backdrop { align-items: flex-end; }
+  .modal-window {
+    width: 100%;
+    height: 88vh;
+    max-height: 88vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    margin: 0;
+  }
+
+  .mobile-menu-toggle {
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+    padding: 0;
+  }
+}
+
+/* ===== BARRA DE NAVEGAÇÃO INFERIOR (MOBILE) ===== */
+.mobile-bottom-nav { display: none; }
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: rgba(15, 23, 42, 0.97);
+    border-top: 1px solid var(--border-color);
+    backdrop-filter: blur(14px);
+    height: 60px;
+    align-items: stretch;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.55);
+  }
+
+  .mobile-nav-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-family);
+    font-size: 10px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 6px 2px 8px;
+    position: relative;
+  }
+
+  .mobile-nav-btn.active { color: var(--color-primary); }
+
+  .mobile-nav-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 2px;
+    background: var(--color-primary);
+    border-radius: 0 0 3px 3px;
+    box-shadow: 0 0 8px rgba(59,130,246,0.5);
+  }
+
+  .mobile-nav-btn svg { width: 20px; height: 20px; }
+}
