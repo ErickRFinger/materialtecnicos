@@ -737,10 +737,16 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <div class="guide-toggle-icon">▼</div>
         </div>
-        <div class="guide-body">
-          <p class="guide-intro">${guide.descricao}</p>
+        <div class="guide-body" id="pdf-content-${guide.id}">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 16px;">
+            <p class="guide-intro" style="margin-bottom: 0; flex-grow: 1;">${guide.descricao}</p>
+            <button class="generate-pdf-btn ignore-pdf" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; white-space: nowrap; transition: 0.2s;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              PDF
+            </button>
+          </div>
           
-          <div class="guide-progress-container">
+          <div class="guide-progress-container ignore-pdf">
             <div class="guide-progress-text">
               <span>Progresso de Execução Segura</span>
               <span class="progress-percentage">0%</span>
@@ -802,6 +808,48 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
       });
+
+      // Lógica do botão de Gerar PDF
+      const pdfBtn = accordion.querySelector('.generate-pdf-btn');
+      if (pdfBtn) {
+        pdfBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetId = `pdf-content-${guide.id}`;
+          const element = document.getElementById(targetId);
+          if (!element || typeof html2pdf === 'undefined') return;
+          
+          const clone = element.cloneNode(true);
+          const ignores = clone.querySelectorAll('.ignore-pdf, .related-videos-section, input[type="checkbox"]');
+          ignores.forEach(el => el.remove());
+          
+          // Ajustes de estilo para leitura em papel/fundo claro
+          clone.style.padding = "20px";
+          clone.style.backgroundColor = "#fff";
+          clone.style.color = "#000";
+          
+          const title = document.createElement('h2');
+          title.textContent = guide.titulo;
+          title.style.marginBottom = "15px";
+          title.style.color = "#000";
+          clone.insertBefore(title, clone.firstChild);
+
+          clone.querySelectorAll('.step-title').forEach(t => t.style.color = "#1a1c23");
+          clone.querySelectorAll('.step-details').forEach(d => d.style.color = "#444");
+          
+          const opt = {
+            margin:       0.5,
+            filename:     `VIGI_Manual_${guide.id}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+          };
+          
+          pdfBtn.textContent = 'Gerando...';
+          html2pdf().set(opt).from(clone).save().then(() => {
+            pdfBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PDF';
+          });
+        });
+      }
 
       // Inicializar barra de progresso individual do guia
       calculateGuideProgress(accordion, guide);

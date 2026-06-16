@@ -363,6 +363,110 @@ const VIGI_DATA = {
         }
       ],
       videosRelacionados: ["v-alarme-1", "v-alarme-3"]
+    },
+    {
+      id: "man-4",
+      titulo: "Troubleshooting: Câmera Sem Imagem (Perda de Vídeo)",
+      categoria: "Manutenção Corretiva",
+      autor: "Engenharia de Suporte VIGI",
+      descricao: "Passo a passo para diagnóstico rápido quando uma ou mais câmeras perdem o sinal de vídeo no DVR.",
+      passos: [
+        {
+          titulo: "1. Verificação de Alimentação (Fonte)",
+          detalhe: "Meça a tensão da fonte principal com um multímetro. Se a voltagem estiver abaixo de 11.5V na chegada da câmera, o infravermelho não vai acionar ou a imagem vai apagar à noite. Troque a fonte ou verifique mau contato no conector P4."
+        },
+        {
+          titulo: "2. Teste de Conectores (BNC/Balun)",
+          detalhe: "Refaça as pontas dos conectores BNC ou Baluns tanto no lado do DVR quanto no lado da câmera. Mau contato é a principal causa de perda de vídeo intermitente."
+        },
+        {
+          titulo: "3. Teste em Porta Diferente do DVR",
+          detalhe: "Conecte a câmera com defeito em um canal que esteja funcionando perfeitamente no DVR. Se a imagem abrir, o canal anterior do DVR pode estar queimado."
+        },
+        {
+          titulo: "4. Teste com Cabo Auxiliar (Curto)",
+          detalhe: "Leve a câmera até o DVR e conecte com um cabo curto de teste (patch cord BNC). Se funcionar, o problema está no cabeamento da infraestrutura do cliente."
+        }
+      ],
+      videosRelacionados: []
+    },
+    {
+      id: "man-5",
+      titulo: "Guia de Configuração e Uso do App Hik-Connect",
+      categoria: "Aplicativos Mobile",
+      autor: "Engenharia de Suporte VIGI",
+      descricao: "Procedimentos comuns e resolução de problemas no aplicativo do cliente final para sistemas Hikvision.",
+      passos: [
+        {
+          titulo: "1. Login e Criação de Conta",
+          detalhe: "Oriente o cliente a criar uma conta usando e-mail ou telefone. Guarde a senha criada na ordem de serviço. Acesse a conta e faça a leitura do QR Code do DVR."
+        },
+        {
+          titulo: "2. Compartilhamento de Dispositivos",
+          detalhe: "Nunca adicione o DVR escaneando o QR Code diretamente no celular de um segundo usuário. O primeiro usuário (Admin) deve compartilhar as câmeras pelo próprio aplicativo para os demais familiares."
+        },
+        {
+          titulo: "3. Desabilitar Modo Tablet",
+          detalhe: "Se o aplicativo do cliente estiver com a tela deformada ou ícones fora do lugar, vá em Mais > Configurações e desative a opção 'Modo Tablet'."
+        },
+        {
+          titulo: "4. Busca e Download de Gravações",
+          detalhe: "No menu de reprodução, selecione a data e a câmera. Use a ferramenta de 'Tesoura' para cortar o trecho exato e salve. O vídeo ficará na aba 'Imagens e Vídeos' do próprio app, de onde pode ser enviado por WhatsApp."
+        }
+      ],
+      videosRelacionados: ["v-hik-1", "v-hik-2", "v-hik-3", "v-hik-6", "v-hik-7"]
+    },
+    {
+      id: "man-6",
+      titulo: "Boas Práticas de Cabeamento e Infraestrutura",
+      categoria: "Instalação Física",
+      autor: "Engenharia de Suporte VIGI",
+      descricao: "Normas básicas para garantir a durabilidade e qualidade da imagem, evitando interferências no CFTV.",
+      passos: [
+        {
+          titulo: "1. Separação de Cabos",
+          detalhe: "Nunca passe o cabo de vídeo (coaxial ou UTP) na mesma tubulação de cabos de energia elétrica (110V/220V). O campo magnético da rede elétrica gera interferência, chuviscos e faixas rolando na imagem."
+        },
+        {
+          titulo: "2. Emendas Adequadas",
+          detalhe: "Evite emendas no cabo de vídeo. Se for inevitável, utilize conectores BNC fêmea-fêmea (emenda BNC) ou solda bem isolada. Emendas apenas torcidas com fita isolante oxidam rapidamente."
+        },
+        {
+          titulo: "3. Distância Máxima do Cabeamento",
+          detalhe: "Para cabos UTP (rede) usando Balun passivo de qualidade, o limite seguro para imagem HD é de 300 metros, e para energia (12V) evite ultrapassar 30 metros para evitar queda de tensão. Use fontes próximas às câmeras se a distância for maior."
+        },
+        {
+          titulo: "4. Isolamento dos Conectores (Caixas de Passagem)",
+          detalhe: "Sempre utilize caixas de passagem (condulete ou caixas VBOX) atrás das câmeras. Proteger os conectores balun/BNC da chuva e umidade evita 80% das chamadas de manutenção."
+        }
+      ],
+      videosRelacionados: []
+    },
+    {
+      id: "man-7",
+      titulo: "Acesso Web via Navegador (IP Local)",
+      categoria: "Redes e Acesso",
+      autor: "Engenharia de Suporte VIGI",
+      descricao: "Procedimento para acessar as configurações avançadas do DVR através do computador na rede local.",
+      passos: [
+        {
+          titulo: "1. Descobrir o IP do Gravador",
+          detalhe: "Conecte o notebook na mesma rede (Wi-Fi ou cabo) do DVR. Use o software SADP (Hikvision) ou EZTools (Uniview) para localizar o IP exato do gravador na rede."
+        },
+        {
+          titulo: "2. Utilizar o Navegador Correto",
+          detalhe: "A maioria dos DVRs exige o Microsoft Edge no 'Modo Internet Explorer' para exibir a imagem corretamente e baixar os plugins, ou um navegador atualizado dependendo da versão do firmware."
+        },
+        {
+          titulo: "3. Instalação do Plugin",
+          detalhe: "Ao acessar o IP, na tela de login será solicitado o download de um plugin (ex: WebComponents). Baixe, feche o navegador, instale o plugin e abra o navegador novamente."
+        },
+        {
+          titulo: "4. Configurações Avançadas",
+          detalhe: "Através do acesso Web é possível configurar eventos inteligentes de vídeo, exportar logs de sistema e ajustar parâmetros de rede que não estão disponíveis no app do celular."
+        }
+      ],
+      videosRelacionados: []
     }
   ],
 

@@ -1,0 +1,21 @@
+{
+  "name": "Portal Técnico VIGI",
+  "short_name": "VIGI Técnicos",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1a1c23",
+  "theme_color": "#1a1c23",
+  "description": "Portal offline e central de vídeos, artes e manuais VIGI Câmeras",
+  "icons": [
+    {
+      "src": "VIGI.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "VIGI.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
