@@ -470,10 +470,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const tagClass = getBrandTagClass(video.categoria);
       const isFav = favorites.some(fav => fav.id === video.id);
 
+      const categoryCovers = {
+        "Alarme": "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80",
+        "Hikvision": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=600&q=80",
+        "Uniview": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80",
+        "Material Técnico": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=600&q=80"
+      };
+      const defaultCover = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80";
+      const capaUrl = video.capa || categoryCovers[video.categoria] || defaultCover;
+
       card.innerHTML = `
         <div class="video-thumbnail">
+          <img src="${capaUrl}" alt="Capa do vídeo" class="video-cover-img" />
+          <div class="thumbnail-overlay"></div>
           <span class="video-brand-tag ${tagClass}">${video.categoria}</span>
-          <div class="thumbnail-pattern"></div>
           <button class="play-overlay-btn" aria-label="Assistir Vídeo">▶</button>
         </div>
         <div class="video-card-body">
@@ -1955,6 +1965,7 @@ document.addEventListener("DOMContentLoaded", () => {
   init();
 
 });
+
 
 
 
