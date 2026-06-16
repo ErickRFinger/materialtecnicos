@@ -75,7 +75,7 @@
   async function checkUserAccess(userId) {
     const { data, error } = await supabase
       .from("vigi_access")
-      .select("granted, role")
+      .select("*")
       .eq("user_id", userId)
       .single();
 
@@ -423,5 +423,6 @@
   });
 
 })();
+
 
 
