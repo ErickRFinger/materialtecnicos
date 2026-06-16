@@ -1,4 +1,4 @@
-/* ==========================================================================
+ï»¿/* ==========================================================================
    PORTAL TÃ‰CNICO VIGI - DESIGN SYSTEM
    ========================================================================== */
 
@@ -1159,6 +1159,11 @@ body {
   outline: none;
   background-color: rgba(255, 255, 255, 0.06);
   border-color: var(--color-primary);
+}
+
+select.form-control option {
+  background-color: var(--bg-surface);
+  color: var(--text-main);
 }
 
 .form-control-textarea {
@@ -2970,7 +2975,7 @@ body {
 .dash-quick-label {
   font-size: 14px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-main);
   line-height: 1.2;
 }
 .dash-quick-sub {
@@ -3160,7 +3165,7 @@ body {
 
 
 /* ==========================================================================
-   MELHORIAS MOBILE — USO EM CAMPO
+   MELHORIAS MOBILE ï¿½ USO EM CAMPO
    ========================================================================== */
 
 @media (max-width: 768px) {
@@ -3272,7 +3277,7 @@ body {
   }
 }
 
-/* ===== BARRA DE NAVEGAÇÃO INFERIOR (MOBILE) ===== */
+/* ===== BARRA DE NAVEGAï¿½ï¿½O INFERIOR (MOBILE) ===== */
 .mobile-bottom-nav { display: none; }
 
 @media (max-width: 768px) {
@@ -3544,3 +3549,4 @@ body {
   color: rgba(148,163,184,0.35);
   margin: 0;
 }
+

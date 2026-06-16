@@ -1,9 +1,11 @@
-const CACHE_NAME = 'vigi-portal-cache-v4';
+const CACHE_NAME = 'vigi-portal-cache-v5';
 const urlsToCache = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './auth.js',
+  './supabase-config.js',
   './data.js',
   './VIGI.png',
   './icon-192.png',
@@ -15,14 +17,14 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Opened cache v5');
         return cache.addAll(urlsToCache);
       })
   );
   self.skipWaiting();
 });
 
-// Activate event
+// Activate event — apaga todos os caches antigos
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -39,46 +41,30 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch event
+// Fetch event — network first para HTML/JS/CSS, cache para imagens
 self.addEventListener('fetch', event => {
-  // Only handle GET requests for cache
   if (event.request.method !== 'GET') return;
-  
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        
-        // Clone the request
-        const fetchRequest = event.request.clone();
 
-        return fetch(fetchRequest).then(
-          response => {
-            // Check if we received a valid response
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
+  const url = new URL(event.request.url);
+  const isAsset = /\.(png|jpg|jpeg|svg|ico|woff2?)$/.test(url.pathname);
 
-            // Clone the response
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                // Don't cache opaque responses or chrome-extension URLs
-                if (event.request.url.startsWith('http') || event.request.url.startsWith('https')) {
-                  cache.put(event.request, responseToCache);
-                }
-              });
-
-            return response;
+  if (isAsset) {
+    // Cache first para imagens/fontes
+    event.respondWith(
+      caches.match(event.request).then(cached => cached || fetch(event.request))
+    );
+  } else {
+    // Network first para HTML/JS/CSS — sempre pega versão mais recente
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response && response.status === 200) {
+            const toCache = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, toCache));
           }
-        ).catch(() => {
-          // If offline and request fails, try to return offline page or do nothing
-          // This app is an SPA so the shell is already loaded
-        });
-      })
-  );
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  }
 });

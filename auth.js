@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    AUTH.JS — SISTEMA DE AUTENTICAÇÃO SUPABASE
    Portal Técnico VIGI Câmeras
    ========================================================================== */
@@ -71,16 +71,16 @@
     signupSpinner.style.display = loading ? "inline" : "none";
   }
 
-  // ── Verificar se usuário tem acesso liberado ──────────────────────────────
+  // ── Verificar se usuário tem acesso liberado e qual o papel ─────────────
   async function checkUserAccess(userId) {
     const { data, error } = await supabase
       .from("vigi_access")
-      .select("granted")
+      .select("granted, role")
       .eq("user_id", userId)
       .single();
 
-    if (error) return false; // sem registro = sem acesso
-    return data?.granted === true;
+    if (error) return { granted: false, role: "tecnico" };
+    return { granted: data?.granted === true, role: data?.role || "tecnico" };
   }
 
   // ── Verificar sessão única por dispositivo ────────────────────────────────
@@ -180,11 +180,18 @@
     if (waitingOverlay) waitingOverlay.style.display = "flex";
   }
 
-  function showApp(user) {
+  function showApp(user, role) {
     const name = user.user_metadata?.nome || user.email.split("@")[0];
-    if (userDisplayName) userDisplayName.textContent = name;
+    if (userDisplayName) {
+      const badge = (role === "admin")
+        ? ` <span class="admin-badge">ADMIN</span>`
+        : "";
+      userDisplayName.innerHTML = name + badge;
+    }
     hideAll();
-    // O app-container fica visível (nunca foi ocultado, só o overlay cobre)
+    // Expõe o papel globalmente para o app.js usar
+    window.VIGI_USER_ROLE = role || "tecnico";
+    window.VIGI_USER_EMAIL = user.email;
   }
 
   // ── Tabs ──────────────────────────────────────────────────────────────────
@@ -240,26 +247,33 @@
     await upsertSession(user.id, user.email, token);
 
     // 3. Verificar acesso liberado
-    const hasAccess = await checkUserAccess(user.id);
+    const access = await checkUserAccess(user.id);
 
-    if (!hasAccess) {
+    if (!access.granted) {
       // Usuário logado mas sem acesso liberado → tela de espera
       showWaitingScreen();
       // Fica verificando a cada 30s se o acesso foi liberado
       const accessCheckInterval = setInterval(async () => {
-        const granted = await checkUserAccess(user.id);
-        if (granted) {
+        const result = await checkUserAccess(user.id);
+        if (result.granted) {
           clearInterval(accessCheckInterval);
+          // Salva o papel (role) na sessão
+          const userData = JSON.parse(sessionStorage.getItem(SESSION_USER_KEY) || "{}");
+          userData.role = result.role;
+          sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(userData));
           startHeartbeat(user.id, token);
-          showApp(user);
+          showApp(user, result.role);
         }
       }, 30_000);
       return;
     }
 
-    // 4. Acesso OK — iniciar heartbeat e mostrar app
+    // 4. Acesso OK — salvar role e mostrar app
+    const userData = JSON.parse(sessionStorage.getItem(SESSION_USER_KEY) || "{}");
+    userData.role = access.role;
+    sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(userData));
     startHeartbeat(user.id, token);
-    showApp(user);
+    showApp(user, access.role);
   }
 
   // ── FLUXO DE LOGIN ────────────────────────────────────────────────────────
@@ -337,9 +351,9 @@
         return;
       }
 
-      // Senão mostra mensagem de confirmação
+      // Cadastro criado — instrui a fazer login
       signupSuccess.style.display = "block";
-      signupSuccess.textContent = "✅ Cadastro realizado! Verifique seu e-mail para confirmar a conta e então faça login.";
+      signupSuccess.textContent = "✅ Cadastro realizado! Clique em \"Entrar\" e faça login com seu e-mail e senha.";
       signupForm.reset();
 
     } catch (err) {
@@ -409,3 +423,5 @@
   });
 
 })();
+
+
