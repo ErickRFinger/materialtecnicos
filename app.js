@@ -822,10 +822,13 @@ document.addEventListener("DOMContentLoaded", () => {
           const ignores = clone.querySelectorAll('.ignore-pdf, .related-videos-section, input[type="checkbox"]');
           ignores.forEach(el => el.remove());
           
-          // Ajustes de estilo para leitura em papel/fundo claro
+          // Ajustes de estilo para leitura em papel/fundo claro e evitar corte (clipping)
           clone.style.padding = "20px";
           clone.style.backgroundColor = "#fff";
           clone.style.color = "#000";
+          clone.style.maxHeight = "none";
+          clone.style.overflow = "visible";
+          clone.style.height = "auto";
           
           const title = document.createElement('h2');
           title.textContent = guide.titulo;
@@ -835,6 +838,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
           clone.querySelectorAll('.step-title').forEach(t => t.style.color = "#1a1c23");
           clone.querySelectorAll('.step-details').forEach(d => d.style.color = "#444");
+          
+          // Force elements inside to not be hidden
+          clone.querySelectorAll('*').forEach(el => {
+            el.style.overflow = "visible";
+            el.style.maxHeight = "none";
+          });
           
           const opt = {
             margin:       0.5,
@@ -911,12 +920,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Mock inicial para primeira visita
   function seedMocks() {
-    return [
-      { id:"req-mock-1", nome:"Guilherme Silva", titulo:"Reset físico central Intelbras ANM 24 NET", tipo:"Vídeo Tutorial", urgencia:"Alta", status:"Em Gravação", data:"05/06/2026", upvotes:24, descricao:"Procedimento passo a passo para fazer o reset físico da central Intelbras modelo ANM 24 NET em campo.", adminReply:"Material em produção na bancada técnica. Previsão de publicação: Quarta-feira (10/06)." },
-      { id:"req-mock-2", nome:"Diego Souza", titulo:"Esquema de ligação de sensores sem fio", tipo:"Tabela / Imagem Informativa", urgencia:"Média", status:"Pronto", data:"01/06/2026", upvotes:12, descricao:"Tabela com especificações técnicas de distância de cada sensor de presença sem fio.", adminReply:"Disponível na aba Artes & Tabelas." },
-      { id:"req-mock-3", nome:"Carlos Oliveira", titulo:"Configurar fuso horário e NTP no DVR Uniview", tipo:"Vídeo Tutorial", urgencia:"Alta", status:"Pronto", data:"07/06/2026", upvotes:18, descricao:"Muitos clientes reclamam de fuso horário incorreto em Uniview, causando falhas na busca remota.", adminReply:"Disponível no Guia de Reset e Configuração Básica de DVR (Passo 3)." },
-      { id:"req-mock-4", nome:"Felipe Rodrigues", titulo:"Como utilizar o aplicativo Hik-Connect", tipo:"Vídeo Tutorial", urgencia:"Alta", status:"Pendente", data:"04/06/2026", upvotes:31, descricao:"Download, criação da conta e adição de dispositivo por QR Code no Hik-Connect." }
-    ];
+    return [];
   }
 
   function getRequests() {
