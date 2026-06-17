@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    AUTH.JS — SISTEMA DE AUTENTICAÇÃO SUPABASE
    Portal Técnico VIGI Câmeras
    ========================================================================== */
@@ -190,9 +190,17 @@
       userDisplayName.innerHTML = name + badge;
     }
     hideAll();
-    // Expõe o papel globalmente para o app.js usar
+    // Expõe o papel e nome globalmente para o app.js usar
     window.VIGI_USER_ROLE = role || "tecnico";
     window.VIGI_USER_EMAIL = user.email;
+    window.VIGI_USER_NAME  = name;
+
+    // Atualiza o banner de saudação do dashboard com o nome real do usuário
+    const dashNameEl = document.getElementById("dashUserName");
+    if (dashNameEl) {
+      const firstName = name.split(" ")[0];
+      dashNameEl.textContent = firstName;
+    }
   }
 
   // ── Tabs ──────────────────────────────────────────────────────────────────

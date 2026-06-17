@@ -139,19 +139,179 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Busca Global
+    // ── BUSCA GLOBAL UNIFICADA ────────────────────────────────────────────────
+    const searchContainer = globalSearch?.closest(".search-container");
+    const searchPanel     = document.getElementById("globalSearchPanel");
+
+    // Função auxiliar: destaca o termo no texto
+    function highlight(text, term) {
+      if (!term) return text;
+      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return text.replace(new RegExp(`(${escaped})`, "gi"),
+        '<span class="gsp-highlight">$1</span>');
+    }
+
+    function openSearchPanel() {
+      if (!searchPanel) return;
+      searchPanel.style.display = "block";
+      searchContainer?.classList.add("panel-active");
+    }
+
+    function closeSearchPanel() {
+      if (!searchPanel) return;
+      searchPanel.style.display = "none";
+      searchContainer?.classList.remove("panel-active");
+    }
+
+    function runGlobalSearch(query) {
+      if (!searchPanel) return;
+      if (!query || query.length < 2) { closeSearchPanel(); return; }
+      openSearchPanel();
+
+      const q = query.toLowerCase();
+
+      // ── Vídeos ──
+      const vidResults = VIGI_DATA.videos.filter(v =>
+        v.titulo.toLowerCase().includes(q) ||
+        v.descricao.toLowerCase().includes(q) ||
+        v.categoria.toLowerCase().includes(q)
+      ).slice(0, 5);
+
+      // ── Artes ──
+      const artResults = VIGI_DATA.artes.filter(a =>
+        a.titulo.toLowerCase().includes(q) ||
+        a.descricao.toLowerCase().includes(q) ||
+        a.categoria.toLowerCase().includes(q)
+      ).slice(0, 4);
+
+      // ── Manuais ──
+      const manResults = VIGI_DATA.manuais.filter(m =>
+        m.titulo.toLowerCase().includes(q) ||
+        m.descricao.toLowerCase().includes(q) ||
+        m.categoria.toLowerCase().includes(q)
+      ).slice(0, 4);
+
+      const total = vidResults.length + artResults.length + manResults.length;
+
+      // ── Renderizar seção de vídeos ──
+      const gspVideos = document.getElementById("gspVideos");
+      const gspVideosList = document.getElementById("gspVideosList");
+      const gspVideosCount = document.getElementById("gspVideosCount");
+      if (gspVideos && gspVideosList) {
+        gspVideos.style.display = vidResults.length ? "block" : "none";
+        if (gspVideosCount) gspVideosCount.textContent = vidResults.length;
+        gspVideosList.innerHTML = vidResults.map(v => `
+          <button class="gsp-item" data-gsp-type="video" data-gsp-id="${v.id}">
+            <span class="gsp-item-icon gsp-icon-video">🎬</span>
+            <span class="gsp-item-info">
+              <span class="gsp-item-title">${highlight(v.titulo, query)}</span>
+              <span class="gsp-item-sub">${highlight(v.descricao.substring(0,60), query)}...</span>
+            </span>
+            <span class="gsp-item-tag tag-video">${v.categoria}</span>
+            <span class="gsp-item-arrow">›</span>
+          </button>
+        `).join("");
+      }
+
+      // ── Renderizar seção de artes ──
+      const gspArtes = document.getElementById("gspArtes");
+      const gspArtesList = document.getElementById("gspArtesList");
+      const gspArtesCount = document.getElementById("gspArtesCount");
+      if (gspArtes && gspArtesList) {
+        gspArtes.style.display = artResults.length ? "block" : "none";
+        if (gspArtesCount) gspArtesCount.textContent = artResults.length;
+        gspArtesList.innerHTML = artResults.map(a => `
+          <button class="gsp-item" data-gsp-type="arte" data-gsp-id="${a.id}">
+            <span class="gsp-item-icon gsp-icon-arte">🖼️</span>
+            <span class="gsp-item-info">
+              <span class="gsp-item-title">${highlight(a.titulo, query)}</span>
+              <span class="gsp-item-sub">${highlight(a.categoria, query)}</span>
+            </span>
+            <span class="gsp-item-tag tag-arte">Arte</span>
+            <span class="gsp-item-arrow">›</span>
+          </button>
+        `).join("");
+      }
+
+      // ── Renderizar seção de manuais ──
+      const gspManuais = document.getElementById("gspManuais");
+      const gspManuaisList = document.getElementById("gspManuaisList");
+      const gspManuaisCount = document.getElementById("gspManuaisCount");
+      if (gspManuais && gspManuaisList) {
+        gspManuais.style.display = manResults.length ? "block" : "none";
+        if (gspManuaisCount) gspManuaisCount.textContent = manResults.length;
+        gspManuaisList.innerHTML = manResults.map(m => `
+          <button class="gsp-item" data-gsp-type="manual" data-gsp-id="${m.id}">
+            <span class="gsp-item-icon gsp-icon-manual">📋</span>
+            <span class="gsp-item-info">
+              <span class="gsp-item-title">${highlight(m.titulo, query)}</span>
+              <span class="gsp-item-sub">${highlight(m.categoria, query)}</span>
+            </span>
+            <span class="gsp-item-tag tag-manual">Guia</span>
+            <span class="gsp-item-arrow">›</span>
+          </button>
+        `).join("");
+      }
+
+      // ── Estado vazio ──
+      const gspEmpty = document.getElementById("gspEmpty");
+      if (gspEmpty) gspEmpty.style.display = total === 0 ? "flex" : "none";
+
+      // ── Delegação de cliques nos itens ──
+      searchPanel.querySelectorAll(".gsp-item").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const type = btn.getAttribute("data-gsp-type");
+          const id   = btn.getAttribute("data-gsp-id");
+          closeSearchPanel();
+          if (globalSearch) globalSearch.value = "";
+          currentSearchQuery = "";
+
+          if (type === "video") {
+            switchTab("videos");
+            const videoObj = VIGI_DATA.videos.find(v => v.id === id);
+            if (videoObj) setTimeout(() => openVideoPlayer(videoObj), 200);
+          } else if (type === "arte") {
+            switchTab("artes");
+            const artObj = VIGI_DATA.artes.find(a => a.id === id);
+            if (artObj) setTimeout(() => openLightbox(artObj), 200);
+          } else if (type === "manual") {
+            switchTab("manuais");
+            setTimeout(() => openGuide(id), 200);
+          }
+        });
+      });
+    }
+
     if (globalSearch) {
       globalSearch.addEventListener("input", (e) => {
         currentSearchQuery = e.target.value.toLowerCase().trim();
-        
-        // Se o usuário começar a digitar na Dashboard, muda para a aba de Vídeos automaticamente
-        if (currentActiveTab === "dashboard" && currentSearchQuery.length > 0) {
-          switchTab("videos");
-        } else {
-          applyFiltersAndSearch();
-        }
+        runGlobalSearch(e.target.value.trim());
+        // Manter filtragem nas abas que não são dashboard
+        if (currentActiveTab !== "dashboard") applyFiltersAndSearch();
+      });
+
+      // Fechar ao pressionar ESC
+      globalSearch.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") { closeSearchPanel(); globalSearch.blur(); }
+      });
+
+      // Abrir painel ao focar se já tem texto
+      globalSearch.addEventListener("focus", () => {
+        if (globalSearch.value.trim().length >= 2) runGlobalSearch(globalSearch.value.trim());
       });
     }
+
+    // Fechar ao clicar fora
+    document.addEventListener("click", (e) => {
+      if (!searchContainer?.contains(e.target)) closeSearchPanel();
+    });
+
+    // ESC global também fecha
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && searchPanel?.style.display !== "none") {
+        closeSearchPanel();
+      }
+    });
 
     // Filtros de Categoria de Vídeo
     if (videoFilterBar) {
@@ -481,18 +641,26 @@ document.addEventListener("DOMContentLoaded", () => {
     if (emojiEl) emojiEl.textContent = emoji;
     if (labelEl) labelEl.textContent = greeting;
 
-    // Buscar nome do usuário na sessão
-    try {
-      const userData = JSON.parse(sessionStorage.getItem("vigi_session_user") || "{}");
-      const nome = userData.nome || userData.email?.split("@")[0] || "Técnico";
-      const firstName = nome.split(" ")[0];
-      if (nameEl) nameEl.textContent = firstName;
-    } catch(e) {
-      // fallback: usar o nome já exibido no header
+    // Buscar nome do usuário — prioriza o valor definido pelo auth.js
+    function resolveFirstName() {
+      // 1) window.VIGI_USER_NAME: definido pelo auth.js imediatamente após login
+      if (window.VIGI_USER_NAME && window.VIGI_USER_NAME.trim()) {
+        return window.VIGI_USER_NAME.split(" ")[0];
+      }
+      // 2) sessionStorage: disponível em reloads
+      try {
+        const userData = JSON.parse(sessionStorage.getItem("vigi_session_user") || "{}");
+        const nome = userData.nome || userData.email?.split("@")[0] || "";
+        if (nome.trim()) return nome.split(" ")[0];
+      } catch(e) { /* ignora */ }
+      // 3) Texto do header (já preenchido pelo auth)
       const displayEl = document.getElementById("userDisplayName");
-      const nome = displayEl?.textContent?.replace(" ADMIN", "").trim() || "Técnico";
-      if (nameEl) nameEl.textContent = nome.split(" ")[0];
+      const headerName = displayEl?.textContent?.replace("ADMIN", "").trim() || "";
+      if (headerName) return headerName.split(" ")[0];
+      return "Técnico";
     }
+
+    if (nameEl) nameEl.textContent = resolveFirstName();
 
     // Atualizar data/hora em tempo real
     function updateDatetime() {

@@ -235,7 +235,42 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" class="search-input" id="globalSearch" placeholder="O que você está procurando hoje?">
+          <input type="text" class="search-input" id="globalSearch" placeholder="Buscar em tudo... (vídeos, artes, manuais)" autocomplete="off">
+          <!-- Painel de resultados unificado -->
+          <div class="global-search-panel" id="globalSearchPanel" style="display:none;">
+            <div class="gsp-section" id="gspVideos" style="display:none;">
+              <div class="gsp-section-header">
+                <span class="gsp-section-icon">🎬</span>
+                <span class="gsp-section-title">Vídeos de Suporte</span>
+                <span class="gsp-section-count" id="gspVideosCount"></span>
+              </div>
+              <div class="gsp-items" id="gspVideosList"></div>
+            </div>
+            <div class="gsp-section" id="gspArtes" style="display:none;">
+              <div class="gsp-section-header">
+                <span class="gsp-section-icon">🖼️</span>
+                <span class="gsp-section-title">Artes & Tabelas</span>
+                <span class="gsp-section-count" id="gspArtesCount"></span>
+              </div>
+              <div class="gsp-items" id="gspArtesList"></div>
+            </div>
+            <div class="gsp-section" id="gspManuais" style="display:none;">
+              <div class="gsp-section-header">
+                <span class="gsp-section-icon">📋</span>
+                <span class="gsp-section-title">Guias & Manuais</span>
+                <span class="gsp-section-count" id="gspManuaisCount"></span>
+              </div>
+              <div class="gsp-items" id="gspManuaisList"></div>
+            </div>
+            <div class="gsp-empty" id="gspEmpty" style="display:none;">
+              <span style="font-size:24px;">🔍</span>
+              <p>Nenhum resultado encontrado</p>
+            </div>
+            <div class="gsp-footer">
+              <span>Pressione <kbd>ESC</kbd> para fechar</span>
+            </div>
+          </div>
+
         </div>
         
         <div class="user-profile" id="userProfileArea">
