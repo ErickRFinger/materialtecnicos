@@ -642,21 +642,36 @@ document.addEventListener("DOMContentLoaded", () => {
     if (labelEl) labelEl.textContent = greeting;
 
     // Buscar nome do usuário — prioriza o valor definido pelo auth.js
+    // Utilitário: extrai o primeiro nome, nunca mostrando email completo
+    function parseName(raw) {
+      if (!raw || !raw.trim()) return null;
+      // Se for email, usa somente a parte antes do @
+      const val = raw.includes("@") ? raw.split("@")[0] : raw;
+      // Capitaliza primeira letra e retorna primeiro nome
+      const cleaned = val.trim();
+      return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).split(" ")[0];
+    }
+
     function resolveFirstName() {
       // 1) window.VIGI_USER_NAME: definido pelo auth.js imediatamente após login
-      if (window.VIGI_USER_NAME && window.VIGI_USER_NAME.trim()) {
-        return window.VIGI_USER_NAME.split(" ")[0];
-      }
+      const fromGlobal = parseName(window.VIGI_USER_NAME);
+      if (fromGlobal) return fromGlobal;
+
       // 2) sessionStorage: disponível em reloads
       try {
         const userData = JSON.parse(sessionStorage.getItem("vigi_session_user") || "{}");
-        const nome = userData.nome || userData.email?.split("@")[0] || "";
-        if (nome.trim()) return nome.split(" ")[0];
+        // Prioriza user_metadata.nome se disponível, senão usa nome salvo
+        const raw = userData.nome || userData.email || "";
+        const fromSession = parseName(raw);
+        if (fromSession) return fromSession;
       } catch(e) { /* ignora */ }
+
       // 3) Texto do header (já preenchido pelo auth)
       const displayEl = document.getElementById("userDisplayName");
-      const headerName = displayEl?.textContent?.replace("ADMIN", "").trim() || "";
-      if (headerName) return headerName.split(" ")[0];
+      const headerRaw = displayEl?.textContent?.replace("ADMIN", "").trim() || "";
+      const fromHeader = parseName(headerRaw);
+      if (fromHeader) return fromHeader;
+
       return "Técnico";
     }
 
@@ -667,13 +682,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const now = new Date();
       const options = { weekday: "long", day: "numeric", month: "long" };
       const datePart = now.toLocaleDateString("pt-BR", options);
-      // Capitalizar primeira letra
       const dateFormatted = datePart.charAt(0).toUpperCase() + datePart.slice(1);
       const timePart = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
       if (dtTextEl) dtTextEl.textContent = `${dateFormatted} — ${timePart}`;
     }
     updateDatetime();
-    setInterval(updateDatetime, 30000); // atualiza a cada 30s
+    setInterval(updateDatetime, 30000);
   }
 
   // ==========================================================================
@@ -1139,19 +1153,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const hiddenInput = document.getElementById("reqName");
     const nameDisplay = document.getElementById("reqNameText");
     if (!hiddenInput || !nameDisplay) return;
-    try {
-      const userData = JSON.parse(sessionStorage.getItem("vigi_session_user") || "{}");
-      const nome = userData.nome || userData.email?.split("@")[0] || "Técnico VIGI";
-      const firstName = nome.split(" ")[0];
-      hiddenInput.value = nome;
-      nameDisplay.textContent = nome;
-    } catch(e) {
-      const displayName = document.getElementById("userDisplayName");
-      const nome = displayName?.textContent?.replace(" ADMIN", "").trim() || "Técnico VIGI";
-      hiddenInput.value = nome;
-      nameDisplay.textContent = nome;
+
+    function safeNameFrom(raw) {
+      if (!raw || !raw.trim()) return null;
+      const val = raw.includes("@") ? raw.split("@")[0] : raw.trim();
+      return val.charAt(0).toUpperCase() + val.slice(1);
     }
+
+    const nome =
+      safeNameFrom(window.VIGI_USER_NAME) ||
+      (() => {
+        try {
+          const ud = JSON.parse(sessionStorage.getItem("vigi_session_user") || "{}");
+          return safeNameFrom(ud.nome || ud.email);
+        } catch(e) { return null; }
+      })() ||
+      safeNameFrom(document.getElementById("userDisplayName")?.textContent?.replace("ADMIN","").trim()) ||
+      "Técnico VIGI";
+
+    hiddenInput.value = nome;
+    nameDisplay.textContent = nome;
   }
+
+
 
   // Mock inicial para primeira visita
   function seedMocks() {

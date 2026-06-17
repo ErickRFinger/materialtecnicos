@@ -251,9 +251,13 @@
     // 2. Gerar/manter token e salvar sessão
     const token = localToken || generateToken();
     sessionStorage.setItem(SESSION_TOKEN_KEY, token);
+    // Usa o nome preenchido no cadastro; se não existir, usa a parte antes do @ do email
+    const displayName = user.user_metadata?.nome
+      || user.user_metadata?.full_name
+      || user.email.split("@")[0];
     sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify({
       id: user.id, email: user.email,
-      nome: user.user_metadata?.nome || user.email
+      nome: displayName
     }));
 
     await upsertSession(user.id, user.email, token);
