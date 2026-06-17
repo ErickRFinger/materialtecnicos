@@ -626,62 +626,54 @@ document.addEventListener("DOMContentLoaded", () => {
   // DASHBOARD — SAUDAÇÃO PERSONALIZADA + DATA/HORA
   // ==========================================================================
   function initDashboardGreeting() {
-    const emojiEl   = document.getElementById("dashGreetingEmoji");
-    const labelEl   = document.getElementById("dashHelloLabel");
-    const nameEl    = document.getElementById("dashUserName");
-    const dtTextEl  = document.getElementById("dashDatetimeText");
+    const emojiEl  = document.getElementById("dashGreetingEmoji");
+    const labelEl  = document.getElementById("dashHelloLabel");
+    const nameEl   = document.getElementById("dashUserName");
+    const dtTextEl = document.getElementById("dashDatetimeText");
 
-    // Determinar saudação por hora do dia
+    // Saudação por horário
     const hour = new Date().getHours();
-    let greeting = "Boa noite,";
-    let emoji    = "🌙";
-    if (hour >= 5  && hour < 12) { greeting = "Bom dia,";   emoji = "☀️"; }
-    else if (hour >= 12 && hour < 18) { greeting = "Boa tarde,";  emoji = "🌤️"; }
-
+    let greeting = "Boa noite,", emoji = "🌙";
+    if (hour >= 5  && hour < 12) { greeting = "Bom dia,";  emoji = "☀️"; }
+    else if (hour >= 12 && hour < 18) { greeting = "Boa tarde,"; emoji = "🌤️"; }
     if (emojiEl) emojiEl.textContent = emoji;
     if (labelEl) labelEl.textContent = greeting;
 
-    // Buscar nome do usuário — prioriza o valor definido pelo auth.js
-    // Utilitário: extrai o primeiro nome, nunca mostrando email completo
+    // Utilitário: nunca exibe email — extrai parte antes do @ e capitaliza
     function parseName(raw) {
       if (!raw || !raw.trim()) return null;
-      // Se for email, usa somente a parte antes do @
-      const val = raw.includes("@") ? raw.split("@")[0] : raw;
-      // Capitaliza primeira letra e retorna primeiro nome
-      const cleaned = val.trim();
-      return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).split(" ")[0];
+      const val = raw.includes("@") ? raw.split("@")[0] : raw.trim();
+      // Remove pontos/underscores e capitaliza primeira letra
+      const clean = val.replace(/[._]/g, " ").trim();
+      return clean.charAt(0).toUpperCase() + clean.slice(1).split(" ")[0];
     }
 
-    function resolveFirstName() {
-      // 1) window.VIGI_USER_NAME: definido pelo auth.js imediatamente após login
-      const fromGlobal = parseName(window.VIGI_USER_NAME);
-      if (fromGlobal) return fromGlobal;
+    // Expõe função global para o auth.js atualizar o nome após login
+    window.VIGI_updateDashName = function(rawName) {
+      const firstName = parseName(rawName) || "Técnico";
+      if (nameEl) nameEl.textContent = firstName;
+    };
 
-      // 2) sessionStorage: disponível em reloads
+    // Só define o nome agora se o auth.js ainda não o definiu
+    // (evita sobrescrever o valor correto já setado pelo showApp)
+    if (!window.VIGI_USER_NAME) {
+      // Tenta ler do sessionStorage (reloads)
       try {
         const userData = JSON.parse(sessionStorage.getItem("vigi_session_user") || "{}");
-        // Prioriza user_metadata.nome se disponível, senão usa nome salvo
         const raw = userData.nome || userData.email || "";
         const fromSession = parseName(raw);
-        if (fromSession) return fromSession;
+        if (nameEl && fromSession) nameEl.textContent = fromSession;
       } catch(e) { /* ignora */ }
-
-      // 3) Texto do header (já preenchido pelo auth)
-      const displayEl = document.getElementById("userDisplayName");
-      const headerRaw = displayEl?.textContent?.replace("ADMIN", "").trim() || "";
-      const fromHeader = parseName(headerRaw);
-      if (fromHeader) return fromHeader;
-
-      return "Técnico";
+    }
+    // Se VIGI_USER_NAME já está set (auth foi rápido), garantir exibição correta
+    else if (nameEl) {
+      nameEl.textContent = parseName(window.VIGI_USER_NAME) || "Técnico";
     }
 
-    if (nameEl) nameEl.textContent = resolveFirstName();
-
-    // Atualizar data/hora em tempo real
+    // Data/hora em tempo real
     function updateDatetime() {
       const now = new Date();
-      const options = { weekday: "long", day: "numeric", month: "long" };
-      const datePart = now.toLocaleDateString("pt-BR", options);
+      const datePart = now.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
       const dateFormatted = datePart.charAt(0).toUpperCase() + datePart.slice(1);
       const timePart = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
       if (dtTextEl) dtTextEl.textContent = `${dateFormatted} — ${timePart}`;

@@ -182,7 +182,7 @@
   }
 
   function showApp(user, role) {
-    const name = user.user_metadata?.nome || user.email.split("@")[0];
+    const name = user.user_metadata?.nome || user.user_metadata?.full_name || user.email.split("@")[0];
     if (userDisplayName) {
       const badge = (role === "admin")
         ? ` <span class="admin-badge">ADMIN</span>`
@@ -195,13 +195,20 @@
     window.VIGI_USER_EMAIL = user.email;
     window.VIGI_USER_NAME  = name;
 
-    // Atualiza o banner de saudação do dashboard com o nome real do usuário
-    const dashNameEl = document.getElementById("dashUserName");
-    if (dashNameEl) {
-      const firstName = name.split(" ")[0];
-      dashNameEl.textContent = firstName;
+    // Atualiza o banner de saudação com o nome REAL do usuário
+    // (usa a função exposta pelo app.js, ou atualiza o DOM diretamente)
+    if (typeof window.VIGI_updateDashName === "function") {
+      window.VIGI_updateDashName(name);
+    } else {
+      // Fallback: atualiza diretamente se app.js ainda não registrou a função
+      const dashNameEl = document.getElementById("dashUserName");
+      if (dashNameEl) {
+        const firstName = name.split(" ")[0];
+        dashNameEl.textContent = firstName;
+      }
     }
   }
+
 
   // ── Tabs ──────────────────────────────────────────────────────────────────
   tabLogin.addEventListener("click", () => {
