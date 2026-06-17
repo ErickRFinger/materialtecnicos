@@ -100,3 +100,24 @@ CREATE POLICY "Anon read access"
 -- FROM auth.users u
 -- LEFT JOIN public.vigi_access a ON a.user_id = u.id
 -- ORDER BY u.created_at DESC;
+
+
+-- ============================================================
+-- SESSÃO TRAVADA — "Login já está em outro dispositivo"
+-- ============================================================
+-- Acontece quando o browser fecha sem fazer logout.
+-- O registro fica na tabela vigi_sessions com last_seen recente.
+
+-- Limpar sessão de um usuário específico:
+-- DELETE FROM public.vigi_sessions
+-- WHERE user_email = 'tecnico@email.com';
+
+-- Limpar TODAS as sessões antigas (+ de 1h sem atividade):
+-- DELETE FROM public.vigi_sessions
+-- WHERE last_seen < NOW() - INTERVAL '1 hour';
+
+-- Ver todas as sessões ativas atualmente:
+-- SELECT user_email, device_info, last_seen
+-- FROM public.vigi_sessions
+-- ORDER BY last_seen DESC;
+
