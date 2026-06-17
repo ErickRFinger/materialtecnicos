@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    PORTAL TÉCNICO VIGI - APLICATIVO LOGIC
    ========================================================================== */
 
@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderSlide(currentSlideIndex);
     setupSlideDots();
     initTipsCarousel();
+    initDashboardGreeting();
     setupEventListeners();
   }
 
@@ -196,21 +197,67 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (toggleBtn && formPanel) {
       toggleBtn.addEventListener("click", () => {
-        const isOpen = formPanel.style.display !== "none";
-        formPanel.style.display = isOpen ? "none" : "block";
-        toggleBtn.textContent = isOpen ? "+ Nova Solicitação" : "✕ Fechar";
-        if (!isOpen) {
-          // Re-inject SVG icon when opening
+        const isOpen = formPanel.classList.contains("panel-open");
+        if (isOpen) {
+          formPanel.classList.remove("panel-open");
+          formPanel.style.display = "";
           toggleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova Solicitação`;
+          // Fechar via transição
+          setTimeout(() => { formPanel.style.display = "none"; }, 400);
+        } else {
+          formPanel.style.display = "block";
+          // Força reflow para iniciar a transição
+          formPanel.getBoundingClientRect();
+          formPanel.classList.add("panel-open");
+          toggleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Fechar`;
+          // Auto-preencher nome do usuário
+          fillUserName();
         }
       });
     }
     if (cancelBtn && formPanel) {
       cancelBtn.addEventListener("click", () => {
-        formPanel.style.display = "none";
-        if (requestForm) requestForm.reset();
+        formPanel.classList.remove("panel-open");
+        toggleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova Solicitação`;
+        setTimeout(() => {
+          formPanel.style.display = "none";
+          if (requestForm) requestForm.reset();
+          // Resetar contador
+          const counter = document.getElementById("reqCharCounter");
+          if (counter) { counter.textContent = "0 / 500"; counter.className = "req-char-counter"; }
+        }, 400);
       });
     }
+
+    // Contador de caracteres do textarea
+    const reqDesc = document.getElementById("reqDesc");
+    const reqCharCounter = document.getElementById("reqCharCounter");
+    if (reqDesc && reqCharCounter) {
+      reqDesc.addEventListener("input", () => {
+        const len = reqDesc.value.length;
+        reqCharCounter.textContent = `${len} / 500`;
+        reqCharCounter.className = "req-char-counter";
+        if (len >= 450) reqCharCounter.classList.add("danger");
+        else if (len >= 350) reqCharCounter.classList.add("warn");
+        if (len > 0) reqDesc.classList.add("valid");
+        else reqDesc.classList.remove("valid");
+      });
+    }
+
+    // Validação visual em tempo real nos campos do formulário
+    ["reqTitle", "reqType", "reqUrgency"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener("change", () => {
+          if (el.value.trim()) el.classList.add("valid");
+          else el.classList.remove("valid");
+        });
+        el.addEventListener("input", () => {
+          if (el.value.trim()) el.classList.add("valid");
+          else el.classList.remove("valid");
+        });
+      }
+    });
 
     // Limpar todas as solicitações
     const clearAllBtn = document.getElementById("btnClearAll");
@@ -413,6 +460,52 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (currentActiveTab === "manuais") {
       renderManuais(currentSearchQuery);
     }
+  }
+
+  // ==========================================================================
+  // DASHBOARD — SAUDAÇÃO PERSONALIZADA + DATA/HORA
+  // ==========================================================================
+  function initDashboardGreeting() {
+    const emojiEl   = document.getElementById("dashGreetingEmoji");
+    const labelEl   = document.getElementById("dashHelloLabel");
+    const nameEl    = document.getElementById("dashUserName");
+    const dtTextEl  = document.getElementById("dashDatetimeText");
+
+    // Determinar saudação por hora do dia
+    const hour = new Date().getHours();
+    let greeting = "Boa noite,";
+    let emoji    = "🌙";
+    if (hour >= 5  && hour < 12) { greeting = "Bom dia,";   emoji = "☀️"; }
+    else if (hour >= 12 && hour < 18) { greeting = "Boa tarde,";  emoji = "🌤️"; }
+
+    if (emojiEl) emojiEl.textContent = emoji;
+    if (labelEl) labelEl.textContent = greeting;
+
+    // Buscar nome do usuário na sessão
+    try {
+      const userData = JSON.parse(sessionStorage.getItem("vigi_session_user") || "{}");
+      const nome = userData.nome || userData.email?.split("@")[0] || "Técnico";
+      const firstName = nome.split(" ")[0];
+      if (nameEl) nameEl.textContent = firstName;
+    } catch(e) {
+      // fallback: usar o nome já exibido no header
+      const displayEl = document.getElementById("userDisplayName");
+      const nome = displayEl?.textContent?.replace(" ADMIN", "").trim() || "Técnico";
+      if (nameEl) nameEl.textContent = nome.split(" ")[0];
+    }
+
+    // Atualizar data/hora em tempo real
+    function updateDatetime() {
+      const now = new Date();
+      const options = { weekday: "long", day: "numeric", month: "long" };
+      const datePart = now.toLocaleDateString("pt-BR", options);
+      // Capitalizar primeira letra
+      const dateFormatted = datePart.charAt(0).toUpperCase() + datePart.slice(1);
+      const timePart = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      if (dtTextEl) dtTextEl.textContent = `${dateFormatted} — ${timePart}`;
+    }
+    updateDatetime();
+    setInterval(updateDatetime, 30000); // atualiza a cada 30s
   }
 
   // ==========================================================================
@@ -866,6 +959,32 @@ document.addEventListener("DOMContentLoaded", () => {
   const KANBAN_KEY = "vigi_requests";
   const STATUSES   = ["Pendente", "Em Gravação", "Pronto"];
 
+  // Mapa de ícone e classe CSS por tipo de conteúdo
+  const TYPE_CONFIG = {
+    "Vídeo Tutorial":              { icon: "🎬", cssClass: "type-video",   iconClass: "icon-video" },
+    "Manual / Guia Escrito":       { icon: "📋", cssClass: "type-manual",  iconClass: "icon-manual" },
+    "Tabela / Imagem Informativa": { icon: "🖼️", cssClass: "type-tabela", iconClass: "icon-tabela" },
+  };
+
+  // Auto-preencher nome do usuário logado no formulário
+  function fillUserName() {
+    const hiddenInput = document.getElementById("reqName");
+    const nameDisplay = document.getElementById("reqNameText");
+    if (!hiddenInput || !nameDisplay) return;
+    try {
+      const userData = JSON.parse(sessionStorage.getItem("vigi_session_user") || "{}");
+      const nome = userData.nome || userData.email?.split("@")[0] || "Técnico VIGI";
+      const firstName = nome.split(" ")[0];
+      hiddenInput.value = nome;
+      nameDisplay.textContent = nome;
+    } catch(e) {
+      const displayName = document.getElementById("userDisplayName");
+      const nome = displayName?.textContent?.replace(" ADMIN", "").trim() || "Técnico VIGI";
+      hiddenInput.value = nome;
+      nameDisplay.textContent = nome;
+    }
+  }
+
   // Mock inicial para primeira visita
   function seedMocks() {
     return [];
@@ -887,6 +1006,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handleRequestSubmit(e) {
     e.preventDefault();
+    // Garante que o nome está preenchido antes de submeter
+    fillUserName();
     const name    = document.getElementById("reqName").value.trim();
     const title   = document.getElementById("reqTitle").value.trim();
     const type    = document.getElementById("reqType").value;
@@ -907,9 +1028,17 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => { submitBtn.textContent = orig; submitBtn.style.background = ""; submitBtn.disabled = false; }, 2000);
 
     requestForm.reset();
-    // Fechar formulário
+    // Resetar contador de caracteres
+    const counter = document.getElementById("reqCharCounter");
+    if (counter) { counter.textContent = "0 / 500"; counter.className = "req-char-counter"; }
+    // Fechar formulário com animação
     const panel = document.getElementById("kanbanFormPanel");
-    if (panel) panel.style.display = "none";
+    const toggleBtn = document.getElementById("toggleKanbanForm");
+    if (panel) {
+      panel.classList.remove("panel-open");
+      if (toggleBtn) toggleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova Solicitação`;
+      setTimeout(() => { panel.style.display = "none"; }, 400);
+    }
     loadRequests();
   }
 
@@ -948,24 +1077,32 @@ document.addEventListener("DOMContentLoaded", () => {
       const urgClass = { Alta:"urg-alta", Média:"urg-media", Media:"urg-media", Baixa:"urg-baixa" }[req.urgencia] || "urg-media";
       const isVoted  = localStorage.getItem("vigi_voted_"+req.id) === "true";
 
+      // Config visual por tipo
+      const typeCfg = TYPE_CONFIG[req.tipo] || { icon: "📄", cssClass: "", iconClass: "" };
+
       // Botões de mover
       const statusIdx = STATUSES.indexOf(req.status);
       const movePrev  = statusIdx > 0 ? `<button class="kanban-move-btn" data-move="${req.id}" data-dir="-1">← Voltar</button>` : "";
       const moveNext  = statusIdx < STATUSES.length-1 ? `<button class="kanban-move-btn" data-move="${req.id}" data-dir="1">Avançar →</button>` : "";
 
       const card = document.createElement("div");
-      card.className = "kanban-card";
+      card.className = `kanban-card ${typeCfg.cssClass}`;
       card.setAttribute("draggable", "true");
       card.setAttribute("data-id", req.id);
       card.setAttribute("data-status", req.status);
 
       card.innerHTML = `
         <div class="kanban-card-header">
-          <span class="kanban-card-type">${req.tipo}</span>
-          <span class="kanban-urgency ${urgClass}">${req.urgencia}</span>
-          <button class="kanban-delete-btn" data-delete="${req.id}" title="Excluir">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="kanban-type-icon ${typeCfg.iconClass}">${typeCfg.icon}</span>
+            <span class="kanban-card-type">${req.tipo}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="kanban-urgency ${urgClass}">${req.urgencia}</span>
+            <button class="kanban-delete-btn" data-delete="${req.id}" title="Excluir">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
         </div>
         <h4 class="kanban-card-title">${req.titulo}</h4>
         <p class="kanban-card-desc">${req.descricao}</p>
@@ -1037,6 +1174,10 @@ document.addEventListener("DOMContentLoaded", () => {
           localStorage.removeItem("vigi_voted_"+id);
         }
         saveRequests(list2);
+        // Animação de pulso
+        btn.classList.remove("pulse");
+        void btn.offsetWidth; // reflow para resetar animação
+        btn.classList.add("pulse");
         loadRequests();
       });
     });

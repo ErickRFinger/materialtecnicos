@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -251,13 +251,26 @@
       <!-- ABA: INÍCIO (DASHBOARD) -->
       <section id="dashboard" class="content-section active">
 
-        <!-- Saudação + logo -->
-        <div class="dash-greeting">
-          <div class="dash-greeting-text">
-            <span class="dash-hello">Olá, técnico! 👋</span>
+        <!-- Saudação Premium -->
+        <div class="dash-welcome-banner">
+          <div class="dash-welcome-left">
+            <div class="dash-welcome-greeting">
+              <span class="dash-greeting-emoji" id="dashGreetingEmoji">👋</span>
+              <div>
+                <span class="dash-hello-label" id="dashHelloLabel">Bom dia,</span>
+                <span class="dash-user-name" id="dashUserName">Técnico</span>
+              </div>
+            </div>
             <h1 class="dash-title">O que você precisa hoje?</h1>
+            <div class="dash-datetime" id="dashDatetime">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span id="dashDatetimeText">Carregando...</span>
+            </div>
           </div>
-          <img src="VIGI.png" alt="VIGI" class="dash-logo-mini">
+          <div class="dash-welcome-right">
+            <img src="VIGI.png" alt="VIGI" class="dash-logo-mini">
+          </div>
+          <div class="dash-welcome-glow"></div>
         </div>
 
         <!-- Acesso rápido: blocos grandes, fáceis de tocar -->
@@ -470,8 +483,12 @@
             <h3 class="kanban-form-title">Nova Solicitação de Material</h3>
             <form id="requestForm" class="kanban-form-grid">
               <div class="form-group">
-                <label class="form-label" for="reqName">Seu Nome *</label>
-                <input type="text" id="reqName" class="form-control" placeholder="Nome completo" required>
+                <label class="form-label">Solicitante</label>
+                <div class="form-autofill-display" id="reqNameDisplay">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span id="reqNameText">Carregando...</span>
+                </div>
+                <input type="hidden" id="reqName">
               </div>
               <div class="form-group">
                 <label class="form-label" for="reqTitle">Título do Material *</label>
@@ -495,8 +512,11 @@
                 </select>
               </div>
               <div class="form-group form-group-full">
-                <label class="form-label" for="reqDesc">Descrição / Detalhes *</label>
-                <textarea id="reqDesc" class="form-control form-control-textarea" placeholder="Descreva o processo técnico ou dúvida que este material deve sanar..." required></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <label class="form-label" for="reqDesc" style="margin-bottom:0;">Descrição / Detalhes *</label>
+                  <span class="req-char-counter" id="reqCharCounter">0 / 500</span>
+                </div>
+                <textarea id="reqDesc" class="form-control form-control-textarea" placeholder="Descreva o processo técnico ou dúvida que este material deve sanar..." maxlength="500" required></textarea>
               </div>
               <div class="form-group form-group-full kanban-form-actions">
                 <button type="button" class="kanban-cancel-btn" id="cancelKanbanForm">Cancelar</button>
@@ -541,8 +561,25 @@
 
         </div>
 
-        <div class="empty-state" id="tableEmptyState" style="display:none; margin-top: 20px;">
-          Nenhuma solicitação registrada ainda. Clique em "Nova Solicitação" para começar!
+        <div class="kanban-empty-state" id="tableEmptyState" style="display:none; margin-top: 20px;">
+          <div class="kanban-empty-illustration">
+            <svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="10" y="20" width="30" height="60" rx="6" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.2)" stroke-width="1.5"/>
+              <rect x="45" y="30" width="30" height="50" rx="6" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.2)" stroke-width="1.5"/>
+              <rect x="80" y="25" width="30" height="55" rx="6" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.2)" stroke-width="1.5"/>
+              <circle cx="25" cy="42" r="8" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1.5" class="kanban-empty-pulse"/>
+              <line x1="18" y1="58" x2="32" y2="58" stroke="rgba(59,130,246,0.3)" stroke-width="2" stroke-linecap="round"/>
+              <line x1="18" y1="64" x2="28" y2="64" stroke="rgba(59,130,246,0.2)" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="60" cy="52" r="8" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+              <line x1="53" y1="68" x2="67" y2="68" stroke="rgba(139,92,246,0.3)" stroke-width="2" stroke-linecap="round"/>
+              <line x1="53" y1="74" x2="63" y2="74" stroke="rgba(139,92,246,0.2)" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="95" cy="47" r="8" fill="rgba(16,185,129,0.15)" stroke="rgba(16,185,129,0.3)" stroke-width="1.5"/>
+              <line x1="88" y1="63" x2="102" y2="63" stroke="rgba(16,185,129,0.3)" stroke-width="2" stroke-linecap="round"/>
+              <line x1="88" y1="69" x2="98" y2="69" stroke="rgba(16,185,129,0.2)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="kanban-empty-title">Nenhuma solicitação ainda</h3>
+          <p class="kanban-empty-desc">Clique em <strong>Nova Solicitação</strong> para pedir um vídeo, manual ou tabela à equipe VIGI.</p>
         </div>
 
       </section>

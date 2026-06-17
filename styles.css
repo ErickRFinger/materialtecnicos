@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    PORTAL TÉCNICO VIGI - DESIGN SYSTEM
    ========================================================================== */
 
@@ -3587,4 +3587,297 @@ select.form-control option {
 .play-overlay-btn {
   position: absolute;
   z-index: 2;
+}
+
+/* ==========================================================================
+   MELHORIA 1 — DASHBOARD: BANNER DE BOAS-VINDAS PREMIUM
+   ========================================================================== */
+
+.dash-welcome-banner {
+  position: relative;
+  background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(139,92,246,0.08) 50%, rgba(16,185,129,0.05) 100%);
+  border: 1px solid rgba(59,130,246,0.22);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  overflow: hidden;
+}
+
+/* Glow decorativo no canto */
+.dash-welcome-glow {
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%);
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.dash-welcome-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1;
+}
+
+.dash-welcome-right {
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.dash-welcome-greeting {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.dash-greeting-emoji {
+  font-size: 36px;
+  line-height: 1;
+  animation: waveHand 2s ease-in-out 0.5s 3;
+  transform-origin: 70% 70%;
+  display: inline-block;
+}
+
+@keyframes waveHand {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(20deg); }
+  75%       { transform: rotate(-10deg); }
+}
+
+.dash-hello-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.dash-user-name {
+  font-size: 26px;
+  font-weight: 800;
+  background: linear-gradient(to right, #ffffff, #93c5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: block;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+.dash-title {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.dash-datetime {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(148, 163, 184, 0.7);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 6px 14px;
+  width: fit-content;
+}
+
+.dash-datetime svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* Responsividade do banner */
+@media (max-width: 768px) {
+  .dash-welcome-banner {
+    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .dash-welcome-right {
+    display: none;
+  }
+  .dash-greeting-emoji {
+    font-size: 28px;
+  }
+  .dash-user-name {
+    font-size: 22px;
+  }
+}
+
+/* ==========================================================================
+   MELHORIA 2 — FORMULÁRIO DE SOLICITAÇÃO: CAMPO AUTOFILL + CONTADOR
+   ========================================================================== */
+
+/* Display do campo autofill (nome do usuário logado) */
+.form-autofill-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(to right, rgba(59,130,246,0.06), rgba(59,130,246,0.03));
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: var(--radius-sm);
+  padding: 11px 16px;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-autofill-display svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* Animação de abertura suave do painel do formulário */
+.kanban-form-panel {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease,
+              padding 0.3s ease;
+  padding: 0 !important;
+}
+
+.kanban-form-panel.panel-open {
+  max-height: 800px;
+  opacity: 1;
+  padding: initial !important;
+}
+
+/* Contador de caracteres do textarea */
+.req-char-counter {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color 0.3s;
+  white-space: nowrap;
+}
+
+.req-char-counter.warn {
+  color: var(--color-warning);
+}
+
+.req-char-counter.danger {
+  color: var(--color-danger);
+}
+
+/* Validação visual dos campos */
+.form-control.valid {
+  border-color: rgba(16,185,129,0.5);
+  background-color: rgba(16,185,129,0.04);
+}
+
+.form-control.valid:focus {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+}
+
+/* ==========================================================================
+   MELHORIA 3 — KANBAN: CARDS COM IDENTIDADE VISUAL POR TIPO + EMPTY STATE
+   ========================================================================== */
+
+/* Cores de borda por tipo de card */
+.kanban-card {
+  border-left: 3px solid var(--border-color);
+  transition: border-color 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+.kanban-card.type-video {
+  border-left-color: var(--color-primary);
+}
+
+.kanban-card.type-manual {
+  border-left-color: var(--color-tec);
+}
+
+.kanban-card.type-tabela {
+  border-left-color: var(--color-alarme);
+}
+
+/* Ícone do tipo de conteúdo no card */
+.kanban-type-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.kanban-type-icon.icon-video {
+  background: rgba(59,130,246,0.15);
+}
+
+.kanban-type-icon.icon-manual {
+  background: rgba(245,158,11,0.15);
+}
+
+.kanban-type-icon.icon-tabela {
+  background: rgba(139,92,246,0.15);
+}
+
+/* Upvote com animação de pulso ao clicar */
+@keyframes upvotePulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.kanban-upvote-btn.pulse {
+  animation: upvotePulse 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Empty State do Kanban — Ilustração SVG animada */
+.kanban-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 16px;
+  text-align: center;
+}
+
+.kanban-empty-illustration {
+  width: 160px;
+  height: 133px;
+  opacity: 0.85;
+  animation: emptyFloat 4s ease-in-out infinite;
+}
+
+@keyframes emptyFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+.kanban-empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.kanban-empty-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 360px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.kanban-empty-desc strong {
+  color: var(--color-primary);
 }
