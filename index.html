@@ -25,11 +25,15 @@
       <h1 class="login-title">Portal Técnico</h1>
       <p class="login-subtitle">Acesso restrito à equipe VIGI Câmeras</p>
 
-      <!-- Tabs: Entrar / Criar Conta -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tabLogin" type="button">Entrar</button>
-        <button class="auth-tab" id="tabSignup" type="button">Criar Conta</button>
-      </div>
+      <!-- Login único: Entrar com Vigi (SSO) -->
+      <button type="button" class="login-btn" id="vigiLoginBtn" style="width:100%;margin-top:6px;">
+        <span id="vigiLoginBtnText">Entrar com Vigi</span>
+        <span class="login-spinner" id="vigiLoginSpinner" style="display:none;">⏳</span>
+      </button>
+      <div class="login-error" id="vigiError" style="margin-top:14px;"></div>
+      <p style="margin-top:16px;font-size:13px;color:#94a3b8;text-align:center;line-height:1.5;">
+        Use o <strong>mesmo login e senha</strong> do sistema VIGI.
+      </p>
 
       <!-- FORM: LOGIN -->
       <form class="login-form" id="loginForm" autocomplete="off">
