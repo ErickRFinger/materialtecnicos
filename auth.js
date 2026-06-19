@@ -256,6 +256,16 @@
   // ── Logout ────────────────────────────────────────────────────────────────
   async function performLogout() {
     stopHeartbeat();
+    // Libera a trava de dispositivo no servidor (senão o slot fica preso até expirar).
+    const token = localStorage.getItem(K_TOKEN);
+    if (token) {
+      try {
+        await fetch(SSO_BASE + "/session/logout", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + token },
+        });
+      } catch (_) { /* best effort */ }
+    }
     clearSession();
     showLoginScreen();
   }
