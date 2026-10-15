@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const mobileMenuToggle = document.getElementById("mobileMenuToggle");
   const sidebar = document.getElementById("sidebar");
   const globalSearch = document.getElementById("globalSearch");
+  const sidebarSearch = document.getElementById("sidebarSearch");
+  const searchClearBtn = document.getElementById("searchClearBtn");
   
   // Grids de renderização
   const videosGrid = document.getElementById("videos-grid");
@@ -46,6 +48,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnFullscreenSlides = document.getElementById("btnFullscreenSlides");
   const slideshowWrapper = document.getElementById("slideshowWrapper");
   const btnCloseFullscreen = document.getElementById("btnCloseFullscreen");
+  const slideProgressTopFill = document.getElementById("slideProgressTopFill");
+
+  // ==========================================================================
+  // SISTEMA DE TOASTS FLUTUANTES
+  // ==========================================================================
+  window.showToast = function(message, type = "info", icon = "") {
+    const toastContainer = document.getElementById("toastContainer");
+    if (!toastContainer) return;
+
+    const toast = document.createElement("div");
+    toast.className = `toast-item toast-${type}`;
+
+    let defaultIcon = "ℹ️";
+    if (type === "success") defaultIcon = "✅";
+    else if (type === "warning") defaultIcon = "⚠️";
+    else if (type === "error") defaultIcon = "❌";
+
+    const displayIcon = icon || defaultIcon;
+
+    toast.innerHTML = `
+      <span class="toast-icon">${displayIcon}</span>
+      <span class="toast-text">${message}</span>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add("toast-leaving");
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 260);
+    }, 3200);
+  };
 
   // ESTADO GLOBAL DO APP
   let currentActiveTab = "dashboard";
@@ -72,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================================
   function init() {
     updateStats();
+    updateFilterCounts();
     renderFavorites();
     renderVideos();
     renderArtes();
@@ -140,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ── BUSCA GLOBAL UNIFICADA ────────────────────────────────────────────────
-    const searchContainer = globalSearch?.closest(".search-container");
+    const searchContainer = globalSearch?.closest(".search-container") || document.querySelector(".search-container");
     const searchPanel     = document.getElementById("globalSearchPanel");
 
     // Função auxiliar: destaca o termo no texto
@@ -161,6 +197,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!searchPanel) return;
       searchPanel.style.display = "none";
       searchContainer?.classList.remove("panel-active");
+    }
+
+    function clearSearch() {
+      if (globalSearch) globalSearch.value = "";
+      if (sidebarSearch) sidebarSearch.value = "";
+      if (searchClearBtn) searchClearBtn.style.display = "none";
+      currentSearchQuery = "";
+      closeSearchPanel();
+      if (currentActiveTab !== "dashboard") applyFiltersAndSearch();
     }
 
     function runGlobalSearch(query) {
@@ -262,9 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.addEventListener("click", () => {
           const type = btn.getAttribute("data-gsp-type");
           const id   = btn.getAttribute("data-gsp-id");
-          closeSearchPanel();
-          if (globalSearch) globalSearch.value = "";
-          currentSearchQuery = "";
+          clearSearch();
 
           if (type === "video") {
             switchTab("videos");
@@ -282,24 +325,57 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    if (globalSearch) {
-      globalSearch.addEventListener("input", (e) => {
-        currentSearchQuery = e.target.value.toLowerCase().trim();
-        runGlobalSearch(e.target.value.trim());
-        // Manter filtragem nas abas que não são dashboard
-        if (currentActiveTab !== "dashboard") applyFiltersAndSearch();
-      });
+    function handleSearchInput(value, source) {
+      const q = value.trim();
+      currentSearchQuery = q.toLowerCase();
 
-      // Fechar ao pressionar ESC
+      // Sincronizar campo alternativo
+      if (source === globalSearch && sidebarSearch) sidebarSearch.value = value;
+      if (source === sidebarSearch && globalSearch) globalSearch.value = value;
+
+      // Exibir ou esconder botão de limpar
+      if (searchClearBtn) {
+        searchClearBtn.style.display = value.length > 0 ? "flex" : "none";
+      }
+
+      runGlobalSearch(q);
+      if (currentActiveTab !== "dashboard") applyFiltersAndSearch();
+    }
+
+    if (globalSearch) {
+      globalSearch.addEventListener("input", (e) => handleSearchInput(e.target.value, globalSearch));
       globalSearch.addEventListener("keydown", (e) => {
         if (e.key === "Escape") { closeSearchPanel(); globalSearch.blur(); }
       });
-
-      // Abrir painel ao focar se já tem texto
       globalSearch.addEventListener("focus", () => {
         if (globalSearch.value.trim().length >= 2) runGlobalSearch(globalSearch.value.trim());
       });
     }
+
+    if (sidebarSearch) {
+      sidebarSearch.addEventListener("input", (e) => handleSearchInput(e.target.value, sidebarSearch));
+      sidebarSearch.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") { closeSearchPanel(); sidebarSearch.blur(); }
+      });
+    }
+
+    if (searchClearBtn) {
+      searchClearBtn.addEventListener("click", () => {
+        clearSearch();
+        globalSearch?.focus();
+      });
+    }
+
+    // Atalho global Cmd+K / Ctrl+K
+    document.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        if (globalSearch) {
+          globalSearch.focus();
+          globalSearch.select();
+        }
+      }
+    });
 
     // Fechar ao clicar fora
     document.addEventListener("click", (e) => {
@@ -471,6 +547,37 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
+
+    // Gestos de deslize touch (Swipe) em dispositivos móveis
+    if (slideshowWrapper) {
+      let touchStartX = 0;
+      let touchStartY = 0;
+
+      slideshowWrapper.addEventListener("touchstart", (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+          touchStartX = e.changedTouches[0].screenX;
+          touchStartY = e.changedTouches[0].screenY;
+        }
+      }, { passive: true });
+
+      slideshowWrapper.addEventListener("touchend", (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+          const touchEndX = e.changedTouches[0].screenX;
+          const touchEndY = e.changedTouches[0].screenY;
+          const diffX = touchEndX - touchStartX;
+          const diffY = touchEndY - touchStartY;
+
+          // Limiar de 40px e movimento horizontal maior que vertical
+          if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
+            if (diffX < 0) {
+              nextSlide();
+            } else {
+              prevSlide();
+            }
+          }
+        }
+      }, { passive: true });
+    }
 
     // Tela cheia do Slideshow
     if (btnFullscreenSlides) {
@@ -699,6 +806,47 @@ document.addEventListener("DOMContentLoaded", () => {
     if (countTec) countTec.textContent = totalTec;
   }
 
+  // Atualizar contadores em badges nos filtros
+  function updateFilterCounts() {
+    // Filtros de vídeos
+    const videoBtns = document.querySelectorAll("#video-filters .filter-btn");
+    videoBtns.forEach(btn => {
+      const f = btn.getAttribute("data-filter");
+      let count = 0;
+      if (f === "todos") {
+        count = VIGI_DATA.videos.length;
+      } else {
+        count = VIGI_DATA.videos.filter(v => v.categoria.toLowerCase() === f.toLowerCase()).length;
+      }
+      let badge = btn.querySelector(".filter-count");
+      if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "filter-count";
+        btn.appendChild(badge);
+      }
+      badge.textContent = count;
+    });
+
+    // Filtros de manuais
+    const manualBtns = document.querySelectorAll("#manual-filters .filter-btn");
+    manualBtns.forEach(btn => {
+      const f = btn.getAttribute("data-filter");
+      let count = 0;
+      if (f === "todos") {
+        count = VIGI_DATA.manuais.length;
+      } else {
+        count = VIGI_DATA.manuais.filter(m => m.categoria.toLowerCase() === f.toLowerCase()).length;
+      }
+      let badge = btn.querySelector(".filter-count");
+      if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "filter-count";
+        btn.appendChild(badge);
+      }
+      badge.textContent = count;
+    });
+  }
+
   // Renderizar Vídeos
   function renderVideos(filter = "todos", search = "") {
     if (!videosGrid) return;
@@ -766,9 +914,17 @@ document.addEventListener("DOMContentLoaded", () => {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21.2 15c.7-1.2 1-2.5.7-3.9-.6-2-2.4-3.5-4.4-3.5h-1.2c-.7-3-3.2-5.2-6.2-5.6-3-.3-5.9 1.3-7.3 4-1.2 2.5-1 5.4.5 7.6M22 10V6h-4"></path>
               </svg>
-              Vídeo em Nuvem
+              Vídeo
             </span>
-            <button class="watch-btn">Assistir</button>
+            <div class="card-quick-actions">
+              <button class="card-action-icon-btn whatsapp-share" title="Enviar no WhatsApp" aria-label="Enviar no WhatsApp">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+              </button>
+              <button class="card-action-icon-btn copy-link" title="Copiar Link" aria-label="Copiar Link">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </button>
+              <button class="watch-btn">Assistir</button>
+            </div>
           </div>
         </div>
       `;
@@ -780,6 +936,35 @@ document.addEventListener("DOMContentLoaded", () => {
       const triggerWatch = () => openVideoPlayer(video);
       actionBtn.addEventListener("click", triggerWatch);
       playBtn.addEventListener("click", triggerWatch);
+
+      // Ações de compartilhamento
+      const waBtn = card.querySelector(".whatsapp-share");
+      if (waBtn) {
+        waBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const shareUrl = video.driveUrl || window.location.href;
+          const msg = `📹 *Suporte Técnico VIGI*\n*${video.titulo}*\nCategoria: ${video.categoria}\nAssista aqui: ${shareUrl}`;
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, "_blank");
+        });
+      }
+
+      const cpBtn = card.querySelector(".copy-link");
+      if (cpBtn) {
+        cpBtn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const shareUrl = video.driveUrl || window.location.href;
+          try {
+            await navigator.clipboard.writeText(shareUrl);
+            if (typeof window.showToast === "function") {
+              window.showToast(`Link de "${video.titulo}" copiado!`, "success", "📋");
+            }
+          } catch (err) {
+            if (typeof window.showToast === "function") {
+              window.showToast("Falha ao copiar link", "warning");
+            }
+          }
+        });
+      }
 
       videosGrid.appendChild(card);
     });
@@ -837,6 +1022,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <p class="art-card-desc">${art.descricao}</p>
           <div class="art-actions">
             <button class="art-btn-main view-art-btn">Ampliar Tabela</button>
+            <div class="card-quick-actions">
+              <button class="card-action-icon-btn whatsapp-share" title="Enviar no WhatsApp" aria-label="Enviar no WhatsApp">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+              </button>
+              <button class="card-action-icon-btn copy-link" title="Copiar Informações" aria-label="Copiar Informações">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -847,6 +1040,33 @@ document.addEventListener("DOMContentLoaded", () => {
       const triggerZoom = () => openLightbox(art);
       viewBtn.addEventListener("click", triggerZoom);
       zoomOverlay.addEventListener("click", triggerZoom);
+
+      // Ações de compartilhamento da arte
+      const waArtBtn = card.querySelector(".whatsapp-share");
+      if (waArtBtn) {
+        waArtBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const msg = `📊 *Material Técnico VIGI*\n*${art.titulo}*\nCategoria: ${art.categoria}\n${art.descricao}`;
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, "_blank");
+        });
+      }
+
+      const cpArtBtn = card.querySelector(".copy-link");
+      if (cpArtBtn) {
+        cpArtBtn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          try {
+            await navigator.clipboard.writeText(`${art.titulo} - ${art.categoria}\n${art.descricao}`);
+            if (typeof window.showToast === "function") {
+              window.showToast(`Info de "${art.titulo}" copiada!`, "success", "📋");
+            }
+          } catch (err) {
+            if (typeof window.showToast === "function") {
+              window.showToast("Falha ao copiar", "warning");
+            }
+          }
+        });
+      }
 
       artesGrid.appendChild(card);
     });
@@ -942,6 +1162,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="guide-badge-row">
               <span class="guide-badge guide-badge-cat">${guide.categoria}</span>
               <span class="guide-badge guide-badge-author">${guide.autor}</span>
+              <span class="guide-status-pill" style="display:none;"></span>
             </div>
             <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
               <button class="favorite-star-btn ${isFav ? 'active' : ''}" data-id="${guide.id}" title="Favoritar" style="width: 24px; height: 24px; font-size: 16px;">
@@ -969,6 +1190,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="guide-progress-bar-bg">
               <div class="guide-progress-bar-fill"></div>
             </div>
+          </div>
+
+          <div class="guide-quick-tools ignore-pdf">
+            <span style="color:var(--text-muted); font-size:11.5px; font-weight:600;">Checklist Rápido:</span>
+            <button class="guide-tool-btn btn-check-all" type="button">✓ Concluir Todos</button>
+            <button class="guide-tool-btn btn-reset-guide" type="button">↺ Limpar Passos</button>
           </div>
 
           <div class="steps-checklist">
@@ -1011,6 +1238,43 @@ document.addEventListener("DOMContentLoaded", () => {
           calculateGuideProgress(accordion, guide);
         });
       });
+
+      // Ações rápidas de checklist
+      const btnCheckAll = accordion.querySelector(".btn-check-all");
+      if (btnCheckAll) {
+        btnCheckAll.addEventListener("click", (e) => {
+          e.stopPropagation();
+          guide.passos.forEach((_, idx) => {
+            localStorage.setItem(`vigi_step_${guide.id}_${idx}`, "true");
+            const chk = accordion.querySelector(`#chk-${guide.id}-${idx}`);
+            if (chk) chk.checked = true;
+            const item = accordion.querySelector(`.step-item[data-step-index="${idx}"]`);
+            if (item) item.classList.add("checked");
+          });
+          calculateGuideProgress(accordion, guide);
+          if (typeof window.showToast === "function") {
+            window.showToast(`Passos de "${guide.titulo}" concluídos!`, "success", "✓");
+          }
+        });
+      }
+
+      const btnResetGuide = accordion.querySelector(".btn-reset-guide");
+      if (btnResetGuide) {
+        btnResetGuide.addEventListener("click", (e) => {
+          e.stopPropagation();
+          guide.passos.forEach((_, idx) => {
+            localStorage.removeItem(`vigi_step_${guide.id}_${idx}`);
+            const chk = accordion.querySelector(`#chk-${guide.id}-${idx}`);
+            if (chk) chk.checked = false;
+            const item = accordion.querySelector(`.step-item[data-step-index="${idx}"]`);
+            if (item) item.classList.remove("checked");
+          });
+          calculateGuideProgress(accordion, guide);
+          if (typeof window.showToast === "function") {
+            window.showToast(`Passos de "${guide.titulo}" desmarcados.`, "info", "↺");
+          }
+        });
+      }
 
       // Evento de clique nos chips de vídeos associados
       accordion.querySelectorAll(".related-video-chip").forEach(chip => {
@@ -1108,9 +1372,31 @@ document.addEventListener("DOMContentLoaded", () => {
     // Atualizar UI do progresso
     const progressFill = accordionEl.querySelector(".guide-progress-bar-fill");
     const progressText = accordionEl.querySelector(".progress-percentage");
+    const pill = accordionEl.querySelector(".guide-status-pill");
     
-    if (progressFill) progressFill.style.width = `${percent}%`;
+    if (progressFill) {
+      progressFill.style.width = `${percent}%`;
+      if (percent === 100) {
+        progressFill.style.background = "#10b981";
+      } else {
+        progressFill.style.background = "";
+      }
+    }
     if (progressText) progressText.textContent = `${percent}% (${checkedCount}/${totalSteps})`;
+
+    if (pill) {
+      if (percent === 100) {
+        pill.textContent = "✓ 100% Concluído";
+        pill.className = "guide-status-pill completed";
+        pill.style.display = "inline-flex";
+      } else if (percent > 0) {
+        pill.textContent = `${percent}% Em andamento`;
+        pill.className = "guide-status-pill in-progress";
+        pill.style.display = "inline-flex";
+      } else {
+        pill.style.display = "none";
+      }
+    }
   }
 
   // Auxiliar para classes CSS de categoria
@@ -2090,6 +2376,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Atualizar texto contador
     if (slideCounterLabel) {
       slideCounterLabel.textContent = `Slide ${index + 1} de ${totalSlides}`;
+    }
+
+    // Atualizar barra de progresso superior
+    if (slideProgressTopFill) {
+      const pct = Math.round(((index + 1) / totalSlides) * 100);
+      slideProgressTopFill.style.width = `${pct}%`;
     }
   }
 

@@ -226,9 +226,20 @@
 
     localStorage.setItem(K_USER_CACHE, JSON.stringify({ email, name, id: user.id }));
 
+    const initial = (name && name.length > 0) ? name.charAt(0).toUpperCase() : "T";
+
     if (userDisplayName) {
       userDisplayName.textContent = name;
     }
+
+    const userAvatarInitial = document.getElementById("userAvatarInitial");
+    if (userAvatarInitial) userAvatarInitial.textContent = initial;
+
+    const sidebarUserName = document.getElementById("sidebarUserName");
+    if (sidebarUserName) sidebarUserName.textContent = name;
+
+    const sidebarUserAvatar = document.getElementById("sidebarUserAvatar");
+    if (sidebarUserAvatar) sidebarUserAvatar.textContent = initial;
 
     if (typeof window.VIGI_updateDashName === "function") {
       window.VIGI_updateDashName(name);
@@ -497,7 +508,49 @@
   // ── Event Listeners ───────────────────────────────────────────────────────
   if (loginForm) loginForm.addEventListener("submit", handleLogin);
   if (signupForm) signupForm.addEventListener("submit", handleSignup);
-  if (logoutBtn) logoutBtn.addEventListener("click", () => performLogout());
+
+  const logoutConfirmModal = document.getElementById("logoutConfirmModal");
+  const cancelLogoutBtn    = document.getElementById("cancelLogoutBtn");
+  const confirmLogoutBtn   = document.getElementById("confirmLogoutBtn");
+
+  function openLogoutModal() {
+    if (logoutConfirmModal) {
+      logoutConfirmModal.style.display = "flex";
+    } else {
+      performLogout();
+    }
+  }
+
+  function closeLogoutModal() {
+    if (logoutConfirmModal) {
+      logoutConfirmModal.style.display = "none";
+    }
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      openLogoutModal();
+    });
+  }
+
+  if (cancelLogoutBtn) {
+    cancelLogoutBtn.addEventListener("click", closeLogoutModal);
+  }
+
+  if (confirmLogoutBtn) {
+    confirmLogoutBtn.addEventListener("click", () => {
+      closeLogoutModal();
+      performLogout();
+    });
+  }
+
+  if (logoutConfirmModal) {
+    logoutConfirmModal.addEventListener("click", (e) => {
+      if (e.target === logoutConfirmModal) closeLogoutModal();
+    });
+  }
+
   if (waitingLogoutBtn) waitingLogoutBtn.addEventListener("click", () => performLogout());
 
   // ── Inicialização ─────────────────────────────────────────────────────────
