@@ -7,3 +7,5 @@ node_modules/
 .env.*.local
 *.pptx
 temp_pptx/
+.vercel
+.env*

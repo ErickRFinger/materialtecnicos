@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "description": "Portal de Suporte Técnico e Materiais VIGI Câmeras",
   "scripts": {
-    "deploy": "vercel --prod --yes"
+    "deploy": "npx vercel --prod --yes"
   }
 }
