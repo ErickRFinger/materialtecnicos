@@ -477,7 +477,7 @@ const VIGI_DATA = {
       subtitulo: "Treinamento de Padronização para Técnicos de Campo",
       tipo: "capa",
       conteudo: [],
-      imagens: ["VIDEOS E ARTES/IMAGENS_SLIDES/image1.jpeg"],
+      imagens: ["slides-img/image1.jpeg"],
       detalhes: "Domínio completo de Redes, CFTV (Hikvision e Uniview), Softwares de Monitoramento e Centrais de Alarme. Siga o padrão de qualidade VIGI e evite retrabalhos."
     },
     {
@@ -491,7 +491,7 @@ const VIGI_DATA = {
         { modulo: "Módulo 3: APLICATIVOS PC", desc: "Gestão profissional via software EZ-Station e iVMS-4200. Adicione dispositivos na nuvem e treine o cliente final." },
         { modulo: "Módulo 4: ALARMES", desc: "Instalação de centrais de intrusão, ligação física de sensores, programação de zonas e testes com sirene sem alarmes falsos." }
       ],
-      imagens: ["VIDEOS E ARTES/IMAGENS_SLIDES/image10.jpeg"],
+      imagens: ["slides-img/image10.jpeg"],
       detalhes: "Cada módulo representa um pilar essencial do trabalho do técnico VIGI no dia a dia. A certificação garante que todos usem o mesmo roteiro."
     },
     {
@@ -506,7 +506,7 @@ const VIGI_DATA = {
         "Como descobrir a classe de IP da rede local e fixar o IP do DVR na mesma faixa fora do DHCP.",
         "Conexão física correta de cabos em Roteadores e Switches/Hubs."
       ],
-      imagens: ["VIDEOS E ARTES/IMAGENS_SLIDES/image11.png", "VIDEOS E ARTES/IMAGENS_SLIDES/image12.png", "VIDEOS E ARTES/IMAGENS_SLIDES/image13.png"],
+      imagens: ["slides-img/image11.png", "slides-img/image12.png", "slides-img/image13.png"],
       detalhes: "Problemas de visualização remota em 90% das vezes são falhas de configuração de rede básica do DVR. Sempre fixe o IP corretamante!"
     },
     {
@@ -521,7 +521,7 @@ const VIGI_DATA = {
         "Ativação de gravação por Movimento para economizar HD e facilitar buscas.",
         "Reset e inicialização do sistema operacional integrado."
       ],
-      imagens: ["VIDEOS E ARTES/IMAGENS_SLIDES/image14.png", "VIDEOS E ARTES/IMAGENS_SLIDES/image15.png", "VIDEOS E ARTES/IMAGENS_SLIDES/image16.png"],
+      imagens: ["slides-img/image14.png", "slides-img/image15.png", "slides-img/image16.png"],
       detalhes: "A Uniview é reconhecida por sua estabilidade na nuvem. Siga a risca o procedimento padrão para inicializar o NVR/DVR."
     },
     {
@@ -536,7 +536,7 @@ const VIGI_DATA = {
         "Configuração de Gravação contínua vs. Detecção de Movimento (Smart Motion).",
         "Configuração de filtros inteligentes de humanos e veículos (evita disparos falsos)."
       ],
-      imagens: ["VIDEOS E ARTES/IMAGENS_SLIDES/image17.png", "VIDEOS E ARTES/IMAGENS_SLIDES/image18.png"],
+      imagens: ["slides-img/image17.png", "slides-img/image18.png"],
       detalhes: "Os gravadores com SSD embutido (série eDVR) possuem alto desempenho acústico e durabilidade, mas requerem atenção na configuração de compressão."
     },
     {
@@ -550,7 +550,7 @@ const VIGI_DATA = {
         "Configurar Áudio: Como habilitar nas câmeras com microfone embutido (mudar Stream de 'Vídeo' para 'Vídeo e Áudio').",
         "Atualização de Firmware: Quando e como fazer para corrigir falhas de nuvem ou bugs de interface."
       ],
-      imagens: ["VIDEOS E ARTES/IMAGENS_SLIDES/image19.png", "VIDEOS E ARTES/IMAGENS_SLIDES/image20.png"],
+      imagens: ["slides-img/image19.png", "slides-img/image20.png"],
       detalhes: "Antes de sair da casa do cliente, faça o checklist completo. O retrabalho custa caro e afeta nossa credibilidade."
     },
     {
@@ -576,7 +576,7 @@ const VIGI_DATA = {
         "Dúvidas pertinentes dos clientes.",
         "Como ajustar em situações que o aplicativo fica somente carregando (BUG)."
       ],
-      imagens: ["VIDEOS E ARTES/IMAGENS_SLIDES/image21.png", "VIDEOS E ARTES/IMAGENS_SLIDES/image22.png"],
+      imagens: ["slides-img/image21.png", "slides-img/image22.png"],
       detalhes: "Oferecer o app de PC configurado para clientes comerciais e portarias é um grande diferencial do serviço VIGI."
     },
     {
@@ -591,7 +591,7 @@ const VIGI_DATA = {
         "Configuração e particionamento de zonas de alarme no teclado.",
         "Configuração do aplicativo móvel Intelbras (AMT Mobile V3) e cadastro de controles remotos."
       ],
-      imagens: ["VIDEOS E ARTES/IMAGENS_SLIDES/image23.png", "VIDEOS E ARTES/IMAGENS_SLIDES/image24.png", "VIDEOS E ARTES/IMAGENS_SLIDES/image25.png"],
+      imagens: ["slides-img/image23.png", "slides-img/image24.png", "slides-img/image25.png"],
       detalhes: "Central de alarme mal instalada causa disparos falsos de madrugada. Posicione os sensores longe de correntes de ar e portas soltas."
     },
     {
@@ -605,7 +605,7 @@ const VIGI_DATA = {
         "Guias e Manuais: Siga a lista de verificação passo a passo para padronizar o serviço.",
         "Solicitação de Materiais: Peça novos vídeos ou manuais sempre que sentir necessidade."
       ],
-      imagens: ["VIDEOS E ARTES/IMAGENS_SLIDES/image9.jpeg"],
+      imagens: ["slides-img/image9.jpeg"],
       detalhes: "Mantenha o portal aberto no seu celular. É a VIGI facilitando o seu dia de trabalho e garantindo suporte instantâneo."
     },
     {

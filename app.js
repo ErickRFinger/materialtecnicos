@@ -1677,7 +1677,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!slide) return;
     
     // Configurar imagem de fundo do slide deck
-    if (index === 0 || index === totalSlides - 1) {
+    if (index === 0 && slide.imagens && slide.imagens[0]) {
+      slideDeck.style.backgroundImage = `linear-gradient(rgba(9, 13, 22, 0.75), rgba(9, 13, 22, 0.85)), url('${slide.imagens[0]}')`;
+    } else if (index === 8 && slide.imagens && slide.imagens[0]) {
+      slideDeck.style.backgroundImage = `linear-gradient(rgba(9, 13, 22, 0.88), rgba(9, 13, 22, 0.92)), url('${slide.imagens[0]}')`;
+    } else if (index === totalSlides - 1) {
       slideDeck.style.backgroundImage = "linear-gradient(rgba(9, 13, 22, 0.85), rgba(9, 13, 22, 0.85))";
     } else {
       slideDeck.style.backgroundImage = "linear-gradient(rgba(9, 13, 22, 0.95), rgba(9, 13, 22, 0.95))";
@@ -1735,7 +1739,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
     } else if (index === 2) {
-      // Slide 3: Redes (Texto à esquerda, duas imagens empilhadas à direita)
+      // Slide 3: Redes (Texto à esquerda, todas as 3 fotos à direita)
       let bulletsHtml = "";
       slide.conteudo.forEach(item => {
         bulletsHtml += `
@@ -1761,13 +1765,19 @@ document.addEventListener("DOMContentLoaded", () => {
               <p>${slide.detalhes}</p>
             </div>
           </div>
-          <div style="display:flex; flex-direction:column; gap: 16px; justify-content:center;">
-            <div class="slide-thumbnail" data-img-path="${slide.imagens[1]}" style="width: 100%; height: 160px; border-radius: var(--radius-md); margin:0;">
-              <img src="${slide.imagens[1]}" alt="Esquema Rede 1">
-              <div class="slide-thumbnail-overlay">🔍 Ampliar Diagrama Ping</div>
+          <div style="display:flex; flex-direction:column; gap: 12px; justify-content:center;">
+            <div style="display:flex; gap: 10px;">
+              <div class="slide-thumbnail" data-img-path="${slide.imagens[0]}" style="flex: 1; height: 140px; border-radius: var(--radius-md); margin:0;">
+                <img src="${slide.imagens[0]}" alt="Teste de Rede / Ping" style="width:100%; height:100%; object-fit:cover;">
+                <div class="slide-thumbnail-overlay">🔍 Ping & Diagnóstico</div>
+              </div>
+              <div class="slide-thumbnail" data-img-path="${slide.imagens[1]}" style="flex: 1; height: 140px; border-radius: var(--radius-md); margin:0;">
+                <img src="${slide.imagens[1]}" alt="Esquema Rede CFTV" style="width:100%; height:100%; object-fit:cover;">
+                <div class="slide-thumbnail-overlay">🔍 Diagrama Ping</div>
+              </div>
             </div>
             <div class="slide-thumbnail" data-img-path="${slide.imagens[2]}" style="width: 100%; height: 130px; border-radius: var(--radius-md); margin:0;">
-              <img src="${slide.imagens[2]}" alt="Esquema Rede 2">
+              <img src="${slide.imagens[2]}" alt="Ligações Switch e Roteador" style="width:100%; height:100%; object-fit:cover;">
               <div class="slide-thumbnail-overlay">🔍 Ampliar Ligações Hub</div>
             </div>
           </div>
@@ -2023,8 +2033,8 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <div class="slide-detail-card" style="margin: 0; text-align:center; padding: 16px; background: rgba(59, 130, 246, 0.06); display:flex; flex-direction:column; align-items:center; gap: 10px;">
             <p style="font-size: 14px; margin: 0;">${slide.detalhes}</p>
-            <a href="http://192.168.10.211:8080" target="_blank" class="filter-btn active" style="text-decoration:none; margin-top:4px; display:inline-flex; align-items:center; gap:8px;">
-              🌐 Acessar Portal Local: http://192.168.10.211:8080
+            <a href="https://materialtecnicos.vercel.app" target="_blank" class="filter-btn active" style="text-decoration:none; margin-top:4px; display:inline-flex; align-items:center; gap:8px;">
+              🌐 Acessar Portal Técnico VIGI
             </a>
           </div>
         </div>
@@ -2045,10 +2055,19 @@ document.addEventListener("DOMContentLoaded", () => {
     
     slideDeck.appendChild(slideCard);
     
-    // Adicionar eventos de clique nas miniaturas dos slides para abrir no Drive
+    // Adicionar eventos de clique nas miniaturas dos slides para abrir no lightbox integrado
     slideCard.querySelectorAll(".slide-thumbnail").forEach(thumb => {
-      thumb.addEventListener("click", () => {
-        window.open("https://drive.google.com/drive/folders/1xOX1e0IQKu_C5EEWF-2UzShTGpoxvVuc?usp=sharing", "_blank");
+      thumb.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const imgPath = thumb.getAttribute("data-img-path");
+        const imgAlt = thumb.querySelector("img")?.alt || slide.titulo;
+        if (imgPath) {
+          openLightbox({
+            titulo: imgAlt,
+            caminho: imgPath,
+            descricao: slide.subtitulo || slide.titulo
+          });
+        }
       });
     });
     
