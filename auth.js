@@ -1,294 +1,515 @@
 /* ==========================================================================
-   AUTH.JS — "ENTRAR COM VIGI" (SSO OAuth2 + PKCE)
+   AUTH.JS — AUTENTICAÇÃO COM SUPABASE & CONTROLE DE SESSÃO ÚNICA
    Portal Técnico VIGI Câmeras
-
-   Os técnicos entram com o MESMO login/senha do sistema VIGI. A autenticação
-   é delegada ao provedor SSO do backend VIGI (Authorization Code + PKCE, sem
-   client_secret — este é um app estático/público). Nada de senha passa por
-   aqui: ela é digitada na página da VIGI. Recebemos um token assinado (RS256)
-   e usamos seus claims (sub/email/name).
-
-   Trava de 1 dispositivo: heartbeat contra /oauth/session/heartbeat (chaveada
-   pelo usuário VIGI). Conteúdo do portal é estático (não depende de Supabase).
    ========================================================================== */
 
 (function () {
   "use strict";
 
-  // ── Config ────────────────────────────────────────────────────────────────
-  const SSO_BASE     = "https://backend.vigicameras.com.br/oauth";
-  const CLIENT_ID    = "treinamento-tecnicos";
-  const REDIRECT_URI = location.origin + "/";
-  const SCOPE        = "openid profile email";
+  // ── Inicialização do Supabase ─────────────────────────────────────────────
+  if (!window.supabase) {
+    console.error("SDK do Supabase não foi carregado!");
+    return;
+  }
 
-  const K_TOKEN   = "vigi_sso_token";
-  const K_USER    = "vigi_sso_user";
-  const K_DEVICE  = "vigi_device_token";
-  const SS_VERIF  = "vigi_pkce_verifier";
-  const SS_STATE  = "vigi_oauth_state";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+  // ── Constantes & Armazenamento Local ───────────────────────────────────────
+  const K_SESSION_TOKEN = "vigi_portal_session_token";
+  const K_USER_CACHE    = "vigi_portal_user";
   let heartbeatInterval = null;
+  let currentUser       = null;
 
-  // ── Elementos DOM ─────────────────────────────────────────────────────────
-  const overlay         = document.getElementById("loginOverlay");
-  const loginForm       = document.getElementById("loginForm");
-  const signupForm      = document.getElementById("signupForm");
-  const waitingOverlay  = document.getElementById("waitingOverlay");
-  const vigiLoginBtn    = document.getElementById("vigiLoginBtn");
-  const vigiError       = document.getElementById("vigiError");
-  const logoutBtn       = document.getElementById("logoutBtn");
-  const userDisplayName = document.getElementById("userDisplayName");
+  // ── Elementos do DOM ──────────────────────────────────────────────────────
+  const overlay           = document.getElementById("loginOverlay");
+  const tabLoginBtn       = document.getElementById("tabLoginBtn");
+  const tabSignupBtn      = document.getElementById("tabSignupBtn");
+  const loginForm         = document.getElementById("loginForm");
+  const signupForm        = document.getElementById("signupForm");
 
-  // ── Utils ─────────────────────────────────────────────────────────────────
-  function b64url(buf) {
-    return btoa(String.fromCharCode.apply(null, new Uint8Array(buf)))
-      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  }
-  function randomStr(len) {
-    const a = new Uint8Array(len);
-    crypto.getRandomValues(a);
-    return b64url(a.buffer).slice(0, len);
-  }
-  async function sha256b64url(str) {
-    const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-    return b64url(hash);
-  }
-  function decodeJwt(token) {
-    let p = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    while (p.length % 4) p += "=";
-    const json = decodeURIComponent(
-      atob(p).split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join("")
-    );
-    return JSON.parse(json);
-  }
-  function tokenExpired(token) {
-    try { return (decodeJwt(token).exp * 1000) < (Date.now() + 5000); }
-    catch (_) { return true; }
-  }
+  // Campos de Login
+  const loginEmail        = document.getElementById("loginEmail");
+  const loginPass         = document.getElementById("loginPass");
+  const loginBtn          = document.getElementById("loginBtn");
+  const loginBtnText      = document.getElementById("loginBtnText");
+  const loginSpinner      = document.getElementById("loginSpinner");
+  const loginError        = document.getElementById("loginError");
+  const togglePassLogin   = document.getElementById("togglePassLogin");
+
+  // Campos de Cadastro
+  const signupName        = document.getElementById("signupName");
+  const signupEmail       = document.getElementById("signupEmail");
+  const signupPass        = document.getElementById("signupPass");
+  const signupBtn         = document.getElementById("signupBtn");
+  const signupBtnText     = document.getElementById("signupBtnText");
+  const signupSpinner     = document.getElementById("signupSpinner");
+  const signupError       = document.getElementById("signupError");
+  const signupSuccess     = document.getElementById("signupSuccess");
+  const togglePassSignup  = document.getElementById("togglePassSignup");
+
+  // Telas e Usuário
+  const waitingOverlay    = document.getElementById("waitingOverlay");
+  const waitingLogoutBtn  = document.getElementById("waitingLogoutBtn");
+  const logoutBtn         = document.getElementById("logoutBtn");
+  const userDisplayName   = document.getElementById("userDisplayName");
+
+  // ── SVGs para alternância de senha ────────────────────────────────────────
+  const EYE_OPEN = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const EYE_CLOSED = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+
+  // ── Utilitários ───────────────────────────────────────────────────────────
   function getDeviceInfo() {
     const ua = navigator.userAgent;
-    let browser = "Navegador";
-    if (ua.includes("Chrome") && !ua.includes("Edg")) browser = "Chrome";
-    else if (ua.includes("Firefox")) browser = "Firefox";
-    else if (ua.includes("Edg")) browser = "Edge";
-    else if (ua.includes("Safari")) browser = "Safari";
-    return `${browser} / ${/Mobi|Android/i.test(ua) ? "Mobile" : "Desktop"}`;
-  }
-  function getDeviceToken() {
-    let dt = localStorage.getItem(K_DEVICE);
-    if (!dt) {
-      dt = (crypto.randomUUID ? crypto.randomUUID() : randomStr(32));
-      localStorage.setItem(K_DEVICE, dt);
-    }
-    return dt;
-  }
-  function showError(msg) {
-    if (!vigiError) return;
-    vigiError.textContent = msg;
-    vigiError.classList.add("visible");
-  }
-  function setBtnLoading(loading) {
-    if (!vigiLoginBtn) return;
-    vigiLoginBtn.disabled = loading;
-    const t = document.getElementById("vigiLoginBtnText");
-    const s = document.getElementById("vigiLoginSpinner");
-    if (t) t.textContent = loading ? "Redirecionando…" : "Entrar com Vigi";
-    if (s) s.style.display = loading ? "inline" : "none";
-  }
-  function clearSession() {
-    localStorage.removeItem(K_TOKEN);
-    localStorage.removeItem(K_USER);
+    let b = "Navegador";
+    if (ua.includes("Chrome") && !ua.includes("Edg")) b = "Chrome";
+    else if (ua.includes("Firefox")) b = "Firefox";
+    else if (ua.includes("Edg")) b = "Edge";
+    else if (ua.includes("Safari") && !ua.includes("Chrome")) b = "Safari";
+    return `${b} / ${/Mobi|Android|iPhone|iPad/i.test(ua) ? "Mobile" : "Desktop"}`;
   }
 
-  // ── Telas ─────────────────────────────────────────────────────────────────
-  function hideAll() {
-    if (overlay) overlay.style.display = "none";
-    if (waitingOverlay) waitingOverlay.style.display = "none";
+  function getSessionToken() {
+    let t = localStorage.getItem(K_SESSION_TOKEN);
+    if (!t) {
+      t = (crypto.randomUUID ? crypto.randomUUID() : 'sess_' + Math.random().toString(36).substring(2) + Date.now().toString(36));
+      localStorage.setItem(K_SESSION_TOKEN, t);
+    }
+    return t;
   }
-  function showLoginScreen(msg) {
-    hideAll();
+
+  function renewSessionToken() {
+    const t = (crypto.randomUUID ? crypto.randomUUID() : 'sess_' + Math.random().toString(36).substring(2) + Date.now().toString(36));
+    localStorage.setItem(K_SESSION_TOKEN, t);
+    return t;
+  }
+
+  function formatUserName(user) {
+    if (!user) return "Técnico";
+    const rawName = user.user_metadata?.full_name || 
+                    user.user_metadata?.name || 
+                    (user.email ? user.email.split("@")[0] : "Técnico");
+    const clean = rawName.replace(/[._]/g, " ").trim();
+    return clean.charAt(0).toUpperCase() + clean.slice(1);
+  }
+
+  function translateError(err) {
+    if (!err || !err.message) return "Ocorreu um erro. Tente novamente.";
+    const m = err.message.toLowerCase();
+    if (m.includes("invalid login credentials")) return "E-mail ou senha incorretos.";
+    if (m.includes("email not confirmed")) return "E-mail ainda não confirmado.";
+    if (m.includes("user already registered")) return "Este e-mail já está cadastrado. Alterne para a aba 'Entrar'.";
+    if (m.includes("password should be at least")) return "A senha deve ter pelo menos 6 caracteres.";
+    if (m.includes("rate limit") || m.includes("too many requests")) return "Muitas tentativas. Aguarde alguns instantes.";
+    if (m.includes("network") || m.includes("fetch")) return "Erro de conexão com o servidor. Verifique sua internet.";
+    return err.message;
+  }
+
+  function showLoginError(msg) {
+    if (!loginError) return;
+    loginError.textContent = msg;
+    loginError.classList.add("visible");
+  }
+
+  function hideLoginError() {
+    if (!loginError) return;
+    loginError.textContent = "";
+    loginError.classList.remove("visible");
+  }
+
+  function showSignupError(msg) {
+    if (!signupError) return;
+    signupError.textContent = msg;
+    signupError.classList.add("visible");
+  }
+
+  function hideSignupError() {
+    if (!signupError) return;
+    signupError.textContent = "";
+    signupError.classList.remove("visible");
+  }
+
+  function setLoginLoading(loading) {
+    if (!loginBtn) return;
+    loginBtn.disabled = loading;
+    if (loginBtnText) loginBtnText.textContent = loading ? "Entrando..." : "Entrar";
+    if (loginSpinner) loginSpinner.style.display = loading ? "inline-block" : "none";
+  }
+
+  function setSignupLoading(loading) {
+    if (!signupBtn) return;
+    signupBtn.disabled = loading;
+    if (signupBtnText) signupBtnText.textContent = loading ? "Cadastrando..." : "Criar Conta";
+    if (signupSpinner) signupSpinner.style.display = loading ? "inline-block" : "none";
+  }
+
+  // ── Alternância de Abas (Entrar / Criar Conta) ────────────────────────────
+  function setTab(tab) {
+    hideLoginError();
+    hideSignupError();
+    if (signupSuccess) signupSuccess.style.display = "none";
+
+    if (tab === "signup") {
+      if (tabSignupBtn) tabSignupBtn.classList.add("active");
+      if (tabLoginBtn) tabLoginBtn.classList.remove("active");
+      if (loginForm) loginForm.style.display = "none";
+      if (signupForm) signupForm.style.display = "flex";
+      if (signupName) signupName.focus();
+    } else {
+      if (tabLoginBtn) tabLoginBtn.classList.add("active");
+      if (tabSignupBtn) tabSignupBtn.classList.remove("active");
+      if (signupForm) signupForm.style.display = "none";
+      if (loginForm) loginForm.style.display = "flex";
+      if (loginEmail) loginEmail.focus();
+    }
+  }
+
+  if (tabLoginBtn) tabLoginBtn.addEventListener("click", () => setTab("login"));
+  if (tabSignupBtn) tabSignupBtn.addEventListener("click", () => setTab("signup"));
+
+  // ── Mostrar / Ocultar Senha ───────────────────────────────────────────────
+  function setupPasswordToggle(btn, input) {
+    if (!btn || !input) return;
+    btn.addEventListener("click", () => {
+      const isPass = input.type === "password";
+      input.type = isPass ? "text" : "password";
+      btn.innerHTML = isPass ? EYE_CLOSED : EYE_OPEN;
+      btn.setAttribute("title", isPass ? "Ocultar senha" : "Mostrar senha");
+    });
+  }
+  setupPasswordToggle(togglePassLogin, loginPass);
+  setupPasswordToggle(togglePassSignup, signupPass);
+
+  // ── Controle de Telas ─────────────────────────────────────────────────────
+  function hideAllOverlays() {
     if (overlay) {
+      overlay.classList.add("hidden");
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, 350);
+    }
+    if (waitingOverlay) {
+      waitingOverlay.style.display = "none";
+    }
+  }
+
+  function showLoginScreen(msg) {
+    stopHeartbeat();
+    currentUser = null;
+    localStorage.removeItem(K_USER_CACHE);
+
+    if (waitingOverlay) waitingOverlay.style.display = "none";
+    if (overlay) {
+      overlay.classList.remove("hidden");
       overlay.style.display = "flex";
       overlay.style.opacity = "1";
-      overlay.classList.remove("hidden");
     }
-    if (msg) showError(msg);
+    setTab("login");
+    if (msg) showLoginError(msg);
   }
-  function showForceLogout() {
-    showLoginScreen("⚠️ Esta conta está sendo usada em outro dispositivo. Você foi desconectado.");
+
+  function showWaitingScreen() {
+    stopHeartbeat();
+    if (overlay) overlay.style.display = "none";
+    if (waitingOverlay) {
+      waitingOverlay.style.display = "flex";
+    }
   }
+
   function showApp(user) {
-    const name = user.name || (user.email || "").split("@")[0] || "Técnico";
-    if (userDisplayName) userDisplayName.textContent = name;
-    hideAll();
+    currentUser = user;
+    const name = formatUserName(user);
+    const email = user.email || "";
+
     window.VIGI_USER_ROLE  = "tecnico";
-    window.VIGI_USER_EMAIL = user.email || "";
+    window.VIGI_USER_EMAIL = email;
     window.VIGI_USER_NAME  = name;
+
+    localStorage.setItem(K_USER_CACHE, JSON.stringify({ email, name, id: user.id }));
+
+    if (userDisplayName) {
+      userDisplayName.textContent = name;
+    }
+
     if (typeof window.VIGI_updateDashName === "function") {
       window.VIGI_updateDashName(name);
     } else {
-      const el = document.getElementById("dashUserName");
-      if (el) el.textContent = name.split(" ")[0];
+      const dashName = document.getElementById("dashUserName");
+      if (dashName) dashName.textContent = name.split(" ")[0];
+    }
+
+    hideAllOverlays();
+    startHeartbeat(user);
+  }
+
+  // ── Verificação de Acesso (vigi_access) ────────────────────────────────────
+  async function checkUserAccess(user) {
+    if (!user) return false;
+    try {
+      const email = user.email ? user.email.toLowerCase().trim() : "";
+      const { data, error } = await supabase
+        .from("vigi_access")
+        .select("granted")
+        .or(`user_id.eq.${user.id},user_email.ilike.${email}`)
+        .maybeSingle();
+
+      if (error) {
+        console.warn("Erro ao consultar vigi_access:", error);
+        return false;
+      }
+
+      return data && data.granted === true;
+    } catch (err) {
+      console.error("Falha ao checar vigi_access:", err);
+      return false;
     }
   }
 
-  // ── Heartbeat (trava de 1 dispositivo) ────────────────────────────────────
-  // Retorna { owner:bool } | { expired:true } | { neterror:true }
-  async function heartbeat(token) {
+  // ── Sessão Única e Heartbeat (vigi_sessions) ───────────────────────────────
+  async function registerDeviceSession(user) {
+    const token = getSessionToken();
+    const deviceInfo = getDeviceInfo();
+    const now = new Date().toISOString();
+
     try {
-      const resp = await fetch(SSO_BASE + "/session/heartbeat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ device_token: getDeviceToken(), device_info: getDeviceInfo() }),
-      });
-      if (resp.status === 401) return { expired: true };
-      if (!resp.ok) return { neterror: true };
-      const j = await resp.json();
-      return { owner: j.owner === true };
-    } catch (_) {
-      return { neterror: true }; // blip de rede não desconecta
+      const { data: existing } = await supabase
+        .from("vigi_sessions")
+        .select("id, token")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (existing && existing.id) {
+        await supabase
+          .from("vigi_sessions")
+          .update({
+            token: token,
+            device_info: deviceInfo,
+            last_seen: now,
+            user_email: user.email
+          })
+          .eq("user_id", user.id);
+      } else {
+        await supabase
+          .from("vigi_sessions")
+          .insert([{
+            user_id: user.id,
+            user_email: user.email,
+            token: token,
+            device_info: deviceInfo,
+            last_seen: now
+          }]);
+      }
+    } catch (err) {
+      console.warn("Não foi possível sincronizar vigi_sessions:", err);
     }
   }
-  function startHeartbeat() {
-    clearInterval(heartbeatInterval);
+
+  function startHeartbeat(user) {
+    stopHeartbeat();
     heartbeatInterval = setInterval(async () => {
-      const token = localStorage.getItem(K_TOKEN);
-      if (!token || tokenExpired(token)) { stopHeartbeat(); clearSession(); showLoginScreen("Sua sessão expirou. Entre novamente."); return; }
-      const hb = await heartbeat(token);
-      if (hb.expired) { stopHeartbeat(); clearSession(); showLoginScreen("Sua sessão expirou. Entre novamente."); }
-      else if (hb.owner === false) { stopHeartbeat(); clearSession(); showForceLogout(); }
-    }, 60_000);
-  }
-  function stopHeartbeat() { clearInterval(heartbeatInterval); }
+      if (!user || !user.id) return;
+      try {
+        const localToken = getSessionToken();
+        const { data, error } = await supabase
+          .from("vigi_sessions")
+          .select("token")
+          .eq("user_id", user.id)
+          .maybeSingle();
 
-  // ── Início do login (redirect PKCE) ───────────────────────────────────────
-  async function startLogin() {
-    try {
-      setBtnLoading(true);
-      const verifier  = randomStr(64);
-      const challenge = await sha256b64url(verifier);
-      const state     = randomStr(24);
-      sessionStorage.setItem(SS_VERIF, verifier);
-      sessionStorage.setItem(SS_STATE, state);
-      const url = new URL(SSO_BASE + "/authorize");
-      url.searchParams.set("response_type", "code");
-      url.searchParams.set("client_id", CLIENT_ID);
-      url.searchParams.set("redirect_uri", REDIRECT_URI);
-      url.searchParams.set("scope", SCOPE);
-      url.searchParams.set("state", state);
-      url.searchParams.set("code_challenge", challenge);
-      url.searchParams.set("code_challenge_method", "S256");
-      location.assign(url.toString());
-    } catch (e) {
-      setBtnLoading(false);
-      showError("Não foi possível iniciar o login. Tente novamente.");
-      console.error(e);
+        if (error) return; // falha transitória de rede
+
+        // Se outro dispositivo assumiu o registro com um token diferente
+        if (data && data.token && data.token !== localToken) {
+          stopHeartbeat();
+          await performLogout("⚠️ Esta conta foi conectada em outro dispositivo. Você foi desconectado.");
+          return;
+        }
+
+        // Mantém a sessão atualizada
+        await supabase
+          .from("vigi_sessions")
+          .update({ last_seen: new Date().toISOString() })
+          .eq("user_id", user.id);
+      } catch (_) {}
+    }, 45000);
+  }
+
+  function stopHeartbeat() {
+    if (heartbeatInterval) {
+      clearInterval(heartbeatInterval);
+      heartbeatInterval = null;
     }
   }
 
-  // ── Pós-token (claims + claim de dispositivo + abrir app) ─────────────────
-  async function onAuthenticated(token) {
-    const claims = decodeJwt(token);
-    const user = {
-      sub: claims.sub,
-      email: claims.email || "",
-      name: claims.name || (claims.email || "").split("@")[0],
-    };
-    localStorage.setItem(K_TOKEN, token);
-    localStorage.setItem(K_USER, JSON.stringify(user));
-    const hb = await heartbeat(token);
-    if (hb.owner === false) { clearSession(); showForceLogout(); return; }
-    startHeartbeat();
-    showApp(user);
-  }
+  // ── Fluxo de Login ────────────────────────────────────────────────────────
+  async function handleLogin(e) {
+    e.preventDefault();
+    hideLoginError();
 
-  // ── Callback do OAuth (?code=) ────────────────────────────────────────────
-  async function handleCallback() {
-    const params = new URLSearchParams(location.search);
-    const code  = params.get("code");
-    const state = params.get("state");
-    if (!code) return false;
+    const email = loginEmail ? loginEmail.value.trim() : "";
+    const password = loginPass ? loginPass.value : "";
 
-    const savedState = sessionStorage.getItem(SS_STATE);
-    const verifier   = sessionStorage.getItem(SS_VERIF);
-    history.replaceState({}, document.title, REDIRECT_URI); // limpa o ?code da URL
-
-    if (!verifier || !savedState || state !== savedState) {
-      showLoginScreen("Sessão de login inválida. Tente novamente.");
-      return true;
+    if (!email || !password) {
+      showLoginError("Por favor, preencha o e-mail e a senha.");
+      return;
     }
+
     try {
-      const resp = await fetch(SSO_BASE + "/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          grant_type: "authorization_code",
-          code,
-          redirect_uri: REDIRECT_URI,
-          client_id: CLIENT_ID,
-          code_verifier: verifier,
-        }),
+      setLoginLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
       });
-      sessionStorage.removeItem(SS_VERIF);
-      sessionStorage.removeItem(SS_STATE);
-      if (!resp.ok) { showLoginScreen("Falha ao autenticar. Tente novamente."); return true; }
-      const data = await resp.json();
-      await onAuthenticated(data.access_token);
-    } catch (e) {
-      showLoginScreen("Erro de conexão ao autenticar.");
-      console.error(e);
+
+      if (error) {
+        setLoginLoading(false);
+        showLoginError(translateError(error));
+        return;
+      }
+
+      const user = data.user;
+      const isGranted = await checkUserAccess(user);
+
+      if (!isGranted) {
+        setLoginLoading(false);
+        showWaitingScreen();
+        return;
+      }
+
+      // Conexão concedida
+      renewSessionToken();
+      await registerDeviceSession(user);
+      setLoginLoading(false);
+      showApp(user);
+    } catch (err) {
+      setLoginLoading(false);
+      showLoginError(translateError(err));
     }
-    return true;
   }
 
-  // ── Sessão existente (reload) ─────────────────────────────────────────────
-  async function checkExistingSession() {
-    const token = localStorage.getItem(K_TOKEN);
-    if (!token || tokenExpired(token)) { clearSession(); showLoginScreen(); return; }
-    const hb = await heartbeat(token);
-    if (hb.expired) { clearSession(); showLoginScreen("Sua sessão expirou. Entre novamente."); return; }
-    if (hb.owner === false) { clearSession(); showForceLogout(); return; }
-    const user = JSON.parse(localStorage.getItem(K_USER) || "{}");
-    startHeartbeat();
-    showApp(user);
+  // ── Fluxo de Cadastro ─────────────────────────────────────────────────────
+  async function handleSignup(e) {
+    e.preventDefault();
+    hideSignupError();
+
+    const name = signupName ? signupName.value.trim() : "";
+    const email = signupEmail ? signupEmail.value.trim() : "";
+    const password = signupPass ? signupPass.value : "";
+
+    if (!name) {
+      showSignupError("Por favor, informe seu nome completo.");
+      return;
+    }
+    if (!email) {
+      showSignupError("Por favor, informe um e-mail válido.");
+      return;
+    }
+    if (!password || password.length < 6) {
+      showSignupError("A senha deve conter no mínimo 6 caracteres.");
+      return;
+    }
+
+    try {
+      setSignupLoading(true);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: name, name: name }
+        }
+      });
+
+      if (error) {
+        setSignupLoading(false);
+        showSignupError(translateError(error));
+        return;
+      }
+
+      setSignupLoading(false);
+      if (signupSuccess) signupSuccess.style.display = "block";
+
+      const user = data.user;
+      if (user) {
+        // Tenta registrar na tabela de acesso para facilitar a aprovação
+        try {
+          await supabase.from("vigi_access").insert([{
+            user_id: user.id,
+            user_email: email,
+            granted: false
+          }]);
+        } catch (_) {}
+
+        setTimeout(() => {
+          showWaitingScreen();
+        }, 1200);
+      }
+    } catch (err) {
+      setSignupLoading(false);
+      showSignupError(translateError(err));
+    }
   }
 
   // ── Logout ────────────────────────────────────────────────────────────────
-  async function performLogout() {
+  async function performLogout(forcedMsg) {
     stopHeartbeat();
-    // Libera a trava de dispositivo no servidor (senão o slot fica preso até expirar).
-    const token = localStorage.getItem(K_TOKEN);
-    if (token) {
-      try {
-        await fetch(SSO_BASE + "/session/logout", {
-          method: "POST",
-          headers: { "Authorization": "Bearer " + token },
-        });
-      } catch (_) { /* best effort */ }
-    }
-    clearSession();
-    showLoginScreen();
+    const token = getSessionToken();
+
+    try {
+      if (currentUser && currentUser.id && !forcedMsg) {
+        await supabase
+          .from("vigi_sessions")
+          .delete()
+          .eq("user_id", currentUser.id);
+      }
+    } catch (_) {}
+
+    try {
+      await supabase.auth.signOut();
+    } catch (_) {}
+
+    showLoginScreen(forcedMsg);
   }
 
-  // ── Wiring ────────────────────────────────────────────────────────────────
-  if (vigiLoginBtn) vigiLoginBtn.addEventListener("click", startLogin);
-  if (logoutBtn) logoutBtn.addEventListener("click", performLogout);
+  // ── Verificação de Sessão Inicial ─────────────────────────────────────────
+  async function checkInitialSession() {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error || !session || !session.user) {
+        showLoginScreen();
+        return;
+      }
+
+      const user = session.user;
+      const isGranted = await checkUserAccess(user);
+
+      if (!isGranted) {
+        showWaitingScreen();
+        return;
+      }
+
+      await registerDeviceSession(user);
+      showApp(user);
+    } catch (err) {
+      console.warn("Falha ao checar sessão:", err);
+      showLoginScreen();
+    }
+  }
+
+  // ── Event Listeners ───────────────────────────────────────────────────────
+  if (loginForm) loginForm.addEventListener("submit", handleLogin);
+  if (signupForm) signupForm.addEventListener("submit", handleSignup);
+  if (logoutBtn) logoutBtn.addEventListener("click", () => performLogout());
+  if (waitingLogoutBtn) waitingLogoutBtn.addEventListener("click", () => performLogout());
 
   // ── Inicialização ─────────────────────────────────────────────────────────
-  // Esconde os formulários legados de e-mail/senha e cadastro (substituídos
-  // pelo botão "Entrar com Vigi"); o conteúdo HTML permanece, só não é usado.
-  if (loginForm) loginForm.style.display = "none";
-  if (signupForm) signupForm.style.display = "none";
+  checkInitialSession();
 
-  if (overlay) {
-    overlay.style.display = "flex";
-    overlay.style.opacity = "0";
-    overlay.style.transition = "opacity 0.4s";
-  }
-  (async () => {
-    const wasCallback = await handleCallback();
-    if (!wasCallback) await checkExistingSession();
-    if (overlay) overlay.style.opacity = "1";
-  })();
+  // Exportar API do Auth no window para integração
+  window.VIGI_AUTH = {
+    supabase,
+    performLogout,
+    checkInitialSession,
+    checkUserAccess,
+    formatUserName
+  };
 
 })();
