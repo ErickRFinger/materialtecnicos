@@ -2277,35 +2277,31 @@ select.form-control option {
 }
 
 .slide-thumbnail {
-  width: 100px;
-  height: 66px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
   overflow: hidden;
   cursor: pointer;
   transition: var(--transition-smooth);
   position: relative;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .slide-thumbnail:hover {
   border-color: var(--color-primary);
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .slide-thumbnail img {
-  display: none;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
-.slide-thumbnail::before {
-  content: "🖼️";
-  font-size: 24px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0.5;
+.slide-thumbnail:hover img {
+  transform: scale(1.03);
 }
 
 .slide-thumbnail-overlay {
@@ -2314,12 +2310,17 @@ select.form-control option {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(9, 13, 22, 0.5);
+  background: rgba(9, 13, 22, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: var(--transition-smooth);
+  transition: opacity 0.2s ease;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  pointer-events: none;
 }
 
 .slide-thumbnail:hover .slide-thumbnail-overlay {
@@ -2337,18 +2338,12 @@ select.form-control option {
 }
 
 .slide-capa-img-container img {
-  display: none;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.slide-capa-img-container::before {
-  content: "🖼️ Capa de Treinamento";
-  font-size: 24px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0.5;
-}
 .slide-capa-img-container {
   width: 100%;
   height: 280px;
@@ -2370,11 +2365,6 @@ select.form-control option {
   
   .slide-capa-img-container {
     height: 180px;
-  }
-  
-  .slide-thumbnail {
-    width: 80px;
-    height: 53px;
   }
 }
 
