@@ -1,5 +1,5 @@
 /* ==========================================================================
-   AUTH.JS — AUTENTICAÇÃO COM SUPABASE & CONTROLE DE SESSÃO ÚNICA
+   AUTH.JS — AUTENTICAÇÃO COM SUPABASE, SESSÃO ÚNICA, BLINDAGEM DOM & PAINEL ADMIN
    Portal Técnico VIGI Câmeras
    ========================================================================== */
 
@@ -17,8 +17,17 @@
   // ── Constantes & Armazenamento Local ───────────────────────────────────────
   const K_SESSION_TOKEN = "vigi_portal_session_token";
   const K_USER_CACHE    = "vigi_portal_user";
+  const K_LAST_ACTIVE   = "vigi_portal_last_active";
+  const ADMIN_EMAILS    = [
+    "erick.finger123@gmail.com",
+    "daniellazzarottogba@gmail.com"
+  ];
+
   let heartbeatInterval = null;
   let currentUser       = null;
+
+  // Garante estado bloqueado por padrão antes da verificação
+  window.VIGI_AUTH_VERIFIED = false;
 
   // ── Elementos do DOM ──────────────────────────────────────────────────────
   const overlay           = document.getElementById("loginOverlay");
@@ -52,12 +61,32 @@
   const waitingLogoutBtn  = document.getElementById("waitingLogoutBtn");
   const logoutBtn         = document.getElementById("logoutBtn");
   const userDisplayName   = document.getElementById("userDisplayName");
+  const userRoleBadge     = document.getElementById("userRoleBadge");
+
+  // Elementos Admin
+  const openAdminModalBtn  = document.getElementById("openAdminModalBtn");
+  const navAdminItem       = document.getElementById("navAdminItem");
+  const sidebarAdminBtn    = document.getElementById("sidebarAdminBtn");
+  const adminAccessModal   = document.getElementById("adminAccessModal");
+  const closeAdminModalBtn = document.getElementById("closeAdminModalBtn");
+  const adminRefreshBtn    = document.getElementById("adminRefreshBtn");
+  const adminAddAccessForm = document.getElementById("adminAddAccessForm");
+  const adminNewEmailInput = document.getElementById("adminNewEmailInput");
+  const adminAccessList    = document.getElementById("adminAccessList");
+  const adminSessionsList  = document.getElementById("adminSessionsList");
+  const adminUsersCount    = document.getElementById("adminUsersCount");
+  const adminSessionsCount = document.getElementById("adminSessionsCount");
 
   // ── SVGs para alternância de senha ────────────────────────────────────────
   const EYE_OPEN = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
   const EYE_CLOSED = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
 
   // ── Utilitários ───────────────────────────────────────────────────────────
+  function isAdminUser(user) {
+    if (!user || !user.email) return false;
+    return ADMIN_EMAILS.includes(user.email.toLowerCase().trim());
+  }
+
   function getDeviceInfo() {
     const ua = navigator.userAgent;
     let b = "Navegador";
@@ -80,7 +109,23 @@
   function renewSessionToken() {
     const t = (crypto.randomUUID ? crypto.randomUUID() : 'sess_' + Math.random().toString(36).substring(2) + Date.now().toString(36));
     localStorage.setItem(K_SESSION_TOKEN, t);
+    localStorage.setItem(K_LAST_ACTIVE, String(Date.now()));
     return t;
+  }
+
+  function isSessionTimedOut() {
+    const timeoutHours = (typeof SESSION_TIMEOUT_HOURS === "number" && SESSION_TIMEOUT_HOURS > 0) ? SESSION_TIMEOUT_HOURS : 8;
+    const lastActive = parseInt(localStorage.getItem(K_LAST_ACTIVE) || "0", 10);
+    if (!lastActive) {
+      localStorage.setItem(K_LAST_ACTIVE, String(Date.now()));
+      return false;
+    }
+    const elapsedMs = Date.now() - lastActive;
+    return elapsedMs > timeoutHours * 3600 * 1000;
+  }
+
+  function touchActivity() {
+    localStorage.setItem(K_LAST_ACTIVE, String(Date.now()));
   }
 
   function formatUserName(user) {
@@ -179,7 +224,7 @@
   setupPasswordToggle(togglePassLogin, loginPass);
   setupPasswordToggle(togglePassSignup, signupPass);
 
-  // ── Controle de Telas ─────────────────────────────────────────────────────
+  // ── Controle de Telas & Blindagem DOM ─────────────────────────────────────
   function hideAllOverlays() {
     if (overlay) {
       overlay.classList.add("hidden");
@@ -195,7 +240,17 @@
   function showLoginScreen(msg) {
     stopHeartbeat();
     currentUser = null;
+    window.VIGI_AUTH_VERIFIED = false;
     localStorage.removeItem(K_USER_CACHE);
+    localStorage.removeItem(K_LAST_ACTIVE);
+
+    if (typeof window.VIGI_LOCK_PORTAL === "function") {
+      window.VIGI_LOCK_PORTAL();
+    }
+
+    if (openAdminModalBtn) openAdminModalBtn.style.display = "none";
+    if (navAdminItem) navAdminItem.style.display = "none";
+    if (adminAccessModal) adminAccessModal.style.display = "none";
 
     if (waitingOverlay) waitingOverlay.style.display = "none";
     if (overlay) {
@@ -209,6 +264,16 @@
 
   function showWaitingScreen() {
     stopHeartbeat();
+    window.VIGI_AUTH_VERIFIED = false;
+
+    if (typeof window.VIGI_LOCK_PORTAL === "function") {
+      window.VIGI_LOCK_PORTAL();
+    }
+
+    if (openAdminModalBtn) openAdminModalBtn.style.display = "none";
+    if (navAdminItem) navAdminItem.style.display = "none";
+    if (adminAccessModal) adminAccessModal.style.display = "none";
+
     if (overlay) overlay.style.display = "none";
     if (waitingOverlay) {
       waitingOverlay.style.display = "flex";
@@ -217,10 +282,14 @@
 
   function showApp(user) {
     currentUser = user;
+    window.VIGI_AUTH_VERIFIED = true;
+    touchActivity();
+
     const name = formatUserName(user);
     const email = user.email || "";
+    const isAdmin = isAdminUser(user);
 
-    window.VIGI_USER_ROLE  = "tecnico";
+    window.VIGI_USER_ROLE  = isAdmin ? "admin" : "tecnico";
     window.VIGI_USER_EMAIL = email;
     window.VIGI_USER_NAME  = name;
 
@@ -232,6 +301,18 @@
       userDisplayName.textContent = name;
     }
 
+    if (userRoleBadge) {
+      userRoleBadge.textContent = isAdmin ? "ADMIN VIGI" : "TÉCNICO VIGI";
+      userRoleBadge.classList.toggle("is-admin", isAdmin);
+    }
+
+    if (openAdminModalBtn) {
+      openAdminModalBtn.style.display = isAdmin ? "inline-flex" : "none";
+    }
+    if (navAdminItem) {
+      navAdminItem.style.display = isAdmin ? "block" : "none";
+    }
+
     const userAvatarInitial = document.getElementById("userAvatarInitial");
     if (userAvatarInitial) userAvatarInitial.textContent = initial;
 
@@ -240,6 +321,11 @@
 
     const sidebarUserAvatar = document.getElementById("sidebarUserAvatar");
     if (sidebarUserAvatar) sidebarUserAvatar.textContent = initial;
+
+    // Inicializa e libera a renderização do Portal somente agora
+    if (typeof window.VIGI_BOOT_PORTAL === "function") {
+      window.VIGI_BOOT_PORTAL();
+    }
 
     if (typeof window.VIGI_updateDashName === "function") {
       window.VIGI_updateDashName(name);
@@ -259,13 +345,23 @@
       const email = user.email ? user.email.toLowerCase().trim() : "";
       const { data, error } = await supabase
         .from("vigi_access")
-        .select("granted")
+        .select("id, user_id, granted")
         .or(`user_id.eq.${user.id},user_email.ilike.${email}`)
         .maybeSingle();
 
       if (error) {
         console.warn("Erro ao consultar vigi_access:", error);
         return false;
+      }
+
+      // Se o e-mail foi pré-autorizado pelo admin sem user_id vinculado, vincula agora
+      if (data && !data.user_id && user.id) {
+        try {
+          await supabase
+            .from("vigi_access")
+            .update({ user_id: user.id })
+            .eq("id", data.id);
+        } catch (_) {}
       }
 
       return data && data.granted === true;
@@ -318,7 +414,24 @@
     stopHeartbeat();
     heartbeatInterval = setInterval(async () => {
       if (!user || !user.id) return;
+
+      // 1. Verifica expiração por inatividade prolongada (SESSION_TIMEOUT_HOURS)
+      if (isSessionTimedOut()) {
+        stopHeartbeat();
+        await performLogout("⏰ Sua sessão expirou por inatividade. Faça login novamente.");
+        return;
+      }
+
       try {
+        // 2. Verifica se o acesso continua concedido em vigi_access
+        const stillGranted = await checkUserAccess(user);
+        if (!stillGranted) {
+          stopHeartbeat();
+          showWaitingScreen();
+          return;
+        }
+
+        // 3. Verifica sessão única por dispositivo em vigi_sessions
         const localToken = getSessionToken();
         const { data, error } = await supabase
           .from("vigi_sessions")
@@ -328,10 +441,10 @@
 
         if (error) return; // falha transitória de rede
 
-        // Se outro dispositivo assumiu o registro com um token diferente
-        if (data && data.token && data.token !== localToken) {
+        // Se a sessão foi removida pelo Admin ou assumida por outro dispositivo
+        if (!data || (data.token && data.token !== localToken)) {
           stopHeartbeat();
-          await performLogout("⚠️ Esta conta foi conectada em outro dispositivo. Você foi desconectado.");
+          await performLogout("⚠️ Esta conta foi conectada em outro dispositivo ou desconectada pelo administrador.");
           return;
         }
 
@@ -350,6 +463,13 @@
       heartbeatInterval = null;
     }
   }
+
+  // Atualiza timestamp de atividade em interações do usuário
+  ["click", "keydown", "touchstart"].forEach(evt => {
+    window.addEventListener(evt, () => {
+      if (window.VIGI_AUTH_VERIFIED) touchActivity();
+    }, { passive: true });
+  });
 
   // ── Fluxo de Login ────────────────────────────────────────────────────────
   async function handleLogin(e) {
@@ -403,7 +523,7 @@
     hideSignupError();
 
     const name = signupName ? signupName.value.trim() : "";
-    const email = signupEmail ? signupEmail.value.trim() : "";
+    const email = signupEmail ? signupEmail.value.trim().toLowerCase() : "";
     const password = signupPass ? signupPass.value : "";
 
     if (!name) {
@@ -440,7 +560,16 @@
 
       const user = data.user;
       if (user) {
-        // Tenta registrar na tabela de acesso para facilitar a aprovação
+        // Verifica se já havia sido pré-autorizado pelo Admin
+        const alreadyGranted = await checkUserAccess(user);
+        if (alreadyGranted) {
+          renewSessionToken();
+          await registerDeviceSession(user);
+          showApp(user);
+          return;
+        }
+
+        // Caso contrário, registra como pendente (granted: false) para aprovação do Admin
         try {
           await supabase.from("vigi_access").insert([{
             user_id: user.id,
@@ -462,7 +591,6 @@
   // ── Logout ────────────────────────────────────────────────────────────────
   async function performLogout(forcedMsg) {
     stopHeartbeat();
-    const token = getSessionToken();
 
     try {
       if (currentUser && currentUser.id && !forcedMsg) {
@@ -489,6 +617,11 @@
         return;
       }
 
+      if (isSessionTimedOut()) {
+        await performLogout("⏰ Sua sessão anterior expirou. Faça login novamente.");
+        return;
+      }
+
       const user = session.user;
       const isGranted = await checkUserAccess(user);
 
@@ -505,7 +638,197 @@
     }
   }
 
-  // ── Event Listeners ───────────────────────────────────────────────────────
+  // ── Painel Admin: Controle de Acessos & Sessões ───────────────────────────
+  function formatRelativeTime(isoStr) {
+    if (!isoStr) return "—";
+    const diffSec = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
+    if (diffSec < 60) return "Agora mesmo";
+    if (diffSec < 3600) return `há ${Math.floor(diffSec / 60)} min`;
+    if (diffSec < 86400) return `há ${Math.floor(diffSec / 3600)}h`;
+    return new Date(isoStr).toLocaleDateString("pt-BR");
+  }
+
+  async function loadAdminPanelData() {
+    if (!currentUser || !isAdminUser(currentUser)) return;
+
+    if (adminAccessList) adminAccessList.innerHTML = `<div class="admin-loading">Carregando acessos...</div>`;
+    if (adminSessionsList) adminSessionsList.innerHTML = `<div class="admin-loading">Carregando sessões...</div>`;
+
+    try {
+      const [accessRes, sessionsRes] = await Promise.all([
+        supabase.from("vigi_access").select("*").order("liberado_em", { ascending: false }),
+        supabase.from("vigi_sessions").select("*").order("last_seen", { ascending: false })
+      ]);
+
+      const accessRows = accessRes.data || [];
+      const sessionRows = sessionsRes.data || [];
+
+      if (adminUsersCount) adminUsersCount.textContent = accessRows.length;
+      if (adminSessionsCount) adminSessionsCount.textContent = sessionRows.length;
+
+      // Renderizar Técnicos (vigi_access)
+      if (adminAccessList) {
+        if (accessRows.length === 0) {
+          adminAccessList.innerHTML = `<div class="admin-empty">Nenhum técnico listado.</div>`;
+        } else {
+          adminAccessList.innerHTML = accessRows.map(row => {
+            const email = (row.user_email || "").toLowerCase();
+            const isSelf = currentUser.email && currentUser.email.toLowerCase() === email;
+            const isRowAdmin = ADMIN_EMAILS.includes(email);
+            const granted = row.granted === true;
+            return `
+              <div class="admin-item-row ${granted ? 'is-granted' : 'is-pending'}">
+                <div class="admin-item-info">
+                  <div class="admin-item-email">
+                    <span>${email}</span>
+                    ${isRowAdmin ? '<span class="admin-mini-tag tag-admin">ADMIN</span>' : ''}
+                    <span class="admin-mini-tag ${granted ? 'tag-granted' : 'tag-pending'}">
+                      ${granted ? '✓ Liberado' : '⏳ Bloqueado / Pendente'}
+                    </span>
+                  </div>
+                  <span class="admin-item-meta">Registro: ${formatRelativeTime(row.liberado_em)}</span>
+                </div>
+                <div class="admin-item-actions">
+                  ${isSelf ? `<span class="admin-self-note">Você</span>` : `
+                    <button type="button" class="admin-action-btn ${granted ? 'btn-revoke' : 'btn-grant'}" data-toggle-access="${row.id}" data-current="${granted}">
+                      ${granted ? 'Bloquear' : 'Liberar'}
+                    </button>
+                    <button type="button" class="admin-action-btn btn-del-row" data-delete-access="${row.id}" title="Remover registro">✕</button>
+                  `}
+                </div>
+              </div>
+            `;
+          }).join("");
+
+          adminAccessList.querySelectorAll("[data-toggle-access]").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              const id = btn.getAttribute("data-toggle-access");
+              const current = btn.getAttribute("data-current") === "true";
+              btn.disabled = true;
+              btn.textContent = "...";
+              const { error } = await supabase
+                .from("vigi_access")
+                .update({ granted: !current, liberado_em: new Date().toISOString() })
+                .eq("id", id);
+              if (error) {
+                if (window.showToast) window.showToast("Erro ao alterar permissão: " + error.message, "error");
+              } else {
+                if (window.showToast) window.showToast(!current ? "Acesso liberado com sucesso!" : "Acesso bloqueado!", !current ? "success" : "warning");
+              }
+              loadAdminPanelData();
+            });
+          });
+
+          adminAccessList.querySelectorAll("[data-delete-access]").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              const id = btn.getAttribute("data-delete-access");
+              if (!confirm("Remover este e-mail da lista de controle de acesso?")) return;
+              await supabase.from("vigi_access").delete().eq("id", id);
+              if (window.showToast) window.showToast("Registro removido.", "info");
+              loadAdminPanelData();
+            });
+          });
+        }
+      }
+
+      // Renderizar Sessões (vigi_sessions)
+      if (adminSessionsList) {
+        if (sessionRows.length === 0) {
+          adminSessionsList.innerHTML = `<div class="admin-empty">Nenhuma sessão ativa no momento.</div>`;
+        } else {
+          adminSessionsList.innerHTML = sessionRows.map(sess => {
+            const email = (sess.user_email || "").toLowerCase();
+            const isRecent = sess.last_seen && (Date.now() - new Date(sess.last_seen).getTime() < 5 * 60 * 1000);
+            return `
+              <div class="admin-item-row">
+                <div class="admin-item-info">
+                  <div class="admin-item-email">
+                    <span class="sess-dot ${isRecent ? 'online' : 'idle'}"></span>
+                    <span>${email}</span>
+                  </div>
+                  <span class="admin-item-meta">${sess.device_info || "Dispositivo"} · Visto ${formatRelativeTime(sess.last_seen)}</span>
+                </div>
+                <div class="admin-item-actions">
+                  <button type="button" class="admin-action-btn btn-revoke" data-kill-session="${sess.id}" title="Encerrar e destravar sessão">
+                    Desconectar
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join("");
+
+          adminSessionsList.querySelectorAll("[data-kill-session]").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              const id = btn.getAttribute("data-kill-session");
+              btn.disabled = true;
+              btn.textContent = "...";
+              await supabase.from("vigi_sessions").delete().eq("id", id);
+              if (window.showToast) window.showToast("Sessão encerrada com sucesso!", "info");
+              loadAdminPanelData();
+            });
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Erro ao carregar painel Admin:", err);
+    }
+  }
+
+  function openAdminModal() {
+    if (!adminAccessModal || !currentUser || !isAdminUser(currentUser)) return;
+    adminAccessModal.style.display = "flex";
+    loadAdminPanelData();
+  }
+
+  function closeAdminModal() {
+    if (adminAccessModal) adminAccessModal.style.display = "none";
+  }
+
+  if (openAdminModalBtn) openAdminModalBtn.addEventListener("click", openAdminModal);
+  if (sidebarAdminBtn) sidebarAdminBtn.addEventListener("click", () => {
+    const sb = document.getElementById("sidebar");
+    if (sb) sb.classList.remove("open");
+    openAdminModal();
+  });
+  if (closeAdminModalBtn) closeAdminModalBtn.addEventListener("click", closeAdminModal);
+  if (adminRefreshBtn) adminRefreshBtn.addEventListener("click", loadAdminPanelData);
+  if (adminAccessModal) {
+    adminAccessModal.addEventListener("click", (e) => {
+      if (e.target === adminAccessModal) closeAdminModal();
+    });
+  }
+
+  if (adminAddAccessForm) {
+    adminAddAccessForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!adminNewEmailInput) return;
+      const email = adminNewEmailInput.value.trim().toLowerCase();
+      if (!email) return;
+
+      const { data: existing } = await supabase
+        .from("vigi_access")
+        .select("id")
+        .ilike("user_email", email)
+        .maybeSingle();
+
+      if (existing && existing.id) {
+        await supabase
+          .from("vigi_access")
+          .update({ granted: true, liberado_em: new Date().toISOString() })
+          .eq("id", existing.id);
+      } else {
+        await supabase
+          .from("vigi_access")
+          .insert([{ user_email: email, granted: true, liberado_em: new Date().toISOString() }]);
+      }
+
+      adminNewEmailInput.value = "";
+      if (window.showToast) window.showToast(`E-mail ${email} autorizado!`, "success");
+      loadAdminPanelData();
+    });
+  }
+
+  // ── Event Listeners de Login / Logout ─────────────────────────────────────
   if (loginForm) loginForm.addEventListener("submit", handleLogin);
   if (signupForm) signupForm.addEventListener("submit", handleSignup);
 
@@ -562,7 +885,8 @@
     performLogout,
     checkInitialSession,
     checkUserAccess,
-    formatUserName
+    formatUserName,
+    openAdminModal
   };
 
 })();

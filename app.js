@@ -101,29 +101,68 @@ document.addEventListener("DOMContentLoaded", () => {
   // Estado para os Slides de Treinamento
   let currentSlideIndex = 0;
   const totalSlides = VIGI_DATA.slides.length;
+  let isPortalInitialized = false;
+  let datetimeInterval = null;
 
   // ==========================================================================
-  // INICIALIZAÇÃO
+  // INICIALIZAÇÃO E BLINDAGEM DO PORTAL (SOMENTE APÓS AUTH + VIGI_ACCESS)
   // ==========================================================================
   function init() {
+    const appContainer = document.getElementById("appContainer");
+    const mobileBottomNav = document.getElementById("mobileBottomNav");
+    if (appContainer) {
+      appContainer.style.display = "flex";
+      appContainer.setAttribute("aria-hidden", "false");
+    }
+    if (mobileBottomNav) {
+      mobileBottomNav.style.display = "";
+    }
+
     updateStats();
     updateFilterCounts();
     renderFavorites();
-    renderVideos();
-    renderArtes();
-    renderManuais();
+    renderVideos(activeVideoFilter, currentSearchQuery);
+    renderArtes(currentSearchQuery);
+    renderManuais(currentSearchQuery);
     loadRequests();
     renderSlide(currentSlideIndex);
     setupSlideDots();
-    initTipsCarousel();
     initDashboardGreeting();
-    setupEventListeners();
+
+    if (!isPortalInitialized) {
+      initTipsCarousel();
+      setupEventListeners();
+      isPortalInitialized = true;
+    }
   }
+
+  function lockPortal() {
+    const appContainer = document.getElementById("appContainer");
+    const mobileBottomNav = document.getElementById("mobileBottomNav");
+    if (appContainer) {
+      appContainer.style.display = "none";
+      appContainer.setAttribute("aria-hidden", "true");
+    }
+    if (mobileBottomNav) {
+      mobileBottomNav.style.display = "none";
+    }
+    if (videosGrid) videosGrid.innerHTML = "";
+    if (artesGrid) artesGrid.innerHTML = "";
+    if (manuaisContainer) manuaisContainer.innerHTML = "";
+    if (slideDeck) slideDeck.innerHTML = "";
+    const favoritesList = document.getElementById("favoritesList");
+    if (favoritesList) favoritesList.innerHTML = "";
+    closeModal();
+  }
+
+  window.VIGI_BOOT_PORTAL = init;
+  window.VIGI_LOCK_PORTAL = lockPortal;
 
   // ==========================================================================
   // COMPORTAMENTO DE NAVEGAÇÃO E ABAS
   // ==========================================================================
   function switchTab(tabId) {
+    if (!tabId) return;
     currentActiveTab = tabId;
     navItems.forEach(item => {
       if (item.getAttribute("data-tab") === tabId) { item.classList.add("active"); }
@@ -149,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
     navItems.forEach(item => {
       item.addEventListener("click", () => {
         const tabId = item.getAttribute("data-tab");
-        switchTab(tabId);
+        if (tabId) switchTab(tabId);
       });
     });
 
@@ -786,7 +825,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (dtTextEl) dtTextEl.textContent = `${dateFormatted} — ${timePart}`;
     }
     updateDatetime();
-    setInterval(updateDatetime, 30000);
+    if (datetimeInterval) clearInterval(datetimeInterval);
+    datetimeInterval = setInterval(updateDatetime, 30000);
   }
 
   // ==========================================================================
@@ -1596,8 +1636,10 @@ document.addEventListener("DOMContentLoaded", () => {
       col.appendChild(card);
     });
 
-    // Drag & Drop nas colunas
+    // Drag & Drop nas colunas (bind único por zona)
     document.querySelectorAll(".kanban-cards").forEach(zone => {
+      if (zone.dataset.dragBound === "true") return;
+      zone.dataset.dragBound = "true";
       zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("drag-over"); });
       zone.addEventListener("dragleave", () => zone.classList.remove("drag-over"));
       zone.addEventListener("drop", e => {
@@ -2597,8 +2639,12 @@ document.addEventListener("DOMContentLoaded", () => {
     startAuto();
   }
 
-  // DISPARO
-  init();
+  // DISPARO PROTEGIDO: Só renderiza se o auth.js já tiver validado sessão + vigi_access
+  if (window.VIGI_AUTH_VERIFIED === true) {
+    init();
+  } else {
+    lockPortal();
+  }
 
 });
 

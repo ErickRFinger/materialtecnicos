@@ -1,0 +1,17 @@
+.git
+.gitignore
+.DS_Store
+Thumbs.db
+node_modules
+.env
+.env.*
+*.pptx
+*.sql
+*.py
+*.md
+package.json
+package-lock.json
+temp_pptx
+_interno
+patch*.js
+generate_icons.js

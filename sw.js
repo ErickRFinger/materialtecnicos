@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigi-portal-cache-v10';
+const CACHE_NAME = 'vigi-portal-cache-v11';
 const urlsToCache = [
   './',
   './index.html',
@@ -17,7 +17,6 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache v5');
         return cache.addAll(urlsToCache);
       })
   );
@@ -31,7 +30,6 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -41,11 +39,13 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch event — network first para HTML/JS/CSS, cache para imagens
+// Fetch event — ignora chamadas externas (Supabase API/Auth)
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
   const isAsset = /\.(png|jpg|jpeg|svg|ico|woff2?)$/.test(url.pathname);
 
   if (isAsset) {
