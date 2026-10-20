@@ -1796,16 +1796,54 @@ select.form-control option {
   }
 
   .main-header {
-    padding: 0 20px;
-    height: 70px;
+    padding: 0 16px;
+    height: 64px;
+    gap: 10px;
   }
 
   .search-container {
-    width: 60%;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .search-kbd-hint {
+    display: none;
   }
 
   .user-profile {
-    display: none; /* Esconde info perfil no mobile para economizar espaço */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .user-details-col {
+    display: none;
+  }
+
+  .logout-btn span,
+  .admin-shield-btn span {
+    display: none;
+  }
+
+  .logout-btn {
+    padding: 8px;
+    min-width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .admin-shield-btn {
+    padding: 8px;
+    min-width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Menu lateral transformado em Gaveta Lateral */
@@ -1823,6 +1861,7 @@ select.form-control option {
   .main-content {
     margin-left: 0;
     width: 100%;
+    padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px));
   }
 
   .content-section {
@@ -3440,13 +3479,14 @@ select.form-control option {
 
   .content-grid { grid-template-columns: 1fr; gap: 14px; }
 
-  .video-card { flex-direction: row; min-height: 90px; }
+  .video-card { flex-direction: row; min-height: 96px; }
   .video-thumbnail {
-    width: 110px; min-width: 110px;
-    aspect-ratio: unset; height: auto;
+    width: 124px; min-width: 124px;
+    aspect-ratio: 16/9; height: auto;
     border-bottom: none;
     border-right: 1px solid var(--border-color);
     border-radius: 0;
+    flex-shrink: 0;
   }
   .video-card-body { padding: 10px 12px; }
   .video-card-title { font-size: 13px; margin-bottom: 4px; }
@@ -3454,12 +3494,13 @@ select.form-control option {
   .video-card-footer { padding-top: 8px; margin-top: 6px; }
   .watch-btn { padding: 8px 14px; font-size: 13px; min-height: 36px; }
 
-  .art-card { flex-direction: row; }
+  .art-card { flex-direction: row; min-height: 96px; }
   .art-thumbnail {
-    width: 100px; min-width: 100px;
-    aspect-ratio: unset; height: auto; min-height: 84px;
+    width: 95px; min-width: 95px;
+    aspect-ratio: 3/4; height: auto; min-height: 84px;
     border-bottom: none;
     border-right: 1px solid var(--border-color);
+    flex-shrink: 0;
   }
   .art-card-body { padding: 10px 12px; }
   .art-card-title { font-size: 13px; }
@@ -3479,6 +3520,39 @@ select.form-control option {
   .dash-tips-track { min-height: 80px; }
 
   .kanban-board { grid-template-columns: 1fr !important; }
+
+  .kanban-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .kanban-filter-pills {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+  .kanban-filter-pill {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .kanban-search-box {
+    width: 100%;
+    min-width: 100%;
+  }
+  .kanban-form-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .kanban-stats {
+    justify-content: center;
+    width: 100%;
+  }
+  .kanban-clear-btn {
+    align-self: center;
+  }
 
   .form-control { font-size: 16px; min-height: 46px; }
   .form-control-textarea { min-height: 100px; font-size: 16px; }
@@ -3523,10 +3597,12 @@ select.form-control option {
     left: 0;
     right: 0;
     z-index: 200;
-    background: rgba(15, 23, 42, 0.97);
+    background: rgba(15, 23, 42, 0.96);
     border-top: 1px solid var(--border-color);
-    backdrop-filter: blur(14px);
-    height: 60px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    height: calc(60px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     align-items: stretch;
     box-shadow: 0 -4px 24px rgba(0,0,0,0.55);
   }
@@ -5616,6 +5692,55 @@ select.form-control option {
   transform: translateY(-1px);
   color: #fff;
 }
+
+/* ==========================================================================
+   OTIMIZAÇÕES DE RESPONSIVIDADE E TOQUE (TELAS PEQUENAS <= 480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 20px 24px;
+    margin: 14px;
+    border-radius: 16px;
+  }
+
+  .dash-welcome-banner {
+    padding: 20px 16px;
+  }
+
+  .dash-title {
+    font-size: 20px !important;
+  }
+
+  .dash-checklist-card {
+    padding: 18px 14px;
+  }
+
+  .dash-checklist-title {
+    font-size: 15px;
+  }
+
+  .dash-quick-btn {
+    padding: 14px 12px;
+    min-height: 90px;
+  }
+
+  .lightbox-controls {
+    bottom: 12px;
+    padding: 6px 12px;
+    gap: 8px;
+    max-width: 95%;
+  }
+
+  .section-title {
+    font-size: 20px !important;
+  }
+
+  .modal-window {
+    height: 92vh;
+    max-height: 92vh;
+  }
+}
+
 
 
 

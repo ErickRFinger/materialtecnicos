@@ -97,3 +97,9 @@ Para aplicar/atualizar as políticas de segurança RLS, tabela `vigi_materiais` 
   - **Chips de Inspiração Rápida:** Botões de preenchimento em 1 clique para dúvidas comuns de campo (Reset de DVR, Ligação de Sirene no Alarme, Tabela de Planos Atualizada, Homologação Onvif e Bornes de Fonte Chaveada).
   - **Filtros por Formato & Busca em Tempo Real:** Barra interativa de filtros (*Todos, 🎬 Vídeos, 🎨 Artes, 📋 Manuais, ⚡ Diagramas*) e campo de busca para evitar solicitações duplicadas no mural Kanban.
   - **Notificação Direta no WhatsApp:** Botão em cada card para transmitir a sugestão formatada diretamente para a equipe técnica de produção/administração no WhatsApp.
+- **v2.5 (Revisão Visual Geral & Otimização Mobile/Desktop):**
+  - **Fluidez & Responsividade Ponta a Ponta:** Ajuste fino de layout para smartphones (iPhone SE, 13/14/15/16 Pro, Androids), tablets e monitores widescreen.
+  - **Proteção de Safe Area:** Padding de compensação dinâmico no conteúdo principal para garantir que botões de ação e rodapés nunca fiquem encobertos pela barra de navegação inferior ou barra de gestos do iOS.
+  - **Header Móvel Otimizado:** Busca flexível com proporção fluida, botões compactos de logout e atalho admin com escudo para abertura direta da Central de Acessos.
+  - **Proporção Perfeita de Miniaturas:** Capas de vídeo Studio 16:9 e artes comerciais 3:4 renderizadas com proporção fixa sem achatamento em dispositivos móveis.
+  - **Touch Gestures & Filtros Horizontais:** Barras de filtros com rolagem tátil suave (*momentum scrolling*) e controles do Lightbox otimizados para telas compactas.
