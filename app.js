@@ -107,6 +107,62 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================================
   // INICIALIZAÇÃO E BLINDAGEM DO PORTAL (SOMENTE APÓS AUTH + VIGI_ACCESS)
   // ==========================================================================
+  // Sincronização dinâmica opcional com Supabase (tabela vigi_materiais + Storage vigi-midia)
+  async function syncMediaFromSupabase() {
+    try {
+      const sb = window.VIGI_AUTH && window.VIGI_AUTH.supabase;
+      if (!sb) return;
+      const { data, error } = await sb.from("vigi_materiais").select("*");
+      if (error || !Array.isArray(data) || data.length === 0) return;
+
+      let updated = false;
+      data.forEach(row => {
+        if (row.tipo === "video") {
+          const existing = VIGI_DATA.videos.find(v => v.id === row.id);
+          if (existing) {
+            if (row.capa_url) existing.capa = row.capa_url;
+            if (row.video_url) existing.videoUrl = row.video_url;
+            if (row.drive_url) existing.driveUrl = row.drive_url;
+            if (row.titulo) existing.titulo = row.titulo;
+            if (row.descricao) existing.descricao = row.descricao;
+            updated = true;
+          } else {
+            VIGI_DATA.videos.push({
+              id: row.id,
+              titulo: row.titulo,
+              categoria: row.categoria || "Material Técnico",
+              marca: row.marca || "VIGI",
+              capa: row.capa_url || "VIGI.png",
+              caminho: "VIGI.png",
+              videoUrl: row.video_url || "",
+              driveUrl: row.drive_url || "",
+              descricao: row.descricao || ""
+            });
+            updated = true;
+          }
+        } else if (row.tipo === "arte") {
+          const existingArt = VIGI_DATA.artes.find(a => a.id === row.id);
+          if (existingArt) {
+            if (row.capa_url || row.video_url) existingArt.caminho = row.capa_url || row.video_url;
+            if (row.drive_url) existingArt.driveUrl = row.drive_url;
+            if (row.titulo) existingArt.titulo = row.titulo;
+            if (row.descricao) existingArt.descricao = row.descricao;
+            updated = true;
+          }
+        }
+      });
+
+      if (updated) {
+        updateStats();
+        updateFilterCounts();
+        renderVideos(activeVideoFilter, currentSearchQuery);
+        renderArtes(currentSearchQuery);
+      }
+    } catch (_) {
+      // Silencioso caso a tabela vigi_materiais ainda não tenha sido criada no Supabase
+    }
+  }
+
   function init() {
     const appContainer = document.getElementById("appContainer");
     const mobileBottomNav = document.getElementById("mobileBottomNav");
@@ -128,6 +184,9 @@ document.addEventListener("DOMContentLoaded", () => {
     renderSlide(currentSlideIndex);
     setupSlideDots();
     initDashboardGreeting();
+    initDashboardFeaturedVideos();
+    initGoldChecklist();
+    syncMediaFromSupabase();
 
     if (!isPortalInitialized) {
       initTipsCarousel();
@@ -447,7 +506,17 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("[data-target-tab]").forEach(btn => {
       btn.addEventListener("click", () => {
         const tab = btn.getAttribute("data-target-tab");
+        const filter = btn.getAttribute("data-target-filter");
         switchTab(tab);
+        if (filter && tab === "videos") {
+          activeVideoFilter = filter.toLowerCase();
+          const filterBtn = document.querySelector(`#video-filters [data-filter="${filter.toLowerCase()}"]`);
+          if (filterBtn) {
+            document.querySelectorAll("#video-filters .filter-btn").forEach(b => b.classList.remove("active"));
+            filterBtn.classList.add("active");
+          }
+          renderVideos(activeVideoFilter, currentSearchQuery);
+        }
       });
     });
 
@@ -838,12 +907,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const totalAlarme = VIGI_DATA.videos.filter(v => v.categoria === "Alarme").length;
     const totalHik = VIGI_DATA.videos.filter(v => v.categoria === "Hikvision").length;
     const totalUnv = VIGI_DATA.videos.filter(v => v.categoria === "Uniview").length;
+    const totalProc = VIGI_DATA.videos.filter(v => v.categoria === "Procedimentos").length;
     const totalTec = VIGI_DATA.manuais.length;
+    const totalArtes = VIGI_DATA.artes.length;
 
     if (countAlarme) countAlarme.textContent = totalAlarme;
     if (countHik) countHik.textContent = totalHik;
     if (countUnv) countUnv.textContent = totalUnv;
     if (countTec) countTec.textContent = totalTec;
+    
+    const countProcEl = document.getElementById("count-proc");
+    if (countProcEl) countProcEl.textContent = totalProc;
+
+    const countArtesEl = document.getElementById("count-artes");
+    if (countArtesEl) countArtesEl.textContent = totalArtes;
   }
 
   // Atualizar contadores em badges nos filtros
@@ -929,16 +1006,18 @@ document.addEventListener("DOMContentLoaded", () => {
         "Alarme": "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80",
         "Hikvision": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=600&q=80",
         "Uniview": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80",
-        "Material Técnico": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=600&q=80"
+        "Material Técnico": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=600&q=80",
+        "Procedimentos": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80"
       };
       const defaultCover = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80";
       const capaUrl = video.capa || categoryCovers[video.categoria] || defaultCover;
 
       card.innerHTML = `
         <div class="video-thumbnail">
-          <img src="${capaUrl}" alt="Capa do vídeo" class="video-cover-img" />
+          <img src="${capaUrl}" alt="${video.titulo}" class="video-cover-img" loading="lazy" onerror="this.onerror=null;this.src='${defaultCover}';" />
           <div class="thumbnail-overlay"></div>
           <span class="video-brand-tag ${tagClass}">${video.categoria}</span>
+          <span class="video-hd-badge">HD</span>
           <button class="play-overlay-btn" aria-label="Assistir Vídeo">▶</button>
         </div>
         <div class="video-card-body">
@@ -971,11 +1050,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Evento para abrir o player de vídeo
       const actionBtn = card.querySelector(".watch-btn");
-      const playBtn = card.querySelector(".play-overlay-btn");
+      const thumbBox = card.querySelector(".video-thumbnail");
       
       const triggerWatch = () => openVideoPlayer(video);
       actionBtn.addEventListener("click", triggerWatch);
-      playBtn.addEventListener("click", triggerWatch);
+      if (thumbBox) thumbBox.addEventListener("click", triggerWatch);
 
       // Ações de compartilhamento
       const waBtn = card.querySelector(".whatsapp-share");
@@ -1445,6 +1524,7 @@ document.addEventListener("DOMContentLoaded", () => {
       case "hikvision": return "tag-hik";
       case "uniview": return "tag-unv";
       case "alarme": return "tag-alarme";
+      case "procedimentos": return "tag-proc";
       default: return "tag-tec";
     }
   }
@@ -1716,25 +1796,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Abrir o Player de Vídeo no Modal
+  // Abrir o Player de Vídeo no Modal (Suporte Híbrido: HTML5 / Supabase Storage + Google Drive Preview)
   function openVideoPlayer(videoData) {
     modalTitle.textContent = videoData.titulo;
     modalBody.innerHTML = "";
     
     const container = document.createElement("div");
     container.className = "video-player-container";
-    
-    // Verifica se possui o link do drive
-    if (videoData.driveUrl && videoData.driveUrl.trim() !== "") {
-      
+    const directVideoUrl = videoData.videoUrl || (videoData.driveUrl && /\.(mp4|webm|mov)(\?|$)/i.test(videoData.driveUrl) ? videoData.driveUrl : "");
+
+    if (directVideoUrl) {
+      // Player Nativo HTML5 (Supabase Storage / MP4 direto)
+      const videoEl = document.createElement("video");
+      videoEl.src = directVideoUrl;
+      if (videoData.capa) videoEl.poster = videoData.capa;
+      videoEl.controls = true;
+      videoEl.autoplay = true;
+      videoEl.playsInline = true;
+      videoEl.style.width = "100%";
+      videoEl.style.height = "100%";
+      videoEl.style.background = "#000";
+      videoEl.id = "nativeVigiVideoPlayer";
+      container.appendChild(videoEl);
+    } else if (videoData.driveUrl && videoData.driveUrl.trim() !== "") {
+      // Backdrop com a miniatura real enquanto o player carrega
+      if (videoData.capa) {
+        container.style.backgroundImage = `linear-gradient(rgba(6,13,34,0.72), rgba(6,13,34,0.85)), url('${videoData.capa}')`;
+        container.style.backgroundSize = "cover";
+        container.style.backgroundPosition = "center";
+      }
+
       const spinner = document.createElement("div");
       spinner.className = "iframe-spinner";
       container.appendChild(spinner);
       
       const iframe = document.createElement("iframe");
-
-      
-      // Converte o link de "view" do Google Drive para "preview" para forçar o player embutido
       let embedUrl = videoData.driveUrl;
       if (embedUrl.includes("/view")) {
         embedUrl = embedUrl.replace("/view", "/preview");
@@ -1744,14 +1840,13 @@ document.addEventListener("DOMContentLoaded", () => {
       iframe.width = "100%";
       iframe.height = "100%";
       iframe.style.border = "none";
-      iframe.allow = "autoplay";
+      iframe.allow = "autoplay; fullscreen";
       iframe.onload = () => {
-        if(container.contains(spinner)) container.removeChild(spinner);
+        if (container.contains(spinner)) container.removeChild(spinner);
       };
       
       container.appendChild(iframe);
     } else {
-      // Mensagem de fallback caso não tenha a URL cadastrada no data.js
       container.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: white; padding: 20px; text-align: center;">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; color: var(--color-danger);">
@@ -1761,8 +1856,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </svg>
           <h3 style="margin-bottom: 8px;">Vídeo não configurado</h3>
           <p style="color: var(--text-muted); font-size: 14px; max-width: 400px; line-height: 1.5;">
-            Este vídeo ainda não possui um link individual do Google Drive configurado no arquivo <code>data.js</code>. <br><br>
-            Edite a propriedade <code>driveUrl</code> do vídeo <b>${videoData.id}</b> para habilitar o reprodutor.
+            Este vídeo ainda não possui um link configurado para reprodução.
           </p>
         </div>
       `;
@@ -1770,15 +1864,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const customControls = document.createElement("div");
     customControls.className = "video-custom-controls";
+    const externalUrl = directVideoUrl || videoData.driveUrl || "";
     customControls.innerHTML = `
       <div class="video-controls-left">
         <span>Categoria: <strong>${videoData.categoria}</strong></span>
         <span>Marca: <strong>${videoData.marca}</strong></span>
       </div>
-      <div class="video-controls-right" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-         <span style="font-size: 12px; color: var(--text-muted);">Reprodutor Integrado do Google Drive</span>
+      <div class="video-controls-right" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        ${directVideoUrl ? `
+          <div style="display:flex; gap:4px; align-items:center;">
+            <button class="zoom-btn" data-speed="1" style="font-size:11px; padding:4px 8px;">1x</button>
+            <button class="zoom-btn" data-speed="1.25" style="font-size:11px; padding:4px 8px;">1.25x</button>
+            <button class="zoom-btn" data-speed="1.5" style="font-size:11px; padding:4px 8px;">1.5x</button>
+            <button class="zoom-btn" data-speed="2" style="font-size:11px; padding:4px 8px;">2x</button>
+          </div>
+        ` : `<span style="font-size: 12px; color: var(--text-muted);">Player Integrado VIGI HD</span>`}
+        ${externalUrl ? `<a href="${externalUrl}" target="_blank" rel="noopener noreferrer" class="watch-btn" style="text-decoration:none; padding:6px 12px; font-size:12px;">↗ Abrir em Nova Aba</a>` : ""}
       </div>
     `;
+
+    customControls.querySelectorAll("[data-speed]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const v = container.querySelector("video");
+        if (v) v.playbackRate = parseFloat(btn.getAttribute("data-speed"));
+      });
+    });
 
     modalBody.appendChild(container);
     modalBody.appendChild(customControls);
@@ -1786,13 +1896,15 @@ document.addEventListener("DOMContentLoaded", () => {
     openModal();
   }
 
-  // Abrir Zoom de Imagens no Modal
+  // Abrir Zoom de Imagens no Modal (Prioriza Lightbox Nativo de Alta Resolução com Zoom & Pan)
   function openLightbox(artData) {
     modalTitle.textContent = artData.titulo;
     modalBody.innerHTML = "";
 
-    // Se tiver driveUrl, abre como iframe do Google Drive (igual ao player de vídeo)
-    if (artData.driveUrl && artData.driveUrl.trim() !== "") {
+    const hasDirectImg = artData.caminho && !artData.caminho.includes("drive.google.com/file/");
+
+    // Só usa iframe do Google Drive caso não exista imagem local/Supabase em artData.caminho
+    if (!hasDirectImg && artData.driveUrl && artData.driveUrl.trim() !== "") {
       const container = document.createElement("div");
       container.className = "video-player-container";
 
@@ -1825,26 +1937,22 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Fallback: lightbox local com zoom & pan
-    // Resetar variáveis de zoom & pan
+    // Lightbox Nativo de Alta Velocidade com Zoom & Pan + Download Direto
     zoomFactor = 1.0;
     panX = 0;
     panY = 0;
     isPanning = false;
 
-    // Criar contêiner
     const container = document.createElement("div");
     container.className = "lightbox-container";
     container.id = "lightboxContainer";
 
-    // Criar imagem
     const img = document.createElement("img");
     img.src = artData.caminho;
     img.className = "lightbox-img";
     img.id = "lightboxImg";
-    img.draggable = false; // Evita arraste padrão do browser
+    img.draggable = false;
     
-    // Controles de zoom
     const controls = document.createElement("div");
     controls.className = "lightbox-controls";
     controls.innerHTML = `
@@ -1852,12 +1960,12 @@ document.addEventListener("DOMContentLoaded", () => {
       <span class="zoom-factor-label" id="zoomLabel">100%</span>
       <button class="zoom-btn" id="zoomIn" title="Aumentar Zoom">+</button>
       <button class="zoom-btn" id="zoomReset" title="Ajustar" style="font-size: 13px; font-weight:bold;">1:1</button>
+      <a href="${artData.caminho}" download="${artData.id || 'arte-vigi'}.jpg" class="zoom-btn" title="Baixar Arte em Alta Resolução" style="text-decoration:none; width:auto; padding:0 12px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:5px;">⬇ Baixar</a>
     `;
 
-    // Legenda inferior
     const caption = document.createElement("div");
     caption.className = "lightbox-caption";
-    caption.innerHTML = `<p>${artData.descricao}</p><small style="color:var(--text-muted); display:block; margin-top:4px;">* Dica: Arraste a imagem com o mouse/dedo para navegar nos detalhes quando estiver com zoom.</small>`;
+    caption.innerHTML = `<p>${artData.descricao}</p><small style="color:var(--text-muted); display:block; margin-top:4px;">* Dica: Use a roda do mouse ou os botões acima para ampliar, e arraste a imagem para navegar nos detalhes.</small>`;
 
     container.appendChild(img);
     modalBody.appendChild(container);
@@ -2562,6 +2670,102 @@ document.addEventListener("DOMContentLoaded", () => {
       switchTab("manuais");
       setTimeout(() => openGuide(link.id), 200);
     }
+  }
+
+  // ==========================================================================
+  // DASHBOARD: TUTORIAIS EM DESTAQUE E CHECKLIST DE OURO
+  // ==========================================================================
+  function initDashboardFeaturedVideos() {
+    const container = document.getElementById("dashFeaturedVideos");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const featuredIds = ["v-proc-1", "v-proc-4", "v-hik-1", "v-unv-1", "v-alarme-1", "v-tec-3"];
+    const featuredVideos = featuredIds.map(id => VIGI_DATA.videos.find(v => v.id === id)).filter(Boolean);
+
+    featuredVideos.forEach(v => {
+      const card = document.createElement("div");
+      card.className = "featured-video-card";
+      const tagClass = getBrandTagClass(v.categoria);
+      const capa = v.capa || "VIGI.png";
+
+      card.innerHTML = `
+        <div class="featured-video-thumb">
+          <img src="${capa}" alt="${v.titulo}" loading="lazy" onerror="this.src='VIGI.png';">
+          <div class="featured-play-badge">
+            <span>▶</span>
+          </div>
+        </div>
+        <div class="featured-video-body">
+          <h4 class="featured-video-title">${v.titulo}</h4>
+          <div class="featured-video-footer">
+            <span class="video-brand-tag ${tagClass}">${v.categoria}</span>
+            <span style="font-size: 11px; color: var(--color-primary); font-weight: 700;">Assistir →</span>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener("click", () => {
+        openVideoPlayer(v);
+      });
+
+      container.appendChild(card);
+    });
+  }
+
+  function initGoldChecklist() {
+    const container = document.getElementById("goldChecklistItems");
+    const counterEl = document.getElementById("goldChecklistCounter");
+    if (!container) return;
+
+    const checkboxes = container.querySelectorAll(".dash-check-input");
+    const STORAGE_KEY = "vigi_gold_checklist";
+    let state = {};
+    try {
+      state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    } catch (_) {
+      state = {};
+    }
+
+    function updateCounter() {
+      const total = checkboxes.length;
+      let checked = 0;
+      checkboxes.forEach(chk => {
+        const id = chk.getAttribute("data-check-id");
+        if (state[id]) {
+          chk.checked = true;
+          checked++;
+        } else {
+          chk.checked = false;
+        }
+      });
+
+      if (counterEl) {
+        if (checked === total) {
+          counterEl.textContent = "🎉 5/5 Tudo Pronto para Entrega!";
+          counterEl.style.background = "rgba(16, 185, 129, 0.2)";
+          counterEl.style.color = "#34d399";
+        } else {
+          counterEl.textContent = `${checked}/${total} Concluídos`;
+          counterEl.style.background = "rgba(16, 185, 129, 0.12)";
+          counterEl.style.color = "#10b981";
+        }
+      }
+    }
+
+    checkboxes.forEach(chk => {
+      chk.addEventListener("change", (e) => {
+        const id = e.target.getAttribute("data-check-id");
+        state[id] = e.target.checked;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        updateCounter();
+        if (state[id] && typeof window.showToast === "function") {
+          window.showToast("Item verificado com sucesso!", "success", "✓");
+        }
+      });
+    });
+
+    updateCounter();
   }
 
   // ==========================================================================

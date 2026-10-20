@@ -13,5 +13,6 @@ package.json
 package-lock.json
 temp_pptx
 _interno
+thumbs/raw
 patch*.js
 generate_icons.js

@@ -828,6 +828,103 @@
     });
   }
 
+  // ── Sincronização de Miniaturas e Artes com Supabase Storage (vigi-midia + vigi_materiais) ──
+  const adminSyncSupabaseMediaBtn = document.getElementById("adminSyncSupabaseMediaBtn");
+  if (adminSyncSupabaseMediaBtn) {
+    adminSyncSupabaseMediaBtn.addEventListener("click", async () => {
+      if (!window.VIGI_DATA) return;
+      const origText = adminSyncSupabaseMediaBtn.textContent;
+      adminSyncSupabaseMediaBtn.disabled = true;
+      adminSyncSupabaseMediaBtn.textContent = "⏳ Sincronizando...";
+
+      try {
+        let uploadedCount = 0;
+        const rows = [];
+
+        for (const v of (window.VIGI_DATA.videos || [])) {
+          let capaPublicUrl = v.capa || "";
+          if (v.capa && v.capa.startsWith("thumbs/")) {
+            const res = await fetch(v.capa);
+            if (res.ok) {
+              const blob = await res.blob();
+              const path = `thumbs/${v.id}.jpg`;
+              const { error: upErr } = await supabase.storage.from("vigi-midia").upload(path, blob, {
+                contentType: "image/jpeg",
+                upsert: true
+              });
+              if (!upErr) {
+                const { data: pub } = supabase.storage.from("vigi-midia").getPublicUrl(path);
+                if (pub && pub.publicUrl) capaPublicUrl = pub.publicUrl;
+                uploadedCount++;
+              }
+            }
+          }
+          rows.push({
+            id: v.id,
+            tipo: "video",
+            titulo: v.titulo,
+            categoria: v.categoria,
+            marca: v.marca || "VIGI",
+            descricao: v.descricao || "",
+            capa_url: capaPublicUrl,
+            video_url: v.videoUrl || "",
+            drive_url: v.driveUrl || "",
+            updated_at: new Date().toISOString()
+          });
+        }
+
+        for (const a of (window.VIGI_DATA.artes || [])) {
+          let artePublicUrl = a.caminho || "";
+          if (a.caminho && a.caminho.startsWith("artes-img/")) {
+            const res = await fetch(a.caminho);
+            if (res.ok) {
+              const blob = await res.blob();
+              const path = `artes/${a.id}.jpg`;
+              const { error: upErr } = await supabase.storage.from("vigi-midia").upload(path, blob, {
+                contentType: "image/jpeg",
+                upsert: true
+              });
+              if (!upErr) {
+                const { data: pub } = supabase.storage.from("vigi-midia").getPublicUrl(path);
+                if (pub && pub.publicUrl) artePublicUrl = pub.publicUrl;
+                uploadedCount++;
+              }
+            }
+          }
+          rows.push({
+            id: a.id,
+            tipo: "arte",
+            titulo: a.titulo,
+            categoria: a.categoria,
+            marca: "VIGI",
+            descricao: a.descricao || "",
+            capa_url: artePublicUrl,
+            video_url: artePublicUrl,
+            drive_url: a.driveUrl || "",
+            updated_at: new Date().toISOString()
+          });
+        }
+
+        const { error: dbErr } = await supabase.from("vigi_materiais").upsert(rows, { onConflict: "id" });
+        if (dbErr) {
+          if (window.showToast) {
+            window.showToast("Execute o script _interno/supabase-setup.sql no Supabase para ativar o bucket vigi-midia e a tabela vigi_materiais!", "warning");
+          }
+        } else {
+          if (window.showToast) {
+            window.showToast(`Sucesso! ${uploadedCount} mídias e ${rows.length} registros sincronizados no Supabase!`, "success");
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao sincronizar mídias:", err);
+        if (window.showToast) window.showToast("Erro ao sincronizar com Supabase Storage.", "error");
+      } finally {
+        adminSyncSupabaseMediaBtn.disabled = false;
+        adminSyncSupabaseMediaBtn.textContent = origText;
+      }
+    });
+  }
+
   // ── Event Listeners de Login / Logout ─────────────────────────────────────
   if (loginForm) loginForm.addEventListener("submit", handleLogin);
   if (signupForm) signupForm.addEventListener("submit", handleSignup);

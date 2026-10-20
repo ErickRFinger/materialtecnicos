@@ -316,7 +316,7 @@
       <!-- ABA: INÍCIO (DASHBOARD) -->
       <section id="dashboard" class="content-section active">
 
-        <!-- Saudação Premium -->
+        <!-- Saudação Premium com Status Operacional -->
         <div class="dash-welcome-banner">
           <div class="dash-welcome-left">
             <div class="dash-welcome-greeting">
@@ -326,10 +326,16 @@
                 <span class="dash-user-name" id="dashUserName">Técnico</span>
               </div>
             </div>
-            <h1 class="dash-title">O que você precisa hoje?</h1>
-            <div class="dash-datetime" id="dashDatetime">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <span id="dashDatetimeText">Carregando...</span>
+            <h1 class="dash-title">Central Operacional VIGI Câmeras</h1>
+            <p class="dash-desc-sub">Acesse rapidamente vídeos práticos de campo, manuais com checklist, tabelas de planos e certificação técnica.</p>
+            <div class="dash-meta-row">
+              <div class="dash-datetime" id="dashDatetime">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span id="dashDatetimeText">Carregando...</span>
+              </div>
+              <span class="dash-badge-online">
+                <span class="pulse-dot"></span> Sistema Online
+              </span>
             </div>
           </div>
           <div class="dash-welcome-right">
@@ -338,61 +344,165 @@
           <div class="dash-welcome-glow"></div>
         </div>
 
-        <!-- Acesso rápido: blocos grandes, fáceis de tocar -->
+        <!-- Acesso rápido: 6 blocos com design moderno -->
         <div class="dash-quick-grid">
 
           <button class="dash-quick-btn dash-btn-videos" data-target-tab="videos">
-            <span class="dash-quick-icon">🎬</span>
-            <span class="dash-quick-label">Vídeos</span>
-            <span class="dash-quick-sub">Tutoriais de suporte</span>
+            <div class="dash-quick-top">
+              <span class="dash-quick-icon">🎬</span>
+              <span class="dash-quick-tag">33 Vídeos</span>
+            </div>
+            <span class="dash-quick-label">Vídeos Tutoriais</span>
+            <span class="dash-quick-sub">Alarmes, DVRs e apps</span>
+          </button>
+
+          <button class="dash-quick-btn dash-btn-proc" data-target-tab="videos" data-target-filter="procedimentos">
+            <div class="dash-quick-top">
+              <span class="dash-quick-icon">🚀</span>
+              <span class="dash-quick-tag tag-new">Novo</span>
+            </div>
+            <span class="dash-quick-label">Procedimentos VIGI</span>
+            <span class="dash-quick-sub">Relatos, OS e ativação</span>
           </button>
 
           <button class="dash-quick-btn dash-btn-artes" data-target-tab="artes">
-            <span class="dash-quick-icon">🖼️</span>
-            <span class="dash-quick-label">Artes & Tabelas</span>
-            <span class="dash-quick-sub">Preços e informativos</span>
+            <div class="dash-quick-top">
+              <span class="dash-quick-icon">🖼️</span>
+              <span class="dash-quick-tag">8 Artes</span>
+            </div>
+            <span class="dash-quick-label">Planos & Produtos</span>
+            <span class="dash-quick-sub">Preços e equipamentos</span>
           </button>
 
           <button class="dash-quick-btn dash-btn-manuais" data-target-tab="manuais">
-            <span class="dash-quick-icon">📋</span>
+            <div class="dash-quick-top">
+              <span class="dash-quick-icon">📋</span>
+              <span class="dash-quick-tag">14 Guias</span>
+            </div>
             <span class="dash-quick-label">Guias & Checklists</span>
-            <span class="dash-quick-sub">Passo a passo</span>
-          </button>
-
-          <button class="dash-quick-btn dash-btn-solicitar" data-target-tab="solicitacoes">
-            <span class="dash-quick-icon">💬</span>
-            <span class="dash-quick-label">Solicitar Material</span>
-            <span class="dash-quick-sub">Pedir novo conteúdo</span>
+            <span class="dash-quick-sub">Passo a passo interativo</span>
           </button>
 
           <button class="dash-quick-btn dash-btn-cert" data-target-tab="treinamento">
-            <span class="dash-quick-icon">🎓</span>
+            <div class="dash-quick-top">
+              <span class="dash-quick-icon">🎓</span>
+              <span class="dash-quick-tag">27 Slides</span>
+            </div>
             <span class="dash-quick-label">Certificação</span>
             <span class="dash-quick-sub">Treinamento técnico</span>
           </button>
 
+          <button class="dash-quick-btn dash-btn-solicitar" data-target-tab="solicitacoes">
+            <div class="dash-quick-top">
+              <span class="dash-quick-icon">💬</span>
+              <span class="dash-quick-tag">Kanban</span>
+            </div>
+            <span class="dash-quick-label">Solicitar Material</span>
+            <span class="dash-quick-sub">Pedir novo tutorial</span>
+          </button>
+
         </div>
 
-        <!-- Estatísticas compactas -->
+        <!-- Estatísticas amplas do catálogo -->
         <div class="dash-stats-strip">
           <div class="dash-stat-item">
-            <span class="dash-stat-num" id="count-alarme">0</span>
-            <span class="dash-stat-lbl">🚨 Alarme</span>
+            <span class="dash-stat-num" id="count-alarme">3</span>
+            <span class="dash-stat-lbl">🚨 Alarmes</span>
           </div>
           <div class="dash-stat-sep"></div>
           <div class="dash-stat-item">
-            <span class="dash-stat-num" id="count-hik">0</span>
+            <span class="dash-stat-num" id="count-hik">9</span>
             <span class="dash-stat-lbl">🔴 Hikvision</span>
           </div>
           <div class="dash-stat-sep"></div>
           <div class="dash-stat-item">
-            <span class="dash-stat-num" id="count-unv">0</span>
+            <span class="dash-stat-num" id="count-unv">6</span>
             <span class="dash-stat-lbl">🟢 Uniview</span>
           </div>
           <div class="dash-stat-sep"></div>
           <div class="dash-stat-item">
-            <span class="dash-stat-num" id="count-tec">0</span>
+            <span class="dash-stat-num" id="count-proc">9</span>
+            <span class="dash-stat-lbl">🚀 Procedimentos</span>
+          </div>
+          <div class="dash-stat-sep"></div>
+          <div class="dash-stat-item">
+            <span class="dash-stat-num" id="count-tec">14</span>
             <span class="dash-stat-lbl">🛠️ Guias</span>
+          </div>
+          <div class="dash-stat-sep"></div>
+          <div class="dash-stat-item">
+            <span class="dash-stat-num" id="count-artes">8</span>
+            <span class="dash-stat-lbl">🖼️ Artes</span>
+          </div>
+        </div>
+
+        <!-- SEÇÃO: TUTORIAIS EM DESTAQUE NO CAMPO -->
+        <div class="dash-featured-section">
+          <div class="dash-section-header">
+            <div>
+              <h2 class="dash-section-title">🔥 Tutoriais em Alta no Campo</h2>
+              <p class="dash-section-subtitle">Acesso rápido aos vídeos mais consultados em campo pela equipe técnica.</p>
+            </div>
+            <button class="dash-view-all-btn" data-target-tab="videos">Ver todos os 33 vídeos →</button>
+          </div>
+          <div class="dash-featured-grid" id="dashFeaturedVideos">
+            <!-- Injetado dinamicamente via JS -->
+          </div>
+        </div>
+
+        <!-- SEÇÃO: CHECKLIST DE OURO DO TÉCNICO EM CAMPO -->
+        <div class="dash-checklist-card">
+          <div class="dash-checklist-header">
+            <div class="dash-checklist-title-wrap">
+              <span class="dash-checklist-icon">⭐</span>
+              <div>
+                <h3 class="dash-checklist-title">Checklist de Ouro do Técnico VIGI</h3>
+                <p class="dash-checklist-sub">5 conferências obrigatórias antes de recolher as ferramentas e sair do cliente.</p>
+              </div>
+            </div>
+            <span class="dash-checklist-counter" id="goldChecklistCounter">0/5 Concluídos</span>
+          </div>
+          <div class="dash-checklist-items" id="goldChecklistItems">
+            <label class="dash-check-item">
+              <input type="checkbox" data-check-id="fuso" class="dash-check-input">
+              <span class="dash-check-custom"></span>
+              <div class="dash-check-text">
+                <strong>1. Fuso Horário GMT -03:00 (Brasília):</strong>
+                <span>Hora certa e sincronização NTP ativa? Sem isso o cliente não consegue recuperar gravações.</span>
+              </div>
+            </label>
+            <label class="dash-check-item">
+              <input type="checkbox" data-check-id="hd" class="dash-check-input">
+              <span class="dash-check-custom"></span>
+              <div class="dash-check-text">
+                <strong>2. HD Inicializado e Gravando:</strong>
+                <span>Status conferido no menu de armazenamento com gravação contínua ou por movimento ativa?</span>
+              </div>
+            </label>
+            <label class="dash-check-item">
+              <input type="checkbox" data-check-id="nuvem" class="dash-check-input">
+              <span class="dash-check-custom"></span>
+              <div class="dash-check-text">
+                <strong>3. Nuvem P2P Online e Compartilhada:</strong>
+                <span>Gravador online no Hik-Connect / UNV-Link e visualização testada no celular do cliente?</span>
+              </div>
+            </label>
+            <label class="dash-check-item">
+              <input type="checkbox" data-check-id="senha" class="dash-check-input">
+              <span class="dash-check-custom"></span>
+              <div class="dash-check-text">
+                <strong>4. Senha Padrão Forte VIGI:</strong>
+                <span>Senha configurada no padrão de segurança e anotada na ordem de serviço do cliente?</span>
+              </div>
+            </label>
+            <label class="dash-check-item">
+              <input type="checkbox" data-check-id="relato" class="dash-check-input">
+              <span class="dash-check-custom"></span>
+              <div class="dash-check-text">
+                <strong>5. Relato e Fotos Anexadas na OS:</strong>
+                <span>Fotos dos pontos, rack, fontes em caixas de passagem e relato preenchido no app?</span>
+              </div>
+            </label>
           </div>
         </div>
 
@@ -429,6 +539,7 @@
           <button class="filter-btn" data-filter="hikvision">Hikvision</button>
           <button class="filter-btn" data-filter="uniview">Uniview</button>
           <button class="filter-btn" data-filter="material técnico">Material Técnico</button>
+          <button class="filter-btn" data-filter="procedimentos">Procedimentos VIGI</button>
         </div>
 
         <div class="content-grid" id="videos-grid">
@@ -460,11 +571,15 @@
           </button>
         </div>
 
-        <div class="filter-bar" id="manual-filters" style="margin-bottom: 24px; display: flex; gap: 10px;">
-          <button class="filter-btn active" data-filter="todos">Todos</button>
-          <button class="filter-btn" data-filter="Gravadores (DVR/NVR)">Gravadores</button>
-          <button class="filter-btn" data-filter="Manutenção Preventiva">Manutenção</button>
-          <button class="filter-btn" data-filter="Sistemas de Alarme">Alarmes</button>
+        <div class="filter-bar" id="manual-filters" style="margin-bottom: 24px; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;">
+          <button class="filter-btn active" data-filter="todos">Todos (14)</button>
+          <button class="filter-btn" data-filter="Procedimentos Operacionais">Procedimentos (4)</button>
+          <button class="filter-btn" data-filter="Gravadores (DVR/NVR)">Gravadores (2)</button>
+          <button class="filter-btn" data-filter="Aplicativos Mobile">Apps Mobile (2)</button>
+          <button class="filter-btn" data-filter="Sistemas de Alarme">Alarmes (1)</button>
+          <button class="filter-btn" data-filter="Softwares Desktop">Softwares PC (1)</button>
+          <button class="filter-btn" data-filter="Manutenção Corretiva">Manutenção (2)</button>
+          <button class="filter-btn" data-filter="Instalação Física">Cabeamento (1)</button>
         </div>
 
         <div class="guides-container" id="manuais-container">
@@ -712,7 +827,8 @@
         <span class="sec-pill sec-ok">🔒 RLS Supabase Blindado</span>
         <span class="sec-pill sec-ok">🚫 Anti-Indexação (NoIndex)</span>
         <span class="sec-pill sec-ok">📱 Sessão Única por Técnico</span>
-        <span class="sec-pill sec-ok">🛡️ Bloqueio DOM Pré-Auth</span>
+        <span class="sec-pill sec-ok">🎬 33 Miniaturas HD &amp; 8 Artes Ativas</span>
+        <button type="button" class="admin-add-btn" id="adminSyncSupabaseMediaBtn" style="margin-left:auto; padding:6px 12px; font-size:12px;">☁️ Sincronizar Mídias no Supabase</button>
       </div>
 
       <!-- Adicionar / Pré-autorizar E-mail -->
