@@ -637,15 +637,15 @@
       <!-- ABA: SOLICITAR MATERIAL -->
       <section id="solicitacoes" class="content-section">
         <div class="section-header">
-          <h1 class="section-title">Solicitação de Novo Material</h1>
-          <p class="section-subtitle">Sentiu falta de algum vídeo, imagem ou manual? Abra uma solicitação e acompanhe o progresso em tempo real no quadro abaixo.</p>
+          <h1 class="section-title">Central de Sugestões de Conteúdo &amp; Tutoriais</h1>
+          <p class="section-subtitle">Sentiu falta de algum vídeo prático, arte de produto/plano, diagrama de ligação ou guia passo a passo? Abra uma solicitação técnica para a equipe produzir e acompanhe o andamento no quadro.</p>
         </div>
 
-        <!-- Formulário compacto (toggle) -->
+        <!-- Formulário compacto (toggle) e estatísticas -->
         <div class="kanban-form-bar">
           <button class="kanban-new-btn" id="toggleKanbanForm">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Nova Solicitação
+            Sugerir Novo Material
           </button>
           <div class="kanban-stats">
             <span class="k-stat" id="req-count-total">0 total</span>
@@ -660,10 +660,53 @@
           </button>
         </div>
 
+        <!-- Barra de Filtros e Busca Rápida no Quadro -->
+        <div class="kanban-filter-bar">
+          <div class="kanban-filter-pills" id="kanbanFilterPills">
+            <button type="button" class="kanban-filter-pill active" data-kanban-filter="all">Todos</button>
+            <button type="button" class="kanban-filter-pill" data-kanban-filter="Vídeo Tutorial">🎬 Vídeos</button>
+            <button type="button" class="kanban-filter-pill" data-kanban-filter="Arte / Tabela Comercial">🎨 Artes &amp; Tabelas</button>
+            <button type="button" class="kanban-filter-pill" data-kanban-filter="Manual / Guia Escrito">📋 Manuais</button>
+            <button type="button" class="kanban-filter-pill" data-kanban-filter="Diagrama de Ligação / Esquema">⚡ Diagramas</button>
+          </div>
+          <div class="kanban-search-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="kanbanSearchInput" class="kanban-search-input" placeholder="Buscar sugestão existente...">
+          </div>
+        </div>
+
         <!-- Painel do formulário (colapsável) -->
         <div class="kanban-form-panel" id="kanbanFormPanel" style="display:none;">
           <div class="kanban-form-inner">
-            <h3 class="kanban-form-title">Nova Solicitação de Material</h3>
+            <div class="kanban-form-header-wrap">
+              <div>
+                <h3 class="kanban-form-title">Sugerir Criação de Conteúdo Técnico</h3>
+                <p class="kanban-form-sub">Especifique o tema para que a equipe de treinamento e design prepare o material para os técnicos.</p>
+              </div>
+            </div>
+
+            <!-- Chips de Inspiração / Atalhos rápidos em 1 clique -->
+            <div class="kanban-quick-ideas">
+              <span class="quick-ideas-label">💡 Ideias frequentes de técnicos (clique para preencher):</span>
+              <div class="quick-ideas-chips">
+                <button type="button" class="quick-idea-chip" data-title="Como resetar senha do DVR Hikvision em bancada" data-type="Vídeo Tutorial" data-desc="Demonstrar o procedimento prático usando o SADP Tool e arquivo XML de recuperação.">
+                  🎬 Reset de Senha no DVR
+                </button>
+                <button type="button" class="quick-idea-chip" data-title="Ligação de Sirene e Sensores na Central de Alarme" data-type="Diagrama de Ligação / Esquema" data-desc="Diagrama esquemático das conexões da zona e resistor de fim de linha (EOL) na saída PGM.">
+                  ⚡ Ligação de Sirene no Alarme
+                </button>
+                <button type="button" class="quick-idea-chip" data-title="Tabela de Preços e Planos Atualizada para Clientes" data-type="Arte / Tabela Comercial" data-desc="Arte formatada para WhatsApp e status com os valores atuais de mensalidade e câmeras adicionais.">
+                  🎨 Tabela de Planos Atualizada
+                </button>
+                <button type="button" class="quick-idea-chip" data-title="Procedimento de Homologação de Câmeras Onvif do Cliente" data-type="Manual / Guia Escrito" data-desc="Checklist e passo a passo para testar compatibilidade Onvif antes de incluir câmeras antigas no contrato.">
+                  📋 Homologação Onvif
+                </button>
+                <button type="button" class="quick-idea-chip" data-title="Diagrama de Bornes da Fonte Chaveada 12V 5A" data-type="Diagrama de Ligação / Esquema" data-desc="Esquema das saídas positivas/negativas e distribuição para 8 câmeras sem queda de tensão.">
+                  ⚡ Bornes da Fonte Chaveada
+                </button>
+              </div>
+            </div>
+
             <form id="requestForm" class="kanban-form-grid">
               <div class="form-group">
                 <label class="form-label">Solicitante</label>
@@ -675,35 +718,36 @@
               </div>
               <div class="form-group">
                 <label class="form-label" for="reqTitle">Título do Material *</label>
-                <input type="text" id="reqTitle" class="form-control" placeholder="Ex: Como configurar fuso horário no DVR Uniview" required>
+                <input type="text" id="reqTitle" class="form-control" placeholder="Ex: Como configurar detecção de humanos no DVR Uniview" required>
               </div>
               <div class="form-group">
                 <label class="form-label" for="reqType">Tipo de Conteúdo *</label>
                 <select id="reqType" class="form-control" required>
-                  <option value="" disabled selected>Selecione...</option>
-                  <option value="Vídeo Tutorial">Vídeo Tutorial</option>
-                  <option value="Manual / Guia Escrito">Manual / Guia Escrito</option>
-                  <option value="Tabela / Imagem Informativa">Tabela / Imagem Informativa</option>
+                  <option value="" disabled selected>Selecione o formato desejado...</option>
+                  <option value="Vídeo Tutorial">🎬 Vídeo Tutorial (Gravação em bancada/campo)</option>
+                  <option value="Arte / Tabela Comercial">🎨 Arte / Tabela Comercial (Imagem de alta resolução)</option>
+                  <option value="Manual / Guia Escrito">📋 Manual / Guia Escrito (Passo a passo documentado)</option>
+                  <option value="Diagrama de Ligação / Esquema">⚡ Diagrama de Ligação / Esquema (Cores de fios, bornes e pinagem)</option>
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label" for="reqUrgency">Urgência *</label>
+                <label class="form-label" for="reqUrgency">Urgência para o Campo *</label>
                 <select id="reqUrgency" class="form-control" required>
-                  <option value="Baixa">🟢 Baixa</option>
-                  <option value="Média" selected>🟡 Média</option>
-                  <option value="Alta">🔴 Alta</option>
+                  <option value="Baixa">🟢 Baixa (Material complementar / melhoria contínua)</option>
+                  <option value="Média" selected>🟡 Média (Dúvida recorrente em instalações normais)</option>
+                  <option value="Alta">🔴 Alta (Impacto direto em manutenções ou dúvidas em obra)</option>
                 </select>
               </div>
               <div class="form-group form-group-full">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                  <label class="form-label" for="reqDesc" style="margin-bottom:0;">Descrição / Detalhes *</label>
+                  <label class="form-label" for="reqDesc" style="margin-bottom:0;">Descrição detalhada da necessidade *</label>
                   <span class="req-char-counter" id="reqCharCounter">0 / 500</span>
                 </div>
-                <textarea id="reqDesc" class="form-control form-control-textarea" placeholder="Descreva o processo técnico ou dúvida que este material deve sanar..." maxlength="500" required></textarea>
+                <textarea id="reqDesc" class="form-control form-control-textarea" placeholder="Descreva o processo técnico, equipamento envolvido ou dúvida que este material deve sanar..." maxlength="500" required></textarea>
               </div>
               <div class="form-group form-group-full kanban-form-actions">
                 <button type="button" class="kanban-cancel-btn" id="cancelKanbanForm">Cancelar</button>
-                <button type="submit" class="submit-btn">Enviar Solicitação</button>
+                <button type="submit" class="submit-btn">Enviar Sugestão</button>
               </div>
             </form>
           </div>

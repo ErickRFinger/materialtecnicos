@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vigi-portal-cache-v14';
+const CACHE_NAME = 'vigi-portal-cache-v16';
 const urlsToCache = [
   './',
   './index.html',

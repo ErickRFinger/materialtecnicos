@@ -2733,6 +2733,77 @@ select.form-control option {
   border-color: rgba(239, 68, 68, 0.5);
 }
 
+/* Barra de Filtros e Busca Rápida no Quadro */
+.kanban-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.kanban-filter-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.kanban-filter-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.kanban-filter-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+.kanban-filter-pill.active {
+  background: linear-gradient(135deg, var(--color-primary), #6366f1);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+}
+
+.kanban-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: var(--text-muted);
+  min-width: 260px;
+  transition: border-color 0.2s;
+}
+
+.kanban-search-box:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.kanban-search-input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+}
+
 .kanban-form-panel {
   margin-bottom: 24px;
   background: var(--bg-card);
@@ -2745,8 +2816,60 @@ select.form-control option {
   from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.kanban-form-inner  { padding: 28px; }
-.kanban-form-title  { font-size: 16px; font-weight: 600; color: var(--text-primary); margin: 0 0 20px; }
+.kanban-form-inner  { padding: 24px; }
+.kanban-form-header-wrap { margin-bottom: 16px; }
+.kanban-form-title  { font-size: 16px; font-weight: 700; color: var(--text-primary); margin: 0 0 6px; }
+.kanban-form-sub    { font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4; }
+
+/* Chips de Inspiração Rápida */
+.kanban-quick-ideas {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quick-ideas-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #93c5fd;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.quick-ideas-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.quick-idea-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: var(--font-primary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.quick-idea-chip:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
+  transform: translateY(-1px);
+}
+
 .kanban-form-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .form-group-full    { grid-column: 1 / -1; }
 .kanban-form-actions { display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
@@ -2891,6 +3014,48 @@ select.form-control option {
 }
 .kanban-upvote-btn:hover, .kanban-upvote-btn.active {
   background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: var(--color-primary);
+}
+
+/* Botão Notificar no WhatsApp */
+.kanban-wa-notify-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 5px;
+  color: #10b981;
+  font-family: var(--font-primary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.kanban-wa-notify-btn:hover {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: #10b981;
+  transform: translateY(-1px);
+}
+
+/* Bordas de destaque por Tipo de Conteúdo Técnico */
+.kanban-card.type-video {
+  border-left: 3px solid #3b82f6;
+}
+.kanban-card.type-tabela {
+  border-left: 3px solid #a855f7;
+}
+.kanban-card.type-manual {
+  border-left: 3px solid #10b981;
+}
+.kanban-card.type-diagrama {
+  border-left: 3px solid #f59e0b;
+}
+
+.kanban-type-icon {
+  font-size: 13px;
+  line-height: 1;
 }
 
 @media (max-width: 900px) {

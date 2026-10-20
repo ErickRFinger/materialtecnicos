@@ -588,6 +588,58 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    // Chips de Ideias Frequentes (Preenchimento Rápido em 1 Toque)
+    document.querySelectorAll(".quick-idea-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const title = chip.getAttribute("data-title");
+        const type  = chip.getAttribute("data-type");
+        const desc  = chip.getAttribute("data-desc");
+
+        const titleInput  = document.getElementById("reqTitle");
+        const typeSelect  = document.getElementById("reqType");
+        const descInput   = document.getElementById("reqDesc");
+        const charCounter = document.getElementById("reqCharCounter");
+
+        if (titleInput && title) {
+          titleInput.value = title;
+          titleInput.classList.add("valid");
+        }
+        if (typeSelect && type) {
+          typeSelect.value = type;
+          typeSelect.classList.add("valid");
+        }
+        if (descInput && desc) {
+          descInput.value = desc;
+          descInput.classList.add("valid");
+          if (charCounter) charCounter.textContent = `${desc.length} / 500`;
+        }
+
+        if (titleInput) titleInput.focus();
+        if (window.showToast) {
+          window.showToast("Sugestão preenchida! Ajuste os detalhes se desejar.", "info", "💡");
+        }
+      });
+    });
+
+    // Filtros por Tipo de Material no Kanban
+    document.querySelectorAll(".kanban-filter-pill").forEach(pill => {
+      pill.addEventListener("click", () => {
+        document.querySelectorAll(".kanban-filter-pill").forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        currentKanbanFilter = pill.getAttribute("data-kanban-filter") || "all";
+        loadRequests();
+      });
+    });
+
+    // Busca Rápida no Quadro Kanban
+    const kanbanSearch = document.getElementById("kanbanSearchInput");
+    if (kanbanSearch) {
+      kanbanSearch.addEventListener("input", () => {
+        currentKanbanSearch = kanbanSearch.value.trim().toLowerCase();
+        loadRequests();
+      });
+    }
+
     // Validação visual em tempo real nos campos do formulário
     ["reqTitle", "reqType", "reqUrgency"].forEach(id => {
       const el = document.getElementById(id);
@@ -1539,11 +1591,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const KANBAN_KEY = "vigi_requests";
   const STATUSES   = ["Pendente", "Em Gravação", "Pronto"];
 
-  // Mapa de ícone e classe CSS por tipo de conteúdo
+  let currentKanbanFilter = "all";
+  let currentKanbanSearch = "";
+
+  // Mapa de ícone e classe CSS por tipo de conteúdo técnico
   const TYPE_CONFIG = {
-    "Vídeo Tutorial":              { icon: "🎬", cssClass: "type-video",   iconClass: "icon-video" },
-    "Manual / Guia Escrito":       { icon: "📋", cssClass: "type-manual",  iconClass: "icon-manual" },
-    "Tabela / Imagem Informativa": { icon: "🖼️", cssClass: "type-tabela", iconClass: "icon-tabela" },
+    "Vídeo Tutorial":                { icon: "🎬", cssClass: "type-video",    iconClass: "icon-video" },
+    "Arte / Tabela Comercial":       { icon: "🎨", cssClass: "type-tabela",   iconClass: "icon-tabela" },
+    "Manual / Guia Escrito":         { icon: "📋", cssClass: "type-manual",   iconClass: "icon-manual" },
+    "Diagrama de Ligação / Esquema": { icon: "⚡", cssClass: "type-diagrama", iconClass: "icon-diagrama" },
+    // Retrocompatibilidade
+    "Tabela / Imagem Informativa":   { icon: "🎨", cssClass: "type-tabela",   iconClass: "icon-tabela" },
   };
 
   // Auto-preencher nome do usuário logado no formulário
@@ -1573,11 +1631,45 @@ document.addEventListener("DOMContentLoaded", () => {
     nameDisplay.textContent = nome;
   }
 
-
-
-  // Mock inicial para primeira visita
+  // Exemplos reais para inspiração inicial do quadro
   function seedMocks() {
-    return [];
+    return [
+      {
+        id: "req-mock-1",
+        nome: "Adilson",
+        titulo: "Como habilitar áudio bidirecional nas câmeras Wi-Fi",
+        tipo: "Vídeo Tutorial",
+        urgencia: "Média",
+        descricao: "Passo a passo nos apps EZView e Hik-Connect de como liberar o microfone e alto-falante para conversar pelo celular com o cliente.",
+        status: "Pronto",
+        data: "14/10/2026",
+        upvotes: 5,
+        adminReply: "Vídeo gravado e publicado na aba de Vídeos (Câmeras Wi-Fi)!"
+      },
+      {
+        id: "req-mock-2",
+        nome: "Daniel Lazzarotto",
+        titulo: "Tabela Comparativa de Planos com IA para Clientes",
+        tipo: "Arte / Tabela Comercial",
+        urgencia: "Alta",
+        descricao: "Arte em alta resolução para enviar no WhatsApp mostrando o que cada plano inclui (detecção inteligente de humanos, gravação em nuvem e ronda virtual).",
+        status: "Em Gravação",
+        data: "18/10/2026",
+        upvotes: 8,
+        adminReply: "Design finalizando arte em alta resolução na pasta de Artes!"
+      },
+      {
+        id: "req-mock-3",
+        nome: "Erick Finger",
+        titulo: "Esquema elétrico de ligação da Sirene na Central de Alarme",
+        tipo: "Diagrama de Ligação / Esquema",
+        urgencia: "Alta",
+        descricao: "Diagrama com as cores dos fios e ligação dos resistores de fim de linha (EOL) na saída PGM e relé da sirene externa.",
+        status: "Pendente",
+        data: "19/10/2026",
+        upvotes: 12
+      }
+    ];
   }
 
   function getRequests() {
@@ -1587,7 +1679,15 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem(KANBAN_KEY, JSON.stringify(mocks));
       return mocks;
     }
-    return JSON.parse(raw);
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      const mocks = seedMocks();
+      localStorage.setItem(KANBAN_KEY, JSON.stringify(mocks));
+      return mocks;
+    } catch(e) {
+      return seedMocks();
+    }
   }
 
   function saveRequests(list) {
@@ -1596,7 +1696,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handleRequestSubmit(e) {
     e.preventDefault();
-    // Garante que o nome está preenchido antes de submeter
     fillUserName();
     const name    = document.getElementById("reqName").value.trim();
     const title   = document.getElementById("reqTitle").value.trim();
@@ -1605,72 +1704,101 @@ document.addEventListener("DOMContentLoaded", () => {
     const desc    = document.getElementById("reqDesc").value.trim();
     if (!name || !title || !type || !urgency || !desc) { alert("Preencha todos os campos."); return; }
 
-    const newReq = { id:"req-"+Date.now(), nome:name, titulo:title, tipo:type, urgencia:urgency, descricao:desc, status:"Pendente", data:new Date().toLocaleDateString("pt-BR"), upvotes:0 };
+    const newReq = {
+      id: "req-" + Date.now(),
+      nome: name,
+      titulo: title,
+      tipo: type,
+      urgencia: urgency,
+      descricao: desc,
+      status: "Pendente",
+      data: new Date().toLocaleDateString("pt-BR"),
+      upvotes: 0
+    };
     const list = getRequests();
     list.unshift(newReq);
     saveRequests(list);
 
     const submitBtn = requestForm.querySelector(".submit-btn");
     const orig = submitBtn.textContent;
-    submitBtn.textContent = "Enviado! ✓";
+    submitBtn.textContent = "Sugestão Enviada! ✓";
     submitBtn.style.background = "var(--color-success)";
     submitBtn.disabled = true;
     setTimeout(() => { submitBtn.textContent = orig; submitBtn.style.background = ""; submitBtn.disabled = false; }, 2000);
 
     requestForm.reset();
-    // Resetar contador de caracteres
     const counter = document.getElementById("reqCharCounter");
     if (counter) { counter.textContent = "0 / 500"; counter.className = "req-char-counter"; }
-    // Fechar formulário com animação
+
     const panel = document.getElementById("kanbanFormPanel");
     const toggleBtn = document.getElementById("toggleKanbanForm");
     if (panel) {
       panel.classList.remove("panel-open");
-      if (toggleBtn) toggleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova Solicitação`;
+      if (toggleBtn) toggleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Sugerir Novo Material`;
       setTimeout(() => { panel.style.display = "none"; }, 400);
     }
     loadRequests();
+    if (window.showToast) {
+      window.showToast("Sugestão adicionada com sucesso ao quadro! 🎬", "success", "✅");
+    }
   }
 
   function loadRequests() {
-    const list = getRequests();
+    const allList = getRequests();
 
-    // Atualizar stats na barra
+    // Atualizar estatísticas gerais na barra
     const totalEl    = document.getElementById("req-count-total");
     const progressEl = document.getElementById("req-count-progress");
     const readyEl    = document.getElementById("req-count-ready");
-    if (totalEl)    totalEl.textContent    = list.length + " total";
-    if (progressEl) progressEl.textContent = list.filter(r=>r.status==="Em Gravação").length + " em produção";
-    if (readyEl)    readyEl.textContent    = list.filter(r=>r.status==="Pronto").length + " concluídos";
+    if (totalEl)    totalEl.textContent    = allList.length + " total";
+    if (progressEl) progressEl.textContent = allList.filter(r=>r.status==="Em Gravação").length + " em produção";
+    if (readyEl)    readyEl.textContent    = allList.filter(r=>r.status==="Pronto").length + " concluídos";
+
+    // Filtragem ativa (por Tipo e por Busca)
+    let filteredList = allList;
+    if (currentKanbanFilter && currentKanbanFilter !== "all") {
+      filteredList = filteredList.filter(r => r.tipo === currentKanbanFilter);
+    }
+    if (currentKanbanSearch) {
+      filteredList = filteredList.filter(r => {
+        const text = `${r.titulo} ${r.descricao} ${r.nome} ${r.tipo}`.toLowerCase();
+        return text.includes(currentKanbanSearch);
+      });
+    }
 
     // Limpar colunas
     STATUSES.forEach(s => {
       const col = document.getElementById("col-"+s);
       if (col) col.innerHTML = "";
       const cnt = document.getElementById("count-"+s);
-      if (cnt) cnt.textContent = list.filter(r=>r.status===s).length;
+      if (cnt) cnt.textContent = filteredList.filter(r=>r.status===s).length;
     });
 
-    if (list.length === 0) {
+    if (filteredList.length === 0) {
       const empty = document.getElementById("tableEmptyState");
-      if (empty) empty.style.display = "block";
+      if (empty) {
+        empty.style.display = "block";
+        const emptyDesc = empty.querySelector(".kanban-empty-desc");
+        if (emptyDesc) {
+          emptyDesc.textContent = (allList.length > 0)
+            ? "Nenhuma solicitação encontrada para o filtro selecionado."
+            : "Clique no botão acima para abrir a primeira solicitação de tutorial ou arte.";
+        }
+      }
       return;
     }
     const empty = document.getElementById("tableEmptyState");
     if (empty) empty.style.display = "none";
 
     // Renderizar cada card na coluna correta
-    list.forEach(req => {
+    filteredList.forEach(req => {
       const col = document.getElementById("col-"+req.status);
       if (!col) return;
 
       const urgClass = { Alta:"urg-alta", Média:"urg-media", Media:"urg-media", Baixa:"urg-baixa" }[req.urgencia] || "urg-media";
       const isVoted  = localStorage.getItem("vigi_voted_"+req.id) === "true";
+      const typeCfg  = TYPE_CONFIG[req.tipo] || { icon: "📄", cssClass: "", iconClass: "" };
 
-      // Config visual por tipo
-      const typeCfg = TYPE_CONFIG[req.tipo] || { icon: "📄", cssClass: "", iconClass: "" };
-
-      // Botões de mover
       const statusIdx = STATUSES.indexOf(req.status);
       const movePrev  = statusIdx > 0 ? `<button class="kanban-move-btn" data-move="${req.id}" data-dir="-1">← Voltar</button>` : "";
       const moveNext  = statusIdx < STATUSES.length-1 ? `<button class="kanban-move-btn" data-move="${req.id}" data-dir="1">Avançar →</button>` : "";
@@ -1699,9 +1827,15 @@ document.addEventListener("DOMContentLoaded", () => {
         ${req.adminReply ? `<div class="kanban-admin-reply"><strong>VIGI:</strong> ${req.adminReply}</div>` : ""}
         <div class="kanban-card-footer">
           <div class="kanban-move-btns">${movePrev}${moveNext}</div>
-          <button class="kanban-upvote-btn ${isVoted?'active':''}" data-upvote="${req.id}">
-            👍 <span>${req.upvotes||0}</span>
-          </button>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button type="button" class="kanban-wa-notify-btn" data-wa-notify="${req.id}" title="Notificar a equipe de produção no WhatsApp">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+              <span>Avisar</span>
+            </button>
+            <button class="kanban-upvote-btn ${isVoted?'active':''}" data-upvote="${req.id}" title="Votar nesta sugestão">
+              👍 <span>${req.upvotes||0}</span>
+            </button>
+          </div>
         </div>
         <div class="kanban-card-user">Por ${req.nome} · ${req.data}</div>
       `;
@@ -1731,7 +1865,48 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Botões: mover, upvote, deletar
+    // Botões: mover, upvote, deletar e notificar no WhatsApp
+    document.querySelectorAll("[data-move]").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        const id  = btn.getAttribute("data-move");
+        const dir = parseInt(btn.getAttribute("data-dir"));
+        const list2 = getRequests();
+        const req2  = list2.find(r=>r.id===id);
+        if (!req2) return;
+        const idx = STATUSES.indexOf(req2.status);
+        const newIdx = idx + dir;
+        if (newIdx >= 0 && newIdx < STATUSES.length) {
+          req2.status = STATUSES[newIdx];
+          saveRequests(list2);
+          loadRequests();
+        }
+      });
+    });
+
+    document.querySelectorAll("[data-wa-notify]").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-wa-notify");
+        const list2 = getRequests();
+        const req2  = list2.find(r=>r.id===id);
+        if (!req2) return;
+
+        let msg = `💡 *SUGESTÃO DE MATERIAL TÉCNICO — VIGI CÂMERAS*\n`;
+        msg += `👤 *Solicitante:* ${req2.nome}\n`;
+        msg += `🏷️ *Formato:* ${req2.tipo}\n`;
+        msg += `📌 *Título:* ${req2.titulo}\n`;
+        msg += `⚠️ *Urgência:* ${req2.urgencia}\n`;
+        msg += `📝 *Detalhes:* ${req2.descricao}\n`;
+        msg += `🗓️ *Data:* ${req2.data}\n\n`;
+        msg += `_Enviado pelo Portal Técnico VIGI_ 🚀`;
+
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+        window.open(waUrl, "_blank");
+      });
+    });
+
+    // Botões mover
     document.querySelectorAll("[data-move]").forEach(btn => {
       btn.addEventListener("click", e => {
         e.stopPropagation();
