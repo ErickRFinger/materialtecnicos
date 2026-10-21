@@ -114,7 +114,7 @@
         <span class="waiting-dot"></span>
         Aguardando aprovação do administrador
       </div>
-      <button class="waiting-logout-btn" id="waitingLogoutBtn">
+      <button type="button" class="waiting-logout-btn" id="waitingLogoutBtn">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Sair
       </button>
@@ -127,7 +127,7 @@
   <div class="app-container" id="appContainer" style="display: none;" aria-hidden="true">
     
     <!-- Hamburguer Mobile -->
-    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir Menu">
+    <button type="button" class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir Menu">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="3" y1="12" x2="21" y2="12"></line>
         <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -165,7 +165,7 @@
       
       <nav class="nav-menu">
         <li class="nav-item active" data-tab="dashboard">
-          <button>
+          <button type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
               <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -174,7 +174,7 @@
           </button>
         </li>
         <li class="nav-item" data-tab="videos">
-          <button>
+          <button type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
               <line x1="7" y1="2" x2="7" y2="22"></line>
@@ -189,7 +189,7 @@
           </button>
         </li>
         <li class="nav-item" data-tab="artes">
-          <button>
+          <button type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
               <circle cx="8.5" cy="8.5" r="1.5"></circle>
@@ -199,7 +199,7 @@
           </button>
         </li>
         <li class="nav-item" data-tab="manuais">
-          <button>
+          <button type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
@@ -211,7 +211,7 @@
           </button>
         </li>
         <li class="nav-item" data-tab="treinamento">
-          <button>
+          <button type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
               <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path>
@@ -220,7 +220,7 @@
           </button>
         </li>
         <li class="nav-item" data-tab="solicitacoes">
-          <button>
+          <button type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
@@ -254,7 +254,7 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
           <input type="text" class="search-input" id="globalSearch" placeholder="Buscar em tudo... (vídeos, artes, manuais)" autocomplete="off">
-          <button class="search-clear-btn" id="searchClearBtn" title="Limpar busca" style="display:none;" aria-label="Limpar">✕</button>
+          <button type="button" class="search-clear-btn" id="searchClearBtn" title="Limpar busca" style="display:none;" aria-label="Limpar">✕</button>
           <span class="search-kbd-hint"><kbd>⌘K</kbd></span>
           <!-- Painel de resultados unificado -->
           <div class="global-search-panel" id="globalSearchPanel" style="display:none;">
@@ -306,7 +306,7 @@
             <span class="user-info-text" id="userDisplayName">Técnico VIGI</span>
             <span class="user-badge-role" id="userRoleBadge">TÉCNICO VIGI</span>
           </div>
-          <button class="logout-btn" id="logoutBtn" title="Sair do portal">
+          <button type="button" class="logout-btn" id="logoutBtn" title="Sair do portal">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             <span>Sair</span>
           </button>
@@ -347,7 +347,7 @@
         <!-- Acesso rápido: 6 blocos com design moderno -->
         <div class="dash-quick-grid">
 
-          <button class="dash-quick-btn dash-btn-videos" data-target-tab="videos">
+          <button type="button" class="dash-quick-btn dash-btn-videos" data-target-tab="videos">
             <div class="dash-quick-top">
               <span class="dash-quick-icon">🎬</span>
               <span class="dash-quick-tag">33 Vídeos</span>
@@ -356,7 +356,7 @@
             <span class="dash-quick-sub">Alarmes, DVRs e apps</span>
           </button>
 
-          <button class="dash-quick-btn dash-btn-proc" data-target-tab="videos" data-target-filter="procedimentos">
+          <button type="button" class="dash-quick-btn dash-btn-proc" data-target-tab="videos" data-target-filter="procedimentos">
             <div class="dash-quick-top">
               <span class="dash-quick-icon">🚀</span>
               <span class="dash-quick-tag tag-new">Novo</span>
@@ -365,7 +365,7 @@
             <span class="dash-quick-sub">Relatos, OS e ativação</span>
           </button>
 
-          <button class="dash-quick-btn dash-btn-artes" data-target-tab="artes">
+          <button type="button" class="dash-quick-btn dash-btn-artes" data-target-tab="artes">
             <div class="dash-quick-top">
               <span class="dash-quick-icon">🖼️</span>
               <span class="dash-quick-tag">8 Artes</span>
@@ -374,7 +374,7 @@
             <span class="dash-quick-sub">Preços e equipamentos</span>
           </button>
 
-          <button class="dash-quick-btn dash-btn-manuais" data-target-tab="manuais">
+          <button type="button" class="dash-quick-btn dash-btn-manuais" data-target-tab="manuais">
             <div class="dash-quick-top">
               <span class="dash-quick-icon">📋</span>
               <span class="dash-quick-tag">14 Guias</span>
@@ -383,7 +383,7 @@
             <span class="dash-quick-sub">Passo a passo interativo</span>
           </button>
 
-          <button class="dash-quick-btn dash-btn-cert" data-target-tab="treinamento">
+          <button type="button" class="dash-quick-btn dash-btn-cert" data-target-tab="treinamento">
             <div class="dash-quick-top">
               <span class="dash-quick-icon">🎓</span>
               <span class="dash-quick-tag">27 Slides</span>
@@ -392,7 +392,7 @@
             <span class="dash-quick-sub">Treinamento técnico</span>
           </button>
 
-          <button class="dash-quick-btn dash-btn-solicitar" data-target-tab="solicitacoes">
+          <button type="button" class="dash-quick-btn dash-btn-solicitar" data-target-tab="solicitacoes">
             <div class="dash-quick-top">
               <span class="dash-quick-icon">💬</span>
               <span class="dash-quick-tag">Kanban</span>
@@ -443,7 +443,7 @@
               <h2 class="dash-section-title">🔥 Tutoriais em Alta no Campo</h2>
               <p class="dash-section-subtitle">Acesso rápido aos vídeos mais consultados em campo pela equipe técnica.</p>
             </div>
-            <button class="dash-view-all-btn" data-target-tab="videos">Ver todos os 33 vídeos →</button>
+            <button type="button" class="dash-view-all-btn" data-target-tab="videos">Ver todos os 33 vídeos →</button>
           </div>
           <div class="dash-featured-grid" id="dashFeaturedVideos">
             <!-- Injetado dinamicamente via JS -->
@@ -512,9 +512,9 @@
             <!-- Injetado via JS -->
           </div>
           <div class="dash-tips-controls">
-            <button class="dash-tip-nav" id="tipPrevBtn" aria-label="Dica anterior">&#8592;</button>
+            <button type="button" class="dash-tip-nav" id="tipPrevBtn" aria-label="Dica anterior">&#8592;</button>
             <div class="dash-tips-dots" id="dashTipsDots"></div>
-            <button class="dash-tip-nav" id="tipNextBtn" aria-label="Próxima dica">&#8594;</button>
+            <button type="button" class="dash-tip-nav" id="tipNextBtn" aria-label="Próxima dica">&#8594;</button>
           </div>
         </div>
 
@@ -534,12 +534,12 @@
         </div>
 
         <div class="filter-bar" id="video-filters">
-          <button class="filter-btn active" data-filter="todos">Todos</button>
-          <button class="filter-btn" data-filter="alarme">Alarmes</button>
-          <button class="filter-btn" data-filter="hikvision">Hikvision</button>
-          <button class="filter-btn" data-filter="uniview">Uniview</button>
-          <button class="filter-btn" data-filter="material técnico">Material Técnico</button>
-          <button class="filter-btn" data-filter="procedimentos">Procedimentos VIGI</button>
+          <button type="button" class="filter-btn active" data-filter="todos">Todos</button>
+          <button type="button" class="filter-btn" data-filter="alarme">Alarmes</button>
+          <button type="button" class="filter-btn" data-filter="hikvision">Hikvision</button>
+          <button type="button" class="filter-btn" data-filter="uniview">Uniview</button>
+          <button type="button" class="filter-btn" data-filter="material técnico">Material Técnico</button>
+          <button type="button" class="filter-btn" data-filter="procedimentos">Procedimentos VIGI</button>
         </div>
 
         <div class="content-grid" id="videos-grid">
@@ -566,20 +566,20 @@
             <h1 class="section-title">Guias de Processo Simplificados</h1>
             <p class="section-subtitle">Siga os checklists para garantir que cada instalação siga o padrão VIGI e evite retrabalhos.</p>
           </div>
-          <button class="filter-btn" id="btnResetAllChecklists" style="display: flex; align-items: center; gap: 8px; border-color: var(--color-danger); color: var(--color-danger); background: rgba(239, 68, 68, 0.05); font-weight: 600; padding: 10px 16px; transition: var(--transition-smooth); cursor: pointer;">
+          <button type="button" class="filter-btn" id="btnResetAllChecklists" style="display: flex; align-items: center; gap: 8px; border-color: var(--color-danger); color: var(--color-danger); background: rgba(239, 68, 68, 0.05); font-weight: 600; padding: 10px 16px; transition: var(--transition-smooth); cursor: pointer;">
             🗑️ Limpar Checklists
           </button>
         </div>
 
         <div class="filter-bar" id="manual-filters" style="margin-bottom: 24px; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;">
-          <button class="filter-btn active" data-filter="todos">Todos (14)</button>
-          <button class="filter-btn" data-filter="Procedimentos Operacionais">Procedimentos (4)</button>
-          <button class="filter-btn" data-filter="Gravadores (DVR/NVR)">Gravadores (2)</button>
-          <button class="filter-btn" data-filter="Aplicativos Mobile">Apps Mobile (2)</button>
-          <button class="filter-btn" data-filter="Sistemas de Alarme">Alarmes (1)</button>
-          <button class="filter-btn" data-filter="Softwares Desktop">Softwares PC (1)</button>
-          <button class="filter-btn" data-filter="Manutenção Corretiva">Manutenção (2)</button>
-          <button class="filter-btn" data-filter="Instalação Física">Cabeamento (1)</button>
+          <button type="button" class="filter-btn active" data-filter="todos">Todos (14)</button>
+          <button type="button" class="filter-btn" data-filter="Procedimentos Operacionais">Procedimentos (4)</button>
+          <button type="button" class="filter-btn" data-filter="Gravadores (DVR/NVR)">Gravadores (2)</button>
+          <button type="button" class="filter-btn" data-filter="Aplicativos Mobile">Apps Mobile (2)</button>
+          <button type="button" class="filter-btn" data-filter="Sistemas de Alarme">Alarmes (1)</button>
+          <button type="button" class="filter-btn" data-filter="Softwares Desktop">Softwares PC (1)</button>
+          <button type="button" class="filter-btn" data-filter="Manutenção Corretiva">Manutenção (2)</button>
+          <button type="button" class="filter-btn" data-filter="Instalação Física">Cabeamento (1)</button>
         </div>
 
         <div class="guides-container" id="manuais-container">
@@ -594,7 +594,7 @@
             <h1 class="section-title">Certificação Técnica</h1>
             <p class="section-subtitle">Slides oficiais do treinamento de capacitação da VIGI Câmeras.</p>
           </div>
-          <button class="filter-btn" id="btnFullscreenSlides" style="display:flex; align-items:center; gap:8px;">
+          <button type="button" class="filter-btn" id="btnFullscreenSlides" style="display:flex; align-items:center; gap:8px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
             </svg>
@@ -606,13 +606,13 @@
           <div class="slide-progress-top">
             <div class="slide-progress-top-fill" id="slideProgressTopFill"></div>
           </div>
-          <button class="slide-close-fullscreen-btn" id="btnCloseFullscreen" title="Sair da Tela Cheia" aria-label="Sair da Tela Cheia">&times;</button>
+          <button type="button" class="slide-close-fullscreen-btn" id="btnCloseFullscreen" title="Sair da Tela Cheia" aria-label="Sair da Tela Cheia">&times;</button>
           <div class="slide-deck" id="slideDeck">
             <!-- Injetado dinamicamente via JS -->
           </div>
 
           <div class="slide-controls-bar">
-            <button class="slide-nav-btn" id="prevSlideBtn" disabled>
+            <button type="button" class="slide-nav-btn" id="prevSlideBtn" disabled>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
@@ -624,7 +624,7 @@
               <span class="slide-counter-label" id="slideCounterLabel">Slide 1 de 10</span>
             </div>
 
-            <button class="slide-nav-btn" id="nextSlideBtn">
+            <button type="button" class="slide-nav-btn" id="nextSlideBtn">
               Próximo
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="9 18 15 12 9 6"></polyline>
@@ -643,7 +643,7 @@
 
         <!-- Formulário compacto (toggle) e estatísticas -->
         <div class="kanban-form-bar">
-          <button class="kanban-new-btn" id="toggleKanbanForm">
+          <button type="button" class="kanban-new-btn" id="toggleKanbanForm">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Sugerir Novo Material
           </button>
@@ -654,7 +654,7 @@
             <span class="k-stat-sep">·</span>
             <span class="k-stat k-stat-ok" id="req-count-ready">0 concluídos</span>
           </div>
-          <button class="kanban-clear-btn" id="btnClearAll" title="Limpar todas as solicitações">
+          <button type="button" class="kanban-clear-btn" id="btnClearAll" title="Limpar todas as solicitações">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
             Limpar Tudo
           </button>
@@ -816,23 +816,23 @@
 
   <!-- BARRA DE NAVEGAÇÃO INFERIOR (MOBILE) -->
   <nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Navegação rápida" style="display:none;">
-    <button class="mobile-nav-btn active" data-tab="dashboard" id="mbn-dashboard">
+    <button type="button" class="mobile-nav-btn active" data-tab="dashboard" id="mbn-dashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Início
     </button>
-    <button class="mobile-nav-btn" data-tab="videos" id="mbn-videos">
+    <button type="button" class="mobile-nav-btn" data-tab="videos" id="mbn-videos">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
       Vídeos
     </button>
-    <button class="mobile-nav-btn" data-tab="artes" id="mbn-artes">
+    <button type="button" class="mobile-nav-btn" data-tab="artes" id="mbn-artes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       Artes
     </button>
-    <button class="mobile-nav-btn" data-tab="manuais" id="mbn-manuais">
+    <button type="button" class="mobile-nav-btn" data-tab="manuais" id="mbn-manuais">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       Guias
     </button>
-    <button class="mobile-nav-btn" data-tab="solicitacoes" id="mbn-solicitacoes">
+    <button type="button" class="mobile-nav-btn" data-tab="solicitacoes" id="mbn-solicitacoes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Solicitar
     </button>
@@ -842,7 +842,7 @@
     <div class="modal-window">
       <div class="modal-header">
         <h3 class="modal-title" id="modalTitle">Título da Mídia</h3>
-        <button class="modal-close-btn" id="modalClose">&times;</button>
+        <button type="button" class="modal-close-btn" id="modalClose">&times;</button>
       </div>
       <div class="modal-body" id="modalBody">
         

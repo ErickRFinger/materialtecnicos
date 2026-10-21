@@ -1,0 +1,14 @@
+# ========================================================
+# .clineignore - MATERIAL TECNICOS
+# ========================================================
+*.png
+*.jpg
+*.jpeg
+*.ico
+*.pdf
+*.zip
+_BACKUP*/
+node_modules/
+.vercel/
+.git/
+.DS_Store

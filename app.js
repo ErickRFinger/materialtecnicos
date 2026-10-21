@@ -851,26 +851,129 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Event delegation para upvotes e acesso material no painel de solicitações
-    const requestsCardsContainer = document.getElementById("requestsCardsContainer");
-    if (requestsCardsContainer) {
-      requestsCardsContainer.addEventListener("click", (e) => {
-        const upvoteBtn = e.target.closest(".upvote-btn");
+    // ======================================================================
+    // EVENT DELEGATION — AÇÕES DOS CARDS DO PAINEL DE SOLICITAÇÕES
+    // ======================================================================
+    // O container real dos cards é #kanbanBoard. O antigo #requestsCardsContainer
+    // nunca existiu no HTML, portanto o bloco anterior era código morto.
+    // A delegação no container estático continua válida mesmo após cada
+    // re-render dos cards feito por loadRequests().
+    const kanbanBoard = document.getElementById("kanbanBoard");
+    if (kanbanBoard) {
+      kanbanBoard.addEventListener("click", (e) => {
+        // --- Upvote ---
+        const upvoteBtn = e.target.closest("[data-upvote]");
         if (upvoteBtn) {
-          const reqId = upvoteBtn.getAttribute("data-id");
-          toggleUpvote(reqId);
+          const reqId = upvoteBtn.getAttribute("data-upvote");
+          if (reqId) {
+            toggleUpvote(reqId);
+            // Anima o botão recriado pelo re-render (o antigo é destruído)
+            const newBtn = kanbanBoard.querySelector(`[data-upvote="${reqId}"]`);
+            if (newBtn) {
+              newBtn.classList.remove("pulse");
+              void newBtn.offsetWidth; // reflow para reiniciar a animação
+              newBtn.classList.add("pulse");
+            }
+          }
           return;
         }
 
+        // --- Mover entre colunas (Voltar / Avançar) ---
+        const moveBtn = e.target.closest("[data-move]");
+        if (moveBtn) {
+          const id  = moveBtn.getAttribute("data-move");
+          const dir = parseInt(moveBtn.getAttribute("data-dir"), 10);
+          const list = getRequests();
+          const req  = list.find(r => r.id === id);
+          if (!req) return;
+          const idx = STATUSES.indexOf(req.status);
+          const newIdx = idx + dir;
+          if (newIdx >= 0 && newIdx < STATUSES.length) {
+            req.status = STATUSES[newIdx];
+            saveRequests(list);
+            loadRequests();
+          }
+          return;
+        }
+
+        // --- Excluir solicitação ---
+        const deleteBtn = e.target.closest("[data-delete]");
+        if (deleteBtn) {
+          const id = deleteBtn.getAttribute("data-delete");
+          if (!confirm("Remover esta solicitação?")) return;
+          saveRequests(getRequests().filter(r => r.id !== id));
+          loadRequests();
+          return;
+        }
+
+        // --- Notificar a equipe de produção no WhatsApp ---
+        const waBtn = e.target.closest("[data-wa-notify]");
+        if (waBtn) {
+          const id = waBtn.getAttribute("data-wa-notify");
+          const req = getRequests().find(r => r.id === id);
+          if (!req) return;
+
+          let msg = `💡 *SUGESTÃO DE MATERIAL TÉCNICO — VIGI CÂMERAS*\n`;
+          msg += `👤 *Solicitante:* ${req.nome}\n`;
+          msg += `🏷️ *Formato:* ${req.tipo}\n`;
+          msg += `📌 *Título:* ${req.titulo}\n`;
+          msg += `⚠️ *Urgência:* ${req.urgencia}\n`;
+          msg += `📝 *Detalhes:* ${req.descricao}\n`;
+          msg += `🗓️ *Data:* ${req.data}\n\n`;
+          msg += `_Enviado pelo Portal Técnico VIGI_ 🚀`;
+
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, "_blank");
+          return;
+        }
+
+        // --- Acessar o material vinculado à solicitação ---
         const accessBtn = e.target.closest(".access-material-btn");
         if (accessBtn) {
           const reqId = accessBtn.getAttribute("data-id");
-          const requests = JSON.parse(localStorage.getItem("vigi_requests") || "[]");
-          const reqObj = requests.find(r => r.id === reqId);
+          const reqObj = getRequests().find(r => r.id === reqId);
           if (reqObj && reqObj.linkMaterial) {
             handleAccessMaterial(reqObj.linkMaterial);
           }
           return;
+        }
+      });
+
+      // Vínculo/desvínculo de material (controle administrativo) via <select>
+      kanbanBoard.addEventListener("change", (e) => {
+        const select = e.target.closest("[data-link-select]");
+        if (!select) return;
+
+        const reqId = select.getAttribute("data-link-select");
+        const value = select.value;
+
+        const list = getRequests();
+        const req  = list.find(r => r.id === reqId);
+        if (!req) return;
+
+        if (!value) {
+          delete req.linkMaterial;
+          saveRequests(list);
+          loadRequests();
+          if (window.showToast) {
+            window.showToast("Vínculo de material removido.", "info", "🔓");
+          }
+          return;
+        }
+
+        const [type, id] = value.split("|");
+        const title = resolveMaterialTitle(type, id);
+        if (!title) {
+          if (window.showToast) {
+            window.showToast("Material não encontrado no acervo.", "warning", "⚠️");
+          }
+          return;
+        }
+
+        req.linkMaterial = { id, type, title };
+        saveRequests(list);
+        loadRequests();
+        if (window.showToast) {
+          window.showToast(`Material vinculado: "${title}"`, "success", "🔗");
         }
       });
     }
@@ -1070,12 +1173,12 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="thumbnail-overlay"></div>
           <span class="video-brand-tag ${tagClass}">${video.categoria}</span>
           <span class="video-hd-badge">HD</span>
-          <button class="play-overlay-btn" aria-label="Assistir Vídeo">▶</button>
+          <button type="button" class="play-overlay-btn" aria-label="Assistir Vídeo">▶</button>
         </div>
         <div class="video-card-body">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
             <h3 class="video-card-title">${video.titulo}</h3>
-            <button class="favorite-star-btn ${isFav ? 'active' : ''}" data-id="${video.id}" title="Favoritar">
+            <button type="button" class="favorite-star-btn ${isFav ? 'active' : ''}" data-id="${video.id}" title="Favoritar">
               ${isFav ? '★' : '☆'}
             </button>
           </div>
@@ -1088,13 +1191,13 @@ document.addEventListener("DOMContentLoaded", () => {
               Vídeo
             </span>
             <div class="card-quick-actions">
-              <button class="card-action-icon-btn whatsapp-share" title="Enviar no WhatsApp" aria-label="Enviar no WhatsApp">
+              <button type="button" class="card-action-icon-btn whatsapp-share" title="Enviar no WhatsApp" aria-label="Enviar no WhatsApp">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
               </button>
-              <button class="card-action-icon-btn copy-link" title="Copiar Link" aria-label="Copiar Link">
+              <button type="button" class="card-action-icon-btn copy-link" title="Copiar Link" aria-label="Copiar Link">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               </button>
-              <button class="watch-btn">Assistir</button>
+              <button type="button" class="watch-btn">Assistir</button>
             </div>
           </div>
         </div>
@@ -1186,18 +1289,18 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="art-card-category">${art.categoria}</span>
               <h3 class="art-card-title">${art.titulo}</h3>
             </div>
-            <button class="favorite-star-btn ${isFav ? 'active' : ''}" data-id="${art.id}" title="Favoritar">
+            <button type="button" class="favorite-star-btn ${isFav ? 'active' : ''}" data-id="${art.id}" title="Favoritar">
               ${isFav ? '★' : '☆'}
             </button>
           </div>
           <p class="art-card-desc">${art.descricao}</p>
           <div class="art-actions">
-            <button class="art-btn-main view-art-btn">Ampliar Tabela</button>
+            <button type="button" class="art-btn-main view-art-btn">Ampliar Tabela</button>
             <div class="card-quick-actions">
-              <button class="card-action-icon-btn whatsapp-share" title="Enviar no WhatsApp" aria-label="Enviar no WhatsApp">
+              <button type="button" class="card-action-icon-btn whatsapp-share" title="Enviar no WhatsApp" aria-label="Enviar no WhatsApp">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
               </button>
-              <button class="card-action-icon-btn copy-link" title="Copiar Informações" aria-label="Copiar Informações">
+              <button type="button" class="card-action-icon-btn copy-link" title="Copiar Informações" aria-label="Copiar Informações">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               </button>
             </div>
@@ -1314,7 +1417,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const videoObj = VIGI_DATA.videos.find(v => v.id === vId);
           if (videoObj) {
             relatedChipsHtml += `
-              <button class="related-video-chip" data-video-id="${videoObj.id}">
+              <button type="button" class="related-video-chip" data-video-id="${videoObj.id}">
                 🎬 ${videoObj.titulo} (${videoObj.categoria})
               </button>
             `;
@@ -1336,7 +1439,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="guide-status-pill" style="display:none;"></span>
             </div>
             <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
-              <button class="favorite-star-btn ${isFav ? 'active' : ''}" data-id="${guide.id}" title="Favoritar" style="width: 24px; height: 24px; font-size: 16px;">
+              <button type="button" class="favorite-star-btn ${isFav ? 'active' : ''}" data-id="${guide.id}" title="Favoritar" style="width: 24px; height: 24px; font-size: 16px;">
                 ${isFav ? '★' : '☆'}
               </button>
               <h3 class="guide-accordion-title" style="margin: 0;">${guide.titulo}</h3>
@@ -1347,7 +1450,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="guide-body" id="pdf-content-${guide.id}">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 16px;">
             <p class="guide-intro" style="margin-bottom: 0; flex-grow: 1;">${guide.descricao}</p>
-            <button class="generate-pdf-btn ignore-pdf" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; white-space: nowrap; transition: 0.2s;">
+            <button type="button" class="generate-pdf-btn ignore-pdf" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; white-space: nowrap; transition: 0.2s;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               PDF
             </button>
@@ -1604,6 +1707,12 @@ document.addEventListener("DOMContentLoaded", () => {
     "Tabela / Imagem Informativa":   { icon: "🎨", cssClass: "type-tabela",   iconClass: "icon-tabela" },
   };
 
+  // Verifica se o técnico é Administrador VIGI (para mostrar o controle de vínculo).
+  // VIGI_USER_ROLE é definido pelo auth.js antes do portal boot.
+  function isAdminUser() {
+    return window.VIGI_USER_ROLE === "admin";
+  }
+
   // Auto-preencher nome do usuário logado no formulário
   function fillUserName() {
     const hiddenInput = document.getElementById("reqName");
@@ -1644,6 +1753,7 @@ document.addEventListener("DOMContentLoaded", () => {
         status: "Pronto",
         data: "14/10/2026",
         upvotes: 5,
+        linkMaterial: { id: "v-hik-7", type: "video", title: "Como Utilizar o Aplicativo Hik-Connect" },
         adminReply: "Vídeo gravado e publicado na aba de Vídeos (Câmeras Wi-Fi)!"
       },
       {
@@ -1656,6 +1766,7 @@ document.addEventListener("DOMContentLoaded", () => {
         status: "Em Gravação",
         data: "18/10/2026",
         upvotes: 8,
+        linkMaterial: { id: "art-planos-cam", type: "arte", title: "Planos de Câmeras por Assinatura" },
         adminReply: "Design finalizando arte em alta resolução na pasta de Artes!"
       },
       {
@@ -1672,6 +1783,65 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
   }
 
+  // Vínculos de material dos cards de exemplo (usados para popular o seletor
+  // administrativo e para migrar requisições salvas antes deste recurso).
+  const MOCK_MATERIAL_LINKS = {
+    "req-mock-1": { id: "v-hik-7", type: "video", title: "Como Utilizar o Aplicativo Hik-Connect" },
+    "req-mock-2": { id: "art-planos-cam", type: "arte", title: "Planos de Câmeras por Assinatura" }
+  };
+
+  // Opções do seletor administrativo de vínculo (agrupadas por tipo).
+  // O valor usa o formato "tipo|id" — o título é resolvido no momento da gravação.
+  function buildMaterialLinkOptions() {
+    let html = "";
+    if (VIGI_DATA.videos && VIGI_DATA.videos.length) {
+      html += '<optgroup label="🎬 Vídeos">';
+      VIGI_DATA.videos.forEach(v => {
+        html += `<option value="video|${v.id}">${v.titulo}</option>`;
+      });
+      html += "</optgroup>";
+    }
+    if (VIGI_DATA.artes && VIGI_DATA.artes.length) {
+      html += '<optgroup label="🎨 Artes / Tabelas">';
+      VIGI_DATA.artes.forEach(a => {
+        html += `<option value="arte|${a.id}">${a.titulo}</option>`;
+      });
+      html += "</optgroup>";
+    }
+    if (VIGI_DATA.manuais && VIGI_DATA.manuais.length) {
+      html += '<optgroup label="📋 Manuais / Guias">';
+      VIGI_DATA.manuais.forEach(m => {
+        html += `<option value="manual|${m.id}">${m.titulo}</option>`;
+      });
+      html += "</optgroup>";
+    }
+    return html;
+  }
+
+  // Resolve o título de um material a partir do par "tipo|id".
+  function resolveMaterialTitle(type, id) {
+    let item = null;
+    if (type === "video") item = VIGI_DATA.videos.find(v => v.id === id);
+    else if (type === "arte") item = VIGI_DATA.artes.find(a => a.id === id);
+    else if (type === "manual") item = VIGI_DATA.manuais.find(m => m.id === id);
+    return item ? item.titulo : "";
+  }
+
+  // Migração: requisições salvas antes do recurso de vínculo não possuem
+  // linkMaterial. Aplicamos o vínculo padrão apenas nos cards de exemplo.
+  function migrateMaterialLinks(list) {
+    if (!Array.isArray(list)) return false;
+    let changed = false;
+    list.forEach(req => {
+      const mockLink = MOCK_MATERIAL_LINKS[req.id];
+      if (mockLink && !req.linkMaterial) {
+        req.linkMaterial = Object.assign({}, mockLink);
+        changed = true;
+      }
+    });
+    return changed;
+  }
+
   function getRequests() {
     const raw = localStorage.getItem(KANBAN_KEY);
     if (!raw) {
@@ -1681,7 +1851,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     try {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        if (migrateMaterialLinks(parsed)) {
+          localStorage.setItem(KANBAN_KEY, JSON.stringify(parsed));
+        }
+        return parsed;
+      }
       const mocks = seedMocks();
       localStorage.setItem(KANBAN_KEY, JSON.stringify(mocks));
       return mocks;
@@ -1800,8 +1975,28 @@ document.addEventListener("DOMContentLoaded", () => {
       const typeCfg  = TYPE_CONFIG[req.tipo] || { icon: "📄", cssClass: "", iconClass: "" };
 
       const statusIdx = STATUSES.indexOf(req.status);
-      const movePrev  = statusIdx > 0 ? `<button class="kanban-move-btn" data-move="${req.id}" data-dir="-1">← Voltar</button>` : "";
-      const moveNext  = statusIdx < STATUSES.length-1 ? `<button class="kanban-move-btn" data-move="${req.id}" data-dir="1">Avançar →</button>` : "";
+      const movePrev  = statusIdx > 0 ? `<button type="button" class="kanban-move-btn" data-move="${req.id}" data-dir="-1">← Voltar</button>` : "";
+      const moveNext  = statusIdx < STATUSES.length-1 ? `<button type="button" class="kanban-move-btn" data-move="${req.id}" data-dir="1">Avançar →</button>` : "";
+
+      // Vínculo de material publicado: exibido quando o material já está no acervo.
+      const linkMaterial = req.linkMaterial;
+      const linkTitle    = linkMaterial ? (linkMaterial.title || resolveMaterialTitle(linkMaterial.type, linkMaterial.id)) : "";
+      const accessBtn   = linkMaterial
+        ? `<button type="button" class="access-material-btn kanban-access-btn" data-id="${req.id}" data-link-type="${linkMaterial.type}" title="Abrir: ${linkTitle}">
+             <span aria-hidden="true">🔗</span> Acessar Material
+           </button>`
+        : "";
+
+      // Controle administrativo para vincular/desvincular material (somente admin).
+      const linkSelect = isAdminUser()
+        ? `<div class="kanban-link-control">
+             <label class="kanban-link-label" for="linkSel-${req.id}">🔗 Material vinculado:</label>
+             <select id="linkSel-${req.id}" class="form-control kanban-link-select" data-link-select="${req.id}">
+               <option value="">— Nenhum material vinculado —</option>
+               ${buildMaterialLinkOptions()}
+             </select>
+           </div>`
+        : "";
 
       const card = document.createElement("div");
       card.className = `kanban-card ${typeCfg.cssClass}`;
@@ -1817,7 +2012,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <div style="display:flex; align-items:center; gap:6px;">
             <span class="kanban-urgency ${urgClass}">${req.urgencia}</span>
-            <button class="kanban-delete-btn" data-delete="${req.id}" title="Excluir">
+            <button type="button" class="kanban-delete-btn" data-delete="${req.id}" title="Excluir">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
@@ -1825,20 +2020,28 @@ document.addEventListener("DOMContentLoaded", () => {
         <h4 class="kanban-card-title">${req.titulo}</h4>
         <p class="kanban-card-desc">${req.descricao}</p>
         ${req.adminReply ? `<div class="kanban-admin-reply"><strong>VIGI:</strong> ${req.adminReply}</div>` : ""}
+        ${linkSelect}
         <div class="kanban-card-footer">
           <div class="kanban-move-btns">${movePrev}${moveNext}</div>
-          <div style="display:flex; align-items:center; gap:6px;">
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            ${accessBtn}
             <button type="button" class="kanban-wa-notify-btn" data-wa-notify="${req.id}" title="Notificar a equipe de produção no WhatsApp">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
               <span>Avisar</span>
             </button>
-            <button class="kanban-upvote-btn ${isVoted?'active':''}" data-upvote="${req.id}" title="Votar nesta sugestão">
+            <button type="button" class="kanban-upvote-btn ${isVoted?'active':''}" data-upvote="${req.id}" title="Votar nesta sugestão">
               👍 <span>${req.upvotes||0}</span>
             </button>
           </div>
         </div>
         <div class="kanban-card-user">Por ${req.nome} · ${req.data}</div>
       `;
+
+      // Seleciona no dropdown o material já vinculado (se houver)
+      if (linkMaterial) {
+        const sel = card.querySelector(`[data-link-select="${req.id}"]`);
+        if (sel) sel.value = `${linkMaterial.type}|${linkMaterial.id}`;
+      }
 
       // Drag & Drop
       card.addEventListener("dragstart", e => {
@@ -1865,100 +2068,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Botões: mover, upvote, deletar e notificar no WhatsApp
-    document.querySelectorAll("[data-move]").forEach(btn => {
-      btn.addEventListener("click", e => {
-        e.stopPropagation();
-        const id  = btn.getAttribute("data-move");
-        const dir = parseInt(btn.getAttribute("data-dir"));
-        const list2 = getRequests();
-        const req2  = list2.find(r=>r.id===id);
-        if (!req2) return;
-        const idx = STATUSES.indexOf(req2.status);
-        const newIdx = idx + dir;
-        if (newIdx >= 0 && newIdx < STATUSES.length) {
-          req2.status = STATUSES[newIdx];
-          saveRequests(list2);
-          loadRequests();
-        }
-      });
-    });
-
-    document.querySelectorAll("[data-wa-notify]").forEach(btn => {
-      btn.addEventListener("click", e => {
-        e.stopPropagation();
-        const id = btn.getAttribute("data-wa-notify");
-        const list2 = getRequests();
-        const req2  = list2.find(r=>r.id===id);
-        if (!req2) return;
-
-        let msg = `💡 *SUGESTÃO DE MATERIAL TÉCNICO — VIGI CÂMERAS*\n`;
-        msg += `👤 *Solicitante:* ${req2.nome}\n`;
-        msg += `🏷️ *Formato:* ${req2.tipo}\n`;
-        msg += `📌 *Título:* ${req2.titulo}\n`;
-        msg += `⚠️ *Urgência:* ${req2.urgencia}\n`;
-        msg += `📝 *Detalhes:* ${req2.descricao}\n`;
-        msg += `🗓️ *Data:* ${req2.data}\n\n`;
-        msg += `_Enviado pelo Portal Técnico VIGI_ 🚀`;
-
-        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-        window.open(waUrl, "_blank");
-      });
-    });
-
-    // Botões mover
-    document.querySelectorAll("[data-move]").forEach(btn => {
-      btn.addEventListener("click", e => {
-        e.stopPropagation();
-        const id  = btn.getAttribute("data-move");
-        const dir = parseInt(btn.getAttribute("data-dir"));
-        const list2 = getRequests();
-        const req2  = list2.find(r=>r.id===id);
-        if (!req2) return;
-        const idx = STATUSES.indexOf(req2.status);
-        const newIdx = idx + dir;
-        if (newIdx >= 0 && newIdx < STATUSES.length) {
-          req2.status = STATUSES[newIdx];
-          saveRequests(list2);
-          loadRequests();
-        }
-      });
-    });
-
-    document.querySelectorAll("[data-upvote]").forEach(btn => {
-      btn.addEventListener("click", e => {
-        e.stopPropagation();
-        const id = btn.getAttribute("data-upvote");
-        const alreadyVoted = localStorage.getItem("vigi_voted_"+id) === "true";
-        const list2 = getRequests();
-        const req2  = list2.find(r=>r.id===id);
-        if (!req2) return;
-        if (!alreadyVoted) {
-          req2.upvotes = (req2.upvotes||0) + 1;
-          localStorage.setItem("vigi_voted_"+id, "true");
-        } else {
-          req2.upvotes = Math.max(0, (req2.upvotes||1) - 1);
-          localStorage.removeItem("vigi_voted_"+id);
-        }
-        saveRequests(list2);
-        // Animação de pulso
-        btn.classList.remove("pulse");
-        void btn.offsetWidth; // reflow para resetar animação
-        btn.classList.add("pulse");
-        loadRequests();
-      });
-    });
-
-    document.querySelectorAll("[data-delete]").forEach(btn => {
-      btn.addEventListener("click", e => {
-        e.stopPropagation();
-        const id = btn.getAttribute("data-delete");
-        if (!confirm("Remover esta solicitação?")) return;
-        const list2 = getRequests().filter(r=>r.id!==id);
-        saveRequests(list2);
-        loadRequests();
-      });
-    });
+    // As ações dos cards (mover, upvote, excluir, avisar no WhatsApp e acessar
+    // material) são tratadas por delegação de evento em #kanbanBoard, criada em
+    // setupEventListeners(). Aqui não deve haver listeners diretos, para evitar
+    // execução duplicada (o card saltava duas colunas ao clicar em "Avançar").
   }
 
   function moveCard(id, newStatus) {
@@ -2048,10 +2161,10 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="video-controls-right" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
         ${directVideoUrl ? `
           <div style="display:flex; gap:4px; align-items:center;">
-            <button class="zoom-btn" data-speed="1" style="font-size:11px; padding:4px 8px;">1x</button>
-            <button class="zoom-btn" data-speed="1.25" style="font-size:11px; padding:4px 8px;">1.25x</button>
-            <button class="zoom-btn" data-speed="1.5" style="font-size:11px; padding:4px 8px;">1.5x</button>
-            <button class="zoom-btn" data-speed="2" style="font-size:11px; padding:4px 8px;">2x</button>
+            <button type="button" class="zoom-btn" data-speed="1" style="font-size:11px; padding:4px 8px;">1x</button>
+            <button type="button" class="zoom-btn" data-speed="1.25" style="font-size:11px; padding:4px 8px;">1.25x</button>
+            <button type="button" class="zoom-btn" data-speed="1.5" style="font-size:11px; padding:4px 8px;">1.5x</button>
+            <button type="button" class="zoom-btn" data-speed="2" style="font-size:11px; padding:4px 8px;">2x</button>
           </div>
         ` : `<span style="font-size: 12px; color: var(--text-muted);">Player Integrado VIGI HD</span>`}
         ${externalUrl ? `<a href="${externalUrl}" target="_blank" rel="noopener noreferrer" class="watch-btn" style="text-decoration:none; padding:6px 12px; font-size:12px;">↗ Abrir em Nova Aba</a>` : ""}
@@ -2131,10 +2244,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const controls = document.createElement("div");
     controls.className = "lightbox-controls";
     controls.innerHTML = `
-      <button class="zoom-btn" id="zoomOut" title="Reduzir Zoom">−</button>
+      <button type="button" class="zoom-btn" id="zoomOut" title="Reduzir Zoom">−</button>
       <span class="zoom-factor-label" id="zoomLabel">100%</span>
-      <button class="zoom-btn" id="zoomIn" title="Aumentar Zoom">+</button>
-      <button class="zoom-btn" id="zoomReset" title="Ajustar" style="font-size: 13px; font-weight:bold;">1:1</button>
+      <button type="button" class="zoom-btn" id="zoomIn" title="Aumentar Zoom">+</button>
+      <button type="button" class="zoom-btn" id="zoomReset" title="Ajustar" style="font-size: 13px; font-weight:bold;">1:1</button>
       <a href="${artData.caminho}" download="${artData.id || 'arte-vigi'}.jpg" class="zoom-btn" title="Baixar Arte em Alta Resolução" style="text-decoration:none; width:auto; padding:0 12px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:5px;">⬇ Baixar</a>
     `;
 
@@ -2807,7 +2920,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toggleUpvote(reqId) {
-    const requests = JSON.parse(localStorage.getItem("vigi_requests") || "[]");
+    // Usa os helpers do Kanban para respeitar a migração de vínculos e a
+    // persistência centralizada (antes lia/escrevia localStorage direto).
+    const requests = getRequests();
     const reqIndex = requests.findIndex(r => r.id === reqId);
     if (reqIndex === -1) return;
 
@@ -2822,28 +2937,48 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.removeItem(storageKey);
     }
 
-    localStorage.setItem("vigi_requests", JSON.stringify(requests));
+    saveRequests(requests);
     loadRequests();
   }
 
+  // Abre o material vinculado a uma solicitação (ou favorito).
+  // Formato esperado: { id, type: "video" | "arte" | "manual", title }
   function handleAccessMaterial(link) {
-    if (!link) return;
-    
+    if (!link || !link.id || !link.type) return;
+
     if (link.type === "video") {
       switchTab("videos");
       const videoData = VIGI_DATA.videos.find(v => v.id === link.id);
       if (videoData) {
         setTimeout(() => openVideoPlayer(videoData), 200);
+      } else {
+        showAccessError(link);
       }
     } else if (link.type === "arte") {
       switchTab("artes");
       const artData = VIGI_DATA.artes.find(a => a.id === link.id);
       if (artData) {
         setTimeout(() => openLightbox(artData), 200);
+      } else {
+        showAccessError(link);
       }
     } else if (link.type === "manual") {
       switchTab("manuais");
-      setTimeout(() => openGuide(link.id), 200);
+      // O guia só existe no DOM se a aba de manuais já tiver renderizado
+      const guideExists = VIGI_DATA.manuais.some(m => m.id === link.id);
+      if (guideExists) {
+        setTimeout(() => openGuide(link.id), 200);
+      } else {
+        showAccessError(link);
+      }
+    }
+  }
+
+  // Feedback visual quando o material vinculado não está mais no acervo.
+  function showAccessError(link) {
+    if (window.showToast) {
+      const nome = link.title || link.id;
+      window.showToast(`Material "${nome}" não está mais disponível no acervo.`, "warning", "⚠️");
     }
   }
 
@@ -2979,7 +3114,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Criar dots
     dotsContainer.innerHTML = TIPS.map((_, i) =>
-      `<button class="dash-tip-dot ${i === 0 ? 'active' : ''}" data-dot="${i}" aria-label="Dica ${i+1}"></button>`
+      `<button type="button" class="dash-tip-dot ${i === 0 ? 'active' : ''}" data-dot="${i}" aria-label="Dica ${i+1}"></button>`
     ).join("");
 
     function goToTip(idx) {

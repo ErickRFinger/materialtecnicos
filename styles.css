@@ -2439,7 +2439,7 @@ select.form-control option {
   border-radius: 8px;
   border: 1px solid var(--border-color);
   background: rgba(255, 255, 255, 0.05);
-  color: var(--text-color);
+  color: var(--text-main);
   font-family: var(--font-family);
   font-size: 0.9rem;
   outline: none;
@@ -2447,7 +2447,7 @@ select.form-control option {
 }
 
 .sidebar-search input:focus {
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
@@ -2470,7 +2470,7 @@ select.form-control option {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(255, 255, 255, 0.1);
-  border-left-color: var(--primary-color);
+  border-left-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   z-index: -1;
@@ -2581,7 +2581,7 @@ select.form-control option {
 .login-field label {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -2607,7 +2607,7 @@ select.form-control option {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   color: #f1f5f9;
-  font-family: var(--font-primary);
+  font-family: var(--font-family);
   font-size: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
@@ -2637,7 +2637,7 @@ select.form-control option {
 }
 
 .toggle-pass:hover {
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 .login-error {
@@ -2675,7 +2675,7 @@ select.form-control option {
   border: none;
   border-radius: 10px;
   color: #fff;
-  font-family: var(--font-primary);
+  font-family: var(--font-family);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -2751,7 +2751,7 @@ select.form-control option {
   border: none;
   border-radius: 8px;
   color: #fff;
-  font-family: var(--font-primary);
+  font-family: var(--font-family);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -2782,7 +2782,7 @@ select.form-control option {
   border: 1px solid rgba(239, 68, 68, 0.25);
   border-radius: 8px;
   color: var(--color-danger);
-  font-family: var(--font-primary);
+  font-family: var(--font-family);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -2817,8 +2817,8 @@ select.form-control option {
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  font-family: var(--font-primary);
+  color: var(--text-muted);
+  font-family: var(--font-family);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -2827,7 +2827,7 @@ select.form-control option {
 
 .kanban-filter-pill:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  color: var(--text-main);
   border-color: var(--border-hover);
 }
 
@@ -2859,7 +2859,7 @@ select.form-control option {
 .kanban-search-input {
   background: transparent;
   border: none;
-  color: var(--text-primary);
+  color: var(--text-main);
   font-family: inherit;
   font-size: 13px;
   outline: none;
@@ -2880,7 +2880,7 @@ select.form-control option {
 }
 .kanban-form-inner  { padding: 24px; }
 .kanban-form-header-wrap { margin-bottom: 16px; }
-.kanban-form-title  { font-size: 16px; font-weight: 700; color: var(--text-primary); margin: 0 0 6px; }
+.kanban-form-title  { font-size: 16px; font-weight: 700; color: var(--text-main); margin: 0 0 6px; }
 .kanban-form-sub    { font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4; }
 
 /* Chips de Inspiração Rápida */
@@ -2913,8 +2913,8 @@ select.form-control option {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  color: var(--text-secondary);
-  font-family: var(--font-primary);
+  color: var(--text-muted);
+  font-family: var(--font-family);
   font-size: 11px;
   font-weight: 600;
   padding: 5px 10px;
@@ -2942,12 +2942,12 @@ select.form-control option {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-muted);
-  font-family: var(--font-primary);
+  font-family: var(--font-family);
   font-size: 13px;
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
 }
-.kanban-cancel-btn:hover { border-color: var(--border-hover); color: var(--text-secondary); }
+.kanban-cancel-btn:hover { border-color: var(--border-hover); color: var(--text-muted); }
 
 /* QUADRO */
 .kanban-board {
@@ -2978,7 +2978,7 @@ select.form-control option {
   border-bottom: 1px solid var(--border-color);
 }
 .kanban-col-dot   { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.kanban-col-title { flex-grow: 1; color: var(--text-secondary); }
+.kanban-col-title { flex-grow: 1; color: var(--text-muted); }
 .kanban-col-count {
   background: rgba(255,255,255,0.06);
   color: var(--text-muted);
@@ -3044,13 +3044,13 @@ select.form-control option {
 }
 .kanban-delete-btn:hover { color: var(--color-danger); background: rgba(239,68,68,0.1); }
 
-.kanban-card-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 6px; line-height: 1.4; }
+.kanban-card-title { font-size: 13px; font-weight: 600; color: var(--text-main); margin: 0 0 6px; line-height: 1.4; }
 .kanban-card-desc  { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0 0 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
 .kanban-admin-reply {
   background: rgba(59, 130, 246, 0.08); border-left: 3px solid var(--color-primary);
   border-radius: 0 6px 6px 0; padding: 8px 10px; font-size: 11px;
-  color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5;
+  color: var(--text-muted); margin-bottom: 10px; line-height: 1.5;
 }
 
 .kanban-card-footer {
@@ -3064,15 +3064,15 @@ select.form-control option {
 .kanban-move-btn {
   background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);
   border-radius: 5px; color: var(--text-muted); font-size: 11px;
-  padding: 3px 8px; cursor: pointer; transition: all 0.15s; font-family: var(--font-primary);
+  padding: 3px 8px; cursor: pointer; transition: all 0.15s; font-family: var(--font-family);
 }
-.kanban-move-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-secondary); border-color: var(--border-hover); }
+.kanban-move-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-muted); border-color: var(--border-hover); }
 
 .kanban-upvote-btn {
   display: flex; align-items: center; gap: 4px;
   background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);
   border-radius: 5px; color: var(--text-muted); font-size: 11px;
-  padding: 3px 8px; cursor: pointer; transition: all 0.15s; font-family: var(--font-primary);
+  padding: 3px 8px; cursor: pointer; transition: all 0.15s; font-family: var(--font-family);
 }
 .kanban-upvote-btn:hover, .kanban-upvote-btn.active {
   background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: var(--color-primary);
@@ -3087,7 +3087,7 @@ select.form-control option {
   border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 5px;
   color: #10b981;
-  font-family: var(--font-primary);
+  font-family: var(--font-family);
   font-size: 11px;
   font-weight: 600;
   padding: 3px 8px;
@@ -3149,7 +3149,7 @@ select.form-control option {
 .dash-title {
   font-size: 22px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-main);
   margin: 0;
   line-height: 1.2;
 }
@@ -3185,7 +3185,7 @@ select.form-control option {
   text-align: left;
   transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
   min-height: 100px;
-  font-family: var(--font-primary);
+  font-family: var(--font-family);
   position: relative;
   overflow: hidden;
 }
@@ -3320,7 +3320,7 @@ select.form-control option {
 .dash-stat-num {
   font-size: 22px;
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--text-main);
   line-height: 1;
 }
 .dash-stat-lbl {
@@ -3447,7 +3447,7 @@ select.form-control option {
 .dash-fav-title {
   font-size: 15px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   margin: 0 0 14px;
 }
 
@@ -5411,7 +5411,7 @@ select.form-control option {
   padding: 8px 14px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: var(--transition-fast);
+  transition: var(--transition-smooth);
 }
 
 .dash-view-all-btn:hover {

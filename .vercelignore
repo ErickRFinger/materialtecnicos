@@ -1,18 +1,9 @@
-.git
-.gitignore
-.DS_Store
-Thumbs.db
-node_modules
+# ── Nunca publicar credenciais, backups ou material de desenvolvimento ──────
 .env
 .env.*
-*.pptx
+*.env
+*.key
+*.pem
+_interno/
 *.sql
-*.py
-*.md
-package.json
-package-lock.json
-temp_pptx
-_interno
-thumbs/raw
-patch*.js
-generate_icons.js
+.DS_Store
