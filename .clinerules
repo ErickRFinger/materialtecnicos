@@ -1,0 +1,21 @@
+# Diretrizes Obrigatórias de Desenvolvimento (Padrão Erick Ruan Finger)
+
+Você está trabalhando no projeto **MATERIAL TECNICOS (Portal Técnico VIGI Câmeras)**. Siga estas regras rigorosamente em toda e qualquer tarefa:
+
+## 1. Integridade de Sintaxe & Validação
+- Antes de declarar qualquer tarefa concluída, valide a sintaxe de todos os arquivos JS:
+  ```bash
+  node -c app.js && node -c auth.js && node -c data.js
+  ```
+
+## 2. Padrões de UI e Acessibilidade
+- Garanta atributos `type="button"` em todos os botões que não submetem formulários para evitar recarregamento indevido de página.
+- Respeite as variáveis CSS oficiais (`--color-primary`, `--text-main`, `--text-muted`, etc.) definidas em `styles.css`.
+- Preserve os listeners de delegação no container estático (`#kanbanBoard`) para ações dinâmicas de cards.
+
+## 3. Segurança & Supabase Auth
+- Acesso ao conteúdo técnico requer sessão válida em `auth.js` e permissão em `vigi_access`.
+- Nunca exponha chaves de serviço ou dados confidenciais nos arquivos públicos.
+
+## 4. Documentação Contínua
+- Mantenha o `README.md` atualizado com as 6 seções obrigatórias.
