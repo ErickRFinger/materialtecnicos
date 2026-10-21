@@ -358,13 +358,14 @@ body {
 
 /* Hero Banner */
 .welcome-banner {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.05) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(139, 92, 246, 0.10) 50%, rgba(16, 185, 129, 0.08) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.35);
   border-radius: var(--radius-lg);
   padding: 32px;
   margin-bottom: 40px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.30), 0 0 40px rgba(59, 130, 246, 0.12);
 }
 
 .welcome-banner::after {
@@ -374,7 +375,7 @@ body {
   top: -50px;
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.32) 0%, transparent 70%);
   filter: blur(20px);
   pointer-events: none;
 }
@@ -2664,6 +2665,9 @@ select.form-control option {
 }
 
 .login-btn {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
   width: 100%;
   padding: 13px;
   margin-top: 4px;
@@ -2694,6 +2698,25 @@ select.form-control option {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Efeito shimmer — brilho que percorre o botao de login */
+.login-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  pointer-events: none;
+  animation: vigi-shimmer 2.8s infinite;
+}
+
+@keyframes vigi-shimmer {
+  0%   { left: -100%; }
+  60%  { left: 100%; }
+  100% { left: 100%; }
 }
 
 .login-footer {
@@ -3716,6 +3739,7 @@ select.form-control option {
 /* Spinner no botão */
 .login-spinner {
   margin-left: 6px;
+  color: #fff;
   animation: spin 1s linear infinite;
   display: inline-block;
 }
@@ -3881,14 +3905,14 @@ select.form-control option {
 .thumbnail-overlay {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
-  background: linear-gradient(to top, rgba(6,13,34,0.38) 0%, rgba(6,13,34,0.02) 45%, rgba(6,13,34,0.16) 100%);
+  background: linear-gradient(to top, rgba(6,13,34,0.45) 0%, rgba(6,13,34,0.08) 45%, rgba(6,13,34,0.22) 100%);
   z-index: 1;
   pointer-events: none;
   transition: background 0.3s ease;
 }
 
 .video-card:hover .thumbnail-overlay {
-  background: linear-gradient(to top, rgba(6,13,34,0.55) 0%, rgba(6,13,34,0.12) 50%, rgba(6,13,34,0.25) 100%);
+  background: linear-gradient(to top, rgba(6,13,34,0.68) 0%, rgba(6,13,34,0.20) 50%, rgba(6,13,34,0.34) 100%);
 }
 
 .video-thumbnail {
@@ -3929,13 +3953,17 @@ select.form-control option {
   z-index: 2;
   width: 48px;
   height: 48px;
-  background-color: rgba(15, 23, 42, 0.62);
-  border: 1.5px solid rgba(255, 255, 255, 0.75);
-  opacity: 0.86;
+  background-color: rgba(59, 130, 246, 0.55);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  opacity: 0.75;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
 }
 
 .video-card:hover .play-overlay-btn {
   opacity: 1;
+  transform: scale(1.15);
+  box-shadow: 0 0 24px rgba(59, 130, 246, 0.55), 0 0 8px rgba(255, 255, 255, 0.25);
 }
 
 /* ==========================================================================
