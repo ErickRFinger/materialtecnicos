@@ -8,6 +8,7 @@ _interno/
 *.sql
 .DS_Store
 *.md
+vault/
 .clinerules
 scripts/
 CLAUDE.md
