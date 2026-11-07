@@ -7,3 +7,9 @@
 _interno/
 *.sql
 .DS_Store
+*.md
+.clinerules
+scripts/
+CLAUDE.md
+AGENTS.md
+GEMINI.md
