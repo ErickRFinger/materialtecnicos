@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
   <title>Portal de Suporte Técnico - VIGI Câmeras</title>
+  <script>
+    try { if (localStorage.getItem('vigi_material_theme') === 'light') document.documentElement.classList.add('light'); } catch (e) {}
+    try { if (/[?&]lite=1/.test(location.search) || matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('lite'); } catch (e) {}
+  </script>
   <!-- Favicon e PWA -->
   <link rel="icon" type="image/png" href="VIGI.png">
   <link rel="apple-touch-icon" href="VIGI.png">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1a1c23">
+  <meta name="theme-color" content="#030610">
   <link rel="stylesheet" href="styles.css">
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
@@ -19,6 +23,10 @@
 
   <!-- ===== TELA DE AUTH (LOGIN / CADASTRO) ===== -->
   <div class="login-overlay" id="loginOverlay">
+    <button type="button" class="theme-toggle login-theme-toggle" id="loginThemeBtn" data-theme-toggle title="Alternar tema" aria-label="Alternar tema">
+      <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+      <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+    </button>
     <div class="login-card">
       <div class="login-logo">
         <img src="VIGI.png" alt="VIGI Logo">
@@ -294,6 +302,10 @@
         </div>
         
         <div class="user-profile" id="userProfileArea">
+          <button type="button" class="theme-toggle" id="themeBtn" data-theme-toggle title="Alternar tema" aria-label="Alternar tema">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+          </button>
           <button type="button" class="admin-shield-btn" id="openAdminModalBtn" style="display:none;" title="Central de Acessos e Privacidade (Admin)">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span>Acessos</span>
@@ -566,7 +578,7 @@
             <h1 class="section-title">Guias de Processo Simplificados</h1>
             <p class="section-subtitle">Siga os checklists para garantir que cada instalação siga o padrão VIGI e evite retrabalhos.</p>
           </div>
-          <button type="button" class="filter-btn" id="btnResetAllChecklists" style="display: flex; align-items: center; gap: 8px; border-color: var(--color-danger); color: var(--color-danger); background: rgba(239, 68, 68, 0.05); font-weight: 600; padding: 10px 16px; transition: var(--transition-smooth); cursor: pointer;">
+          <button type="button" class="filter-btn" id="btnResetAllChecklists" style="display: flex; align-items: center; gap: 8px; border-color: var(--bad-line); color: var(--bad); background: var(--bad-soft); font-weight: 600; padding: 10px 16px; transition: var(--transition-smooth); cursor: pointer;">
             🗑️ Limpar Checklists
           </button>
         </div>
@@ -932,6 +944,27 @@
   <script src="auth.js"></script>
   <script src="app.js"></script>
   <script>
+    function syncThemeControls() {
+      const light = document.documentElement.classList.contains('light');
+      const label = light ? 'Ativar tema escuro' : 'Ativar tema claro';
+      document.querySelectorAll('[data-theme-toggle]').forEach(button => {
+        button.title = label;
+        button.setAttribute('aria-label', label);
+        button.setAttribute('aria-pressed', String(light));
+      });
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = light ? '#eef2f6' : '#030610';
+    }
+
+    document.querySelectorAll('[data-theme-toggle]').forEach(button => {
+      button.addEventListener('click', () => {
+        const light = document.documentElement.classList.toggle('light');
+        try { localStorage.setItem('vigi_material_theme', light ? 'light' : 'dark'); } catch (e) {}
+        syncThemeControls();
+      });
+    });
+    syncThemeControls();
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')

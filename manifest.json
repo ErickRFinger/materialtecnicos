@@ -3,8 +3,8 @@
   "short_name": "VIGI Técnicos",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#1a1c23",
-  "theme_color": "#1a1c23",
+  "background_color": "#030610",
+  "theme_color": "#030610",
   "description": "Portal offline e central de vídeos, artes e manuais VIGI Câmeras",
   "icons": [
     {

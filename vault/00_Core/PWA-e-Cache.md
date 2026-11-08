@@ -10,7 +10,7 @@ O `sw.js` precacheia o shell do app, incluindo `supabase-config.js`. Assim, alte
 
 ## Regra
 
-Suba `CACHE_NAME` a cada mudança de configuração. Na ativação, o worker remove caches antigos; HTML/JS/CSS usam Network-First, enquanto imagens e fontes usam Cache-First. Chamadas externas não passam pelo cache do worker.
+Suba `CACHE_NAME` a cada mudança de configuração ou do shell (HTML/CSS/JS). Na ativação, o worker remove caches antigos; HTML/JS/CSS usam Network-First, enquanto imagens e fontes usam Cache-First. Chamadas externas não passam pelo cache do worker. O shell visual de novembro de 2026 usa v19; tokens e temas estão em [[00_Core/Design-System|Design System]].
 
 ## Atenção
 
