@@ -3,7 +3,7 @@
    ========================================================================== */
 
 const SUPABASE_URL  = "https://hnfhrjgzeivzrcpumkyk.supabase.co";
-const SUPABASE_ANON = "COLE_AQUI_A_SB_PUBLISHABLE_KEY";
+const SUPABASE_ANON = "sb_publishable_ekOWLdVoQWfk6UANQPiYDg_o6bkYCmX";
 if (!SUPABASE_ANON.startsWith('sb_publishable_')) {
   console.error('[config] SUPABASE_ANON precisa ser a publishable key sb_publishable_...');
 }
